@@ -1,0 +1,12 @@
+Contratos com as vilas: mercenários por 5, 10 ou 15 minutos ou até a morte, herói da vila, guarnição, proteção, aliança juramentada e rota fixa.
+Um mensageiro leva cada proposta a pé; a vila aceita, recusa ou pede mais. Renovar sai 10% mais barato.
+Honra: quem cumpre contratos paga menos; quem quebra, saqueia ou ataca vilas paga mais e é recusado.
+Cada vila tem tropas de elite e um herói próprios.
+Exército com hierarquia: o de maior patente comanda, empates vão a voto, grupos com chefes e subchefes.
+Comandos de patente: Parede de escudos, Avante!, Segurar a linha e Grito de guerra.
+Ordens ao general: defender, atacar pelo flanco, recuar, patrulhar ou deixar livre.
+Batedores estudam o terreno e o general propõe um plano de defesa e de ataque, obra por obra, com o motivo.
+Névoa de guerra opcional.
+Economia interna: impostos, humor do povo, feira com fama, soldo, caravanas e pedágio.
+Conquista de vilas, vassalos, revoltas e leilão; o Reino Vermelho faz tudo isso também, com o Mestre Rubro.
+Conselho: um lugar só para pedidos, exército, contratos, estradas, economia e regras.

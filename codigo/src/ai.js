@@ -22,7 +22,7 @@ function aiScan(){
     if(e.team===2){
       if(D.unit){
         if(e.kind==='pawn'){I.pawns.push(e);if(!e.order)I.idle.push(e);else if(e.order.type==='gather')I.gath[e.order.res]++;}
-        else if(D.holy)I.monks.push(e);else if(!D.boss&&!e.wave&&!D.cart&&!e.svc)I.army.push(e);
+        else if(D.holy)I.monks.push(e);else if(!D.boss&&!e.wave&&!D.cart&&!e.svc&&!D.civil&&!e.retreat)I.army.push(e);
       }else if(D.building){(I.blds[e.kind]=I.blds[e.kind]||[]).push(e);if(!e.built)I.unbuilt.push(e);}
     }else if(e.team===1){
       if(D.unit){if(D.mil){I.foeArmy.push(e);I.foeMil[baseKind(e.kind)]=(I.foeMil[baseKind(e.kind)]||0)+1;}else I.foePawns.push(e);}
@@ -58,6 +58,41 @@ function aiUpdate(dt){
   if(I.goal&&!I.T.research&&afford(2,I.goal.cost)){if(startResearch(2)==='ok')I.goal=null;}
   aiTrain(I);
   aiArmy(I);
+  aiDiplo(I);
+}
+// ---------------------------------------------------------------- diplomacy: the Red Kingdom hires, protects, swears, outbids, conquers
+function aiDiplo(I){
+  const A=S.ai;if(!S.towns||!S.towns.length||S.t<(A.dipNext||200))return;A.dipNext=S.t+22;
+  if(svcList().list.some(m=>m.team===2&&m.type==='contract'&&m.state==='run'))return;
+  const gold=I.res.gold,mine=ctrList().filter(c=>c.team===2&&c.state==='active'),c=I.castle;
+  const ok=S.towns.filter(T=>!townFoe(T.i,2)&&(!T.owner||T.owner===2));
+  if(!ok.length)return;
+  const fav=ok.slice().sort((a,b)=>(friendOf(b,2)-friendOf(a,2))||(hyp(a.x-c.x,a.y-c.y)-hyp(b.x-c.x,b.y-c.y)));
+  const best=fav[0];
+  // 1. mercenaries for a big push, or when the village is in trouble
+  if((A.attacking||I.threats.length>=4)&&!mine.some(k=>k.kind==='merc'||k.kind==='mercLife')&&gold>=300){
+    const T=fav.find(t=>friendOf(t,2)>=1);if(T&&proposeContract(2,'merc',T.i,{min:A.attacking?5:10})==='ok')return;
+  }
+  // 2. protection from the friendliest town
+  if(!mine.some(k=>k.kind==='protect'||k.kind==='loyalty')&&friendOf(best,2)>=2&&gold>=280&&S.t>480){
+    if(!loyalTo(best)&&proposeContract(2,'protect',best.i)==='ok')return;
+  }
+  // 3. rich and well liked: swear an alliance, outbidding the player if needed
+  if(friendOf(best,2)>=3&&gold>=650&&!mine.some(k=>k.kind==='loyalty')&&S.t>720){
+    const pc=activeCtr(best,'loyalty',1)||activeCtr(best,'protect',1);
+    if(pc&&S.t>(A.bidT||0)){A.bidT=S.t+300;const b=bidFor(2,best.i);if(b&&afford(2,{gold:b.offer})){
+      ask({kind:'bid',bid:b,cost:{gold:b.cover},who:`${best.name} avisa`,av:'av14',loc:{x:best.x,y:best.y},text:`O Reino Vermelho ofereceu ${b.offer} de ouro para ${best.name} quebrar ${CTR[pc.kind].name.toLowerCase()} com vocês e jurar com ele. Se vocês cobrirem com ${b.cover} de ouro, ficamos do seu lado. Cobrem?`});return;}}
+    if(!pc&&proposeContract(2,'loyalty',best.i)==='ok')return;
+  }
+  // 4. a hero for the hard and insane generals
+  if(S.diff.key!=='normal'&&friendOf(best,2)>=4&&gold>=900&&!mine.some(k=>k.kind==='hero')&&proposeContract(2,'hero',best.i)==='ok')return;
+  // 5. buy back a town the player conquered
+  for(const T of S.towns)if(T.owner===1&&(T.loyal||0)<55&&gold>=ctrTerms('liberate',T,2).cost.gold+200&&S.t>(A.libT||0)){A.libT=S.t+400;if(proposeContract(2,'liberate',T.i)==='ok')return;}
+  // 6. conquest: late, rarely, a weak town close to home
+  if(S.diff.key!=='normal'&&S.t>1500&&I.army.length>=16&&!A.attacking&&!S.towns.some(T=>T.siege)&&Math.random()<(S.diff.key==='insano'?.25:.1)){
+    const T=S.towns.filter(t=>!t.owner&&loyalTo(t)!==2&&hyp(t.x-c.x,t.y-c.y)<45*TS&&townGuardsNear(t,16*TS)<=6).sort((a,b)=>hyp(a.x-c.x,a.y-c.y)-hyp(b.x-c.x,b.y-c.y))[0];
+    if(T&&startConquest(2,T.i)==='ok'){A.siegeTown=T.i;for(const u of I.army.slice(0,Math.ceil(I.army.length*.6))){u.order={type:'move',x:T.x+(Math.random()-.5)*60,y:T.y+(Math.random()-.5)*40,amove:true};u.path=null;}}
+  }
 }
 // the next age is the long-term goal once the economy is big enough for it
 function aiGoal(I){
@@ -204,7 +239,7 @@ function aiPlan(I){
   const e=I.era,ins=S.diff.key==='insano',hard=S.diff.key!=='normal';
   const p=[];
   if(I.pawns.length>=7)p.push(['barracks',1]);
-  if(e>=2){p.push(['archery',1]);if(I.pawns.length>=13)p.push(['tower',1]);if(ins)p.push(['barracks',2]);}
+  if(e>=2){p.push(['archery',1]);if(I.pawns.length>=13)p.push(['tower',1]);if(ins)p.push(['barracks',2]);if(I.pawns.length>=16)p.push(['market',1]);}
   if(e>=3){p.push(['monastery',1]);p.push(['tower',2]);if(hard)p.push(['barracks',2]);}
   if(e>=4){p.push(['archery',2]);p.push(['tower',3]);if(ins)p.push(['barracks',3]);}
   if(e>=5){if(hard)p.push(['monastery',2]);p.push(['tower',4]);}
@@ -317,6 +352,7 @@ function aiRaidTarget(I){
 }
 function aiArmy(I){
   const A=S.ai;
+  if(A.siegeTown!=null){const T=S.towns&&S.towns[A.siegeTown];if(!T||!T.siege||T.siege.team!==2){A.siegeTown=null;}else if(!A.defending){for(const u of I.army){if(!u.order||u.order.type==='move'&&!u.order.amove){u.order={type:'move',x:T.x+(Math.random()-.5)*60,y:T.y+(Math.random()-.5)*40,amove:true};u.path=null;}}return;}}
   if(A.defending||!I.rally)return;
   const raidIds=new Set(A.raid?A.raid.ids:[]);
   const main=I.army.filter(u=>!raidIds.has(u.id));
@@ -384,8 +420,14 @@ function aiArmy(I){
     A.target=tgt.id;
   }
   const c=centerOf(tgt);
+  const fl=main.length>=10?armyFlank(2,main,c):null;
+  if(fl&&!A.flankSaid){A.flankSaid=S.t;HOOK.army('flank',2,byId.get(fl.q.lead),{});}
   for(const u of main.concat(I.monks)){
     const o=u.order;
+    if(fl&&fl.ids.has(u.id)&&!u.flankDone){
+      if(hyp(u.x-fl.wp.x,u.y-fl.wp.y)<90){u.flankDone=true;}
+      else{if(!o||o.type==='move'&&(!o.flank)){u.order={type:'move',x:fl.wp.x+(Math.random()-.5)*40,y:fl.wp.y+(Math.random()-.5)*40,amove:true,flank:true};u.path=null;}continue;}
+    }
     if(!o||(o.type==='move'&&(!o.amove||hyp(o.x-c.x,o.y-c.y)>60))){u.order={type:'move',x:c.x+(Math.random()-.5)*50,y:c.y+(Math.random()-.5)*50,amove:true};u.path=null;}
   }
   // retreat when the fight is lost, to save the army
@@ -396,7 +438,7 @@ function aiArmy(I){
     for(const b of I.foeBlds)if(DEF[b.kind].dmg&&distRect(mid.x,mid.y,rectOf(b))<260)foes.push(b);
     const mine=strength(near),theirs=strength(foes);
     if(main.length<=2||(theirs>0&&mine<theirs*.5)){
-      A.attacking=false;A.retreatT=S.t;
+      A.attacking=false;A.retreatT=S.t;A.flankSaid=0;for(const u of main)u.flankDone=false;
       for(const u of main.concat(I.monks)){u.order={type:'move',x:I.rally.x+(Math.random()-.5)*80,y:I.rally.y+(Math.random()-.5)*60};u.path=null;}
     }
   }

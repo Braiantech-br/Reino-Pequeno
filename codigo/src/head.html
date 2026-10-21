@@ -181,11 +181,12 @@
     <div class="chip" title="População"><img src="assets/ic_pawn.png" alt=""><span id="r-pop">0/0</span></div>
     <button class="chip era" id="c-era" type="button" title="Ver as eras"><img src="assets/ic_monk.png" alt=""><span id="r-era">Era I</span><i id="r-era-bar"></i></button>
     <button class="chip foe" id="c-foe" type="button" title="Reino Vermelho"><img src="assets/ic_enemy.png" alt=""><span id="r-foe">Era I</span><i id="r-foe-bar"></i></button>
+    <button class="chip mood" id="c-pop" type="button" title="Humor do povo e impostos"><span class="face" id="r-face">☺</span><span id="r-mood">60</span><i id="r-mood-bar"></i></button>
     <div class="spacer"></div>
     <button class="tbtn" id="b-idle" type="button" title="Selecionar peão ocioso (.)">Ociosos</button>
     <button class="tbtn" id="b-army" type="button" title="Selecionar todo o exército (E)">Exército</button>
  <button class="tbtn bell" id="b-sos" type="button" title="Sino das vilas: pedir ajuda e responder pedidos de socorro" hidden><svg class="bell-ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1.2c.6 0 1 .4 1 1v.7a4.6 4.6 0 0 1 3.6 4.5v2.9l1.4 1.7v.8H2v-.8l1.4-1.7V7.4A4.6 4.6 0 0 1 7 2.9v-.7c0-.6.4-1 1-1zM6.2 13.4h3.6a1.8 1.8 0 0 1-3.6 0z"/></svg><span id="sos-lbl">Vilas</span><i id="sos-n" hidden>0</i></button>
-    <button class="tbtn" id="b-svc" type="button" title="Serviços de entrega e relatórios (J)">Serviços<b id="svc-n" hidden></b></button>
+    <button class="tbtn" id="b-svc" type="button" title="Conselho: pedidos, exército, contratos, estradas, economia e regras (J)">Conselho<b id="svc-n" hidden></b></button>
     <button class="tbtn" id="b-speed" type="button" title="Velocidade do jogo (V)">1x</button>
     <button class="tbtn" id="b-sound" type="button" title="Som (M)">Som</button>
     <button class="tbtn" id="b-pause" type="button" title="Pausar (P)">Pausar</button>
@@ -226,7 +227,7 @@
       <h4 class="lbl">Modo de jogo</h4>
       <div class="modes" role="radiogroup" aria-label="Modo de jogo">
         <label><input type="radio" name="mode" value="campaign" checked><span><b>Campanha</b><em>A Coroa de Pedravale: 5 capítulos com história, herói e o rei para proteger.</em></span></label>
-        <label><input type="radio" name="mode" value="skirmish"><span><b>Batalha Rápida</b><em>Você contra o Reino Vermelho num mapa grande. Quatro vilas neutras crescem, negociam e podem te ajudar; bandidos rondam as estradas.</em></span></label>
+        <label><input type="radio" name="mode" value="skirmish"><span><b>Batalha Rápida</b><em>Você contra o Reino Vermelho num mapa grande. Quatro vilas neutras crescem, negociam, alugam tropas e heróis e podem ser aliadas ou conquistadas; bandidos rondam as estradas.</em></span></label>
         <label><input type="radio" name="mode" value="survival"><span><b>Defesa do Rei</b><em>Ondas sem fim e um chefe a cada cinco. Quantas você aguenta?</em></span></label>
       </div>
       <div id="hero-box">
@@ -243,6 +244,7 @@
         <label><input type="radio" name="diff" id="d-dificil" value="dificil" checked><span>Difícil<em>Ataques mais fortes</em></span></label>
         <label><input type="radio" name="diff" id="d-insano" value="insano"><span>Insano<em>Sem trégua</em></span></label>
       </div>
+      <label class="sw opt-fog" id="opt-fog-box"><input type="checkbox" id="opt-fog"><span><b>Névoa de guerra</b> · só se vê o que as suas tropas, prédios e vilas aliadas enxergam. Batedores revelam o mapa.</span></label>
       <h4 class="lbl">Mapa</h4>
       <div class="mapbox">
         <canvas id="map-prev" width="192" height="128" aria-label="Prévia do mapa"></canvas>
@@ -323,11 +325,13 @@
       <div class="row"><button class="btn alt" id="b-sos-close" type="button">Fechar</button></div>
     </div>
   </div>
-  <div class="overlay" id="ov-svc" hidden>
-    <div class="sheet wide">
-      <div class="kicker">Economia e estradas</div>
-      <h2>Serviços de entrega</h2>
-      <p id="svc-sum"></p>
+  <div class="overlay" id="ov-council" hidden>
+    <div class="sheet wide council">
+      <div class="c-top"><div><div class="kicker">O seu reino</div><h2>Conselho</h2></div><button class="btn alt sm-btn" id="b-c-close" type="button">Fechar</button></div>
+      <nav class="c-tabs" id="c-tabs" aria-label="Assuntos do Conselho"></nav>
+      <div id="c-body" class="c-body"></div>
+      <div id="c-road" class="c-body" hidden>
+        <p id="svc-sum"></p>
       <h4 class="lbl">Em andamento</h4>
       <div id="svc-run" class="svc-list"></div>
       <h4 class="lbl">Relatórios</h4>
@@ -347,7 +351,7 @@
           <li><b>Livre mercado:</b> o Reino Vermelho também negocia com as vilas e mexe nos preços. As carroças dele podem ser saqueadas: metade da carga fica com você.</li>
         </ol>
       </details>
-      <div class="row"><button class="btn" id="b-svc-close" type="button">Fechar</button></div>
+      </div>
     </div>
   </div>
 
@@ -364,6 +368,7 @@
       <p style="font-size:13px">Cada nível acima do inimigo dá mais dano (+20%, +35%, +50%) e arqueiros atiram mais longe; atacar morro acima enfraquece. Torres sobem com o botão Subir torre: cada nível dá +20% de alcance e +15% de dano. O engenheiro faz os degraus e as escadas sozinho.</p>
       <h4 style="margin-top:14px">Patentes</h4>
       <p style="font-size:13px">A cada 3 soldados inimigos derrotados (do Reino Vermelho ou bandidos) a unidade sobe uma patente: +10% de vida, +12% de dano e cura metade da vida. A partir de Sargento (3ª patente) as feridas se curam sozinhas fora de combate, e o soldado pode pedir para virar médico de campo: você decide. Converter com o monge também conta.</p>
+      <p style="font-size:13px"><b>Hierarquia:</b> o soldado de maior patente comanda o exército (entre iguais, a tropa vota). Sargentos e acima lideram grupos; Tenente, Capitão e Major têm subchefes. Patentes altas regeneram mais rápido e liberam comandos: Parede de escudos (Tenente), Avante! (Capitão), Segurar a linha (Major) e Grito de guerra (Comandante). Se o chefe cai, o próximo assume e o grupo fica abalado por alguns segundos. Ordens ao general e grupos ficam no Conselho (tecla J).</p>
       <p class="meta" style="font-size:12px">Aldeões também evoluem: cada recurso coletado treina a profissão (Lenhador, Minerador, Coletor, Construtor), até +40% de velocidade. Feridos bebem na taberna e se curam. Soldado 3 · Cabo 6 · Sargento 9 · Tenente 12 · Capitão 15 · Major 18 · Comandante 21</p>
       <div class="row"><button class="btn" id="b-eras-close" type="button">Fechar</button></div>
     </div>

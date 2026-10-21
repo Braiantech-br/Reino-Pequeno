@@ -1,0 +1,20 @@
+#!/bin/bash
+# Reino Pequeno for macOS: copies the game to ~/Library/Application Support/ReinoPequeno and opens it
+# in its own window (Chrome, Edge, Brave or Chromium in app mode); without them, in Safari.
+RES="$(cd "$(dirname "$0")/../Resources" && pwd)"
+DATA="$HOME/Library/Application Support/ReinoPequeno"
+mkdir -p "$DATA"
+SRC="$RES/ReinoPequeno.html"; DST="$DATA/ReinoPequeno.html"
+cmp -s "$SRC" "$DST" || cp "$SRC" "$DST"
+urlenc() { local LC_ALL=C s="$1" out="" c i; for ((i=0;i<${#s};i++)); do c="${s:i:1}"; case "$c" in [a-zA-Z0-9/._~-]) out+="$c";; *) out+=$(printf '%%%02X' "'$c");; esac; done; printf '%s' "$out"; }
+URL="file://$(urlenc "$DST")"
+for app in "Google Chrome" "Microsoft Edge" "Brave Browser" "Chromium"; do
+  for root in "/Applications" "$HOME/Applications"; do
+    BIN="$root/$app.app/Contents/MacOS/$app"
+    if [ -x "$BIN" ]; then
+      exec "$BIN" --app="$URL" --user-data-dir="$DATA/navegador" --no-first-run --no-default-browser-check \
+        --window-size=1280,800 --autoplay-policy=no-user-gesture-required
+    fi
+  done
+done
+open -a Safari "$DST" || open "$DST"

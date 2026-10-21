@@ -105,14 +105,47 @@ function promoteEngineer(g,r){
 const engineerBoss=g=>alive(g)&&(g.rank||0)>=6;
 const ENG_IDEAS=['barracks','archery','tower','monastery'];
 // requests that need the player's yes
+// the council's standing rules: what the king lets his people decide alone
+const RULES_DEF={obras:false,gold:0,estradas:false,socorro:false,renovar:false,medicos:false,batedor:false,armyAuto:true,tolls:false,quiet:false};
+function rulesOf(){return Object.assign({},RULES_DEF,S.rules||{});}
+function autoRule(q){
+  const R=rulesOf(),c=q.cost||{},gold=c.gold||0,other=Object.keys(c).some(k=>k!=='gold'&&c[k]>0);
+  const cheap=gold<=R.gold&&(!other||R.gold>=200)&&afford(1,c);
+  switch(q.kind){
+    case 'build':case 'house':case 'tavern':case 'reno':case 'terra':return R.obras&&cheap;
+    case 'svc':return R.estradas&&cheap;
+    case 'townhelp':{const T=S.towns&&S.towns[q.town];return R.socorro&&!!T&&friendOf(T,1)>=3;}
+    case 'genhelp':return R.socorro;
+    case 'renew':return R.renovar&&afford(1,c);
+    case 'medic':return R.medicos;
+    case 'scoutAsk':return R.batedor;
+  }
+  return false;
+}
 function ask(req){
-  req=Object.assign({who:'Mestre Gaspar pede autorização',av:'av05'},req,{t:S.t});
-  if(S.ask){(S.asks=S.asks||[]).push(req);return;}
+  req=Object.assign({who:'Mestre Gaspar pede autorização',av:'av05'},req,{t:S.t,id:(S.askN=(S.askN||0)+1)});
+  if(autoRule(req)){HOOK.council('auto',req);answerQ(req,true);return;}
+  if(S.ask){(S.asks=S.asks||[]).push(req);HOOK.council('queued',req);return;}
   S.ask=req;HOOK.ask(S.ask);
 }
 function nextAsk(){S.ask=(S.asks&&S.asks.length)?Object.assign(S.asks.shift(),{t:S.t}):null;HOOK.ask(S.ask);}
-function answerAsk(yes){
-  const q=S.ask;if(!q)return;nextAsk();
+function answerAsk(yes){const q=S.ask;if(!q)return;nextAsk();answerQ(q,yes);}
+// answer a question that is still waiting in the council's list
+function answerQueued(id,yes){
+  if(S.ask&&S.ask.id===id){answerAsk(yes);return;}
+  const i=(S.asks||[]).findIndex(q=>q.id===id);if(i<0)return;
+  const q=S.asks.splice(i,1)[0];answerQ(q,yes);
+}
+function answerQ(q,yes){
+  if(q.kind==='counter'){if(!yes)return;const t=Object.assign({},q.terms,{cost:q.price,raised:true});if(q.outbid)t.outbid=q.outbid;
+    if(!afford(1,t.cost)){HOOK.toast('Falta ouro para fechar o contrato.','warn');return;}const T=S.towns[q.town];if(!T||townFoe(q.town,1)){HOOK.toast('A vila não aceita mais a proposta.','warn');return;}ctrActivate(1,t);return;}
+  if(q.kind==='renew'){if(!yes){HOOK.ctr('noRenew',ctrList().find(c=>c.id===q.cid)||{});return;}const r=ctrRenew(q.cid);if(r!=='ok')HOOK.toast(r==='cost'?'Falta ouro para renovar o contrato.':'O contrato já terminou.','warn');return;}
+  if(q.kind==='bid'){bidResolve(q.bid,!!yes);return;}
+  if(q.kind==='genorder'){if(yes)armyOrder(1,'defend');return;}
+  if(q.kind==='genhelp'){if(yes){const r=proposeContract(1,'help',q.town,{foe:q.foe,p:q.p});if(r!=='ok')HOOK.toast('Não deu para mandar o mensageiro agora.','warn');}return;}
+  if(q.kind==='scoutAsk'){if(yes){const r=startSweep(1,'defense',byId.get(q.scout));if(r!=='ok')HOOK.toast('O batedor não pôde sair agora.','warn');}return;}
+  if(q.kind==='scoutTrain'){if(yes){const b=BLDS.find(b=>!b.dead&&b.team===1&&b.kind==='barracks'&&b.built);const r=b?trainAt(b,'scout'):'none';if(r==='ok')intelOf(1).wantSweep=S.t;else HOOK.toast(r==='cost'?'Faltam recursos para o batedor.':r==='pop'?'Sem população livre para o batedor.':'Não deu para treinar o batedor agora.','warn');}return;}
+  if(q.kind==='planReady'){if(yes)HOOK.scout('openPlan',1,null,{});return;}
   if(q.kind==='svc'){svcAnswer(q,yes);return;}
   if(q.kind==='envoy'){envoyAnswer(q,yes);return;}
   if(q.kind==='townhelp'){townHelpAnswer(q,yes);return;}

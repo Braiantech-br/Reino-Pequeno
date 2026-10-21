@@ -1,0 +1,813 @@
+﻿==============================================================================
+  REINO PEQUENO  ·  versão 2.0  ·  21 de outubro de 2026
+  Estratégia medieval em tempo real  ·  Braian Tech
+==============================================================================
+
+Este pacote roda o jogo inteiro no seu aparelho, SEM internet e SEM passar
+por nenhum servidor. O que você faz aqui (jogos salvos, capítulos liberados)
+fica guardado só no aparelho. A internet só é usada quando VOCÊ toca em
+"Procurar atualização" para baixar uma versão nova.
+
+  Jogar no navegador e instalar no iPhone: https://braiantech-br.github.io/Reino-Pequeno/
+  Downloads de todas as versões ......... https://github.com/Braiantech-br/Reino-Pequeno/releases
+
+Índice
+  1. O que vem no pacote
+  2. Como abrir em cada aparelho
+  3. Requisitos mínimos
+  4. Configurações do jogo
+  5. Controles
+  6. Regras do jogo
+  7. Dicas para começar
+  8. Problemas comuns
+  9. Atualizações
+ 10. Créditos e versão
+
+
+==============================================================================
+ 1. O QUE VEM NO PACOTE
+==============================================================================
+
+  Cada sistema tem o seu arquivo para baixar:
+
+  ReinoPequeno-2.0-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
+  ReinoPequeno-2.0-Mac.zip .......... Reino Pequeno.app
+  ReinoPequeno-2.0-Linux.zip ........ jogar-linux.sh + o jogo + ícone
+  ReinoPequeno-2.0-Android.apk ...... aplicativo instalável (Android 5.0+)
+  ReinoPequeno-2.0-iPhone-iPad.zip .. web app (ou use o site, mais fácil)
+  ReinoPequeno-2.0.html ............. o jogo num arquivo só, qualquer
+                                          sistema com navegador
+  ReinoPequeno-2.0-completo.zip ..... tudo isso junto, com este LEIA-ME
+
+Todas as versões têm o mesmo jogo, com todas as imagens, fontes, músicas e
+vozes embutidas, e o mesmo botão de atualização.
+
+
+==============================================================================
+ 2. COMO ABRIR EM CADA APARELHO
+==============================================================================
+
+------------------------------------------------------------------------------
+ PELO SITE (sem instalar nada)
+------------------------------------------------------------------------------
+  Abra https://braiantech-br.github.io/Reino-Pequeno/ em qualquer navegador e jogue.
+  Depois da primeira visita o site continua abrindo sem internet. No Chrome
+  ou no Edge aparece o ícone "Instalar" na barra de endereço: ele cria um
+  atalho com janela própria. O site está sempre na versão mais nova.
+
+------------------------------------------------------------------------------
+ QUALQUER COMPUTADOR OU CELULAR (arquivo único)
+------------------------------------------------------------------------------
+  Dê dois cliques em ReinoPequeno-2.0.html. Ele abre no navegador e
+  funciona sem internet. Os jogos salvos ficam nesse navegador, ligados ao
+  lugar do arquivo: se mudar o arquivo de pasta, o jogo começa do zero lá.
+
+ WINDOWS 10 e 11
+------------------------------------------------------------------------------
+  1. Descompacte o ReinoPequeno-2.0-Windows.zip e dê dois cliques em
+     "Reino Pequeno.exe".
+  2. Na primeira vez o Windows pode mostrar "O Windows protegeu o computador"
+     (o programa não tem assinatura digital paga). Clique em "Mais
+     informações" e depois em "Executar assim mesmo".
+  3. O jogo pergunta se você quer INSTALAR:
+       Sim  → cria atalhos na Área de Trabalho e no menu Iniciar.
+       Não  → só roda agora, sem instalar nada.
+  4. O jogo abre numa janela própria, sem barra de navegador, usando o
+     Microsoft Edge (que já vem no Windows) ou o Google Chrome. Se nenhum dos
+     dois existir, abre no navegador padrão.
+
+  Onde ficam os arquivos: %LOCALAPPDATA%\ReinoPequeno
+  Para desinstalar: apague os atalhos e essa pasta.
+
+------------------------------------------------------------------------------
+ MAC (macOS)
+------------------------------------------------------------------------------
+  1. Descompacte o ReinoPequeno-2.0-Mac.zip e arraste "Reino Pequeno.app"
+     para a pasta Aplicativos (opcional).
+  2. Na primeira vez o macOS bloqueia apps sem assinatura da Apple:
+       macOS 13 e 14: clique com o botão direito no app → Abrir → Abrir.
+       macOS 15 ou mais novo: tente abrir uma vez, depois vá em
+       Ajustes do Sistema → Privacidade e Segurança → "Abrir Mesmo Assim".
+  3. O jogo abre numa janela própria se você tiver Chrome, Edge ou Brave;
+     senão, abre no Safari.
+
+  Sem querer mexer em permissões? Abra o site ou o arquivo .html no Safari.
+  Onde ficam os arquivos: ~/Library/Application Support/ReinoPequeno
+
+------------------------------------------------------------------------------
+ LINUX
+------------------------------------------------------------------------------
+  Descompacte o ReinoPequeno-2.0-Linux.zip. No terminal, dentro da pasta:
+      chmod +x jogar-linux.sh      (só se ele não estiver executável)
+      ./jogar-linux.sh             abre o jogo
+      ./jogar-linux.sh --instalar  coloca o Reino Pequeno no menu de apps
+  Abre numa janela própria com Chrome, Chromium, Edge ou Brave; senão, no
+  navegador padrão. Depois de instalar no menu, não mude a pasta de lugar.
+
+------------------------------------------------------------------------------
+ ANDROID
+------------------------------------------------------------------------------
+  1. Baixe o ReinoPequeno-2.0-Android.apk no celular ou passe o arquivo (cabo, WhatsApp para
+     você mesmo, Google Drive, pendrive...).
+  2. Toque no arquivo. O Android pede para permitir "instalar apps
+     desconhecidos" para o app que abriu o arquivo (Arquivos, Chrome,
+     WhatsApp). Permita e toque em Instalar.
+  3. O Play Protect pode avisar que o app é desconhecido: toque em "Mais
+     detalhes" → "Instalar assim mesmo". É normal para apps fora da loja.
+  4. O ícone "Reino Pequeno" aparece na tela de apps.
+
+  Tela cheia, tela sempre acesa durante o jogo, funciona deitado ou em pé.
+  Botão Voltar: pausa o jogo; tocando de novo em até 2 segundos, sai.
+  Ao sair para outro app o jogo pausa e salva sozinho.
+  Vozes: usa a voz do próprio celular. Se os bonecos não falarem, instale a
+  voz "Português (Brasil)" em Configurações → Acessibilidade → Saída de texto
+  para fala (ou escolha "Murmúrio" no menu Som do jogo).
+  Atualizar: pelo botão "Procurar atualização" do menu (veja a seção 9), sem
+  reinstalar. Um APK novo também pode ser instalado por cima: todos são
+  assinados com a mesma chave, então o progresso continua.
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+ IPHONE e IPAD
+------------------------------------------------------------------------------
+  A Apple não deixa instalar aplicativos fora da App Store (não existe um
+  "APK" para iPhone). O caminho é o web app, que depois de instalado funciona
+  sem internet:
+
+  1. No iPhone/iPad, abra https://braiantech-br.github.io/Reino-Pequeno/ no Safari.
+  2. Toque em Compartilhar → "Adicionar à Tela de Início".
+  3. Pronto: o ícone abre o jogo em tela cheia, também sem internet, e se
+     atualiza sozinho quando houver internet.
+
+  O pacote iPhone-iPad.zip traz os mesmos arquivos do site, para quem quiser
+  hospedar em outro endereço https:// (o site da Braian Tech, por exemplo).
+  O mesmo web app pode ser instalado no Android (Chrome → menu → Instalar
+  app) e no computador (ícone de instalar na barra de endereço do Chrome/Edge).
+
+
+==============================================================================
+ 3. REQUISITOS MÍNIMOS
+==============================================================================
+
+  O jogo roda dentro de um navegador moderno (ou do componente de navegador
+  do Android). O que mais pesa é o mapa grande da Batalha Rápida com muitas
+  tropas na tela.
+
+                     MÍNIMO                          RECOMENDADO
+  -----------------  ------------------------------  --------------------------
+  Computador         Windows 10 64-bit, macOS 11      Windows 11, macOS 13+,
+                     ou Linux 64-bit                  Linux recente
+  Processador        2 núcleos, 2 GHz                 4 núcleos ou mais
+  Memória (RAM)      4 GB                             8 GB
+  Vídeo              qualquer placa com aceleração    placa integrada recente
+                     (Intel HD 4000 ou equivalente)   ou dedicada
+  Tela               1280 × 720                       1920 × 1080
+  Navegador          Chrome/Edge 100+, Firefox 100+,  Chrome ou Edge atuais
+                     Safari 15+
+  Celular Android    Android 7.0, 3 GB de RAM,        Android 10+, 4 GB+,
+                     "Android System WebView"         processador de 2019 em
+                     atualizado (versão 100+)         diante
+  iPhone / iPad      iOS / iPadOS 15                  iOS 16+, iPhone XR ou
+                                                      mais novo
+  Espaço em disco    10 MB (Android: 15 MB)
+  Internet           NÃO precisa (só para baixar atualizações)
+  Som                opcional (música e vozes são geradas no aparelho)
+
+  O APK instala a partir do Android 5.0, mas abaixo do 7.0 o desempenho e o
+  componente de navegador costumam ser fracos demais.
+  Se o jogo ficar lento: prefira os modos Campanha e Defesa do Rei (mapa
+  menor), feche outros apps/abas e deixe a velocidade do jogo em 1x.
+
+
+==============================================================================
+ 4. CONFIGURAÇÕES DO JOGO
+==============================================================================
+
+  Na tela inicial você escolhe:
+
+  MODO DE JOGO
+    Campanha ........ "A Coroa de Pedravale": 5 capítulos com história, um
+                      herói e o rei para proteger. Cada capítulo vencido
+                      libera o próximo.
+    Batalha Rápida .. você contra o Reino Vermelho (computador) num mapa
+                      grande (136 × 92), com 4 vilas neutras que crescem,
+                      negociam e podem ajudar, e bandidos nas estradas.
+    Defesa do Rei ... ondas sem fim; um chefe a cada 5 ondas. O jogo guarda
+                      o seu recorde em cada dificuldade.
+
+  HERÓI (Campanha e Defesa do Rei)
+    Sir Tomás (guerreiro), Dona Isolda (lanceira), Robério (arqueiro),
+    Irmão Bento (monge, já sabe o Raio Divino), Dama Celeste (paladina),
+    Mestre Alvar (mago) e Ruiva (batedora). O herói é mais forte que uma
+    tropa comum e guarda as patentes de uma partida para a outra.
+
+  DIFICULDADE
+    Normal ... trégua de 8:00 antes do primeiro ataque grande; inimigo calmo.
+    Difícil .. trégua de 5:00; inimigo coleta mais rápido e ataca mais forte.
+    Insano ... trégua de 3:20; inimigo começa na frente e pensa rápido.
+
+  NÉVOA DE GUERRA (opcional)
+    Marque "Névoa de guerra" na tela inicial: você só vê o que as suas
+    tropas, prédios e vilas aliadas enxergam. O que já foi explorado fica
+    escuro, com os prédios inimigos que você já viu. Batedores revelam o mapa.
+
+  MAPA
+    Cada partida sorteia um mapa novo (formato, florestas, ouro, animais,
+    lagos) e o relevo: plano, colinas ou montanhas com até 4 alturas.
+    "Sortear outro mapa" troca antes de começar.
+
+  SOM (botão Som)
+    Efeitos liga/desliga · Música liga/desliga e volume · Vozes:
+      Voz ........ os bonecos falam em português (voz do aparelho)
+      Murmúrio ... falam "na língua do jogo", com balões de texto
+      Texto ...... só os balões, sem som
+      Desligado .. sem falas
+
+  DURANTE A PARTIDA
+    Velocidade 1x / 2x / 3x · Pausar · Ajuda · Ver as eras · Menu.
+    Rosto com número: humor do povo (toque para ver impostos e economia).
+    Conselho: pedidos, exército, contratos, estradas, economia e regras.
+
+  SALVAMENTO
+    O progresso (capítulos liberados, patentes dos heróis, recordes e
+    configurações de som) é salvo sempre.
+    A partida em andamento é salva sozinha a cada 40 segundos de jogo e
+    sempre que você troca de app ou minimiza. Na tela inicial aparece
+    "Continuar partida salva", com o modo, o tempo de jogo e a hora em que
+    foi salva. Uma partida que termina (vitória ou derrota) é apagada.
+
+
+==============================================================================
+ 5. CONTROLES
+==============================================================================
+
+  COMPUTADOR (mouse)
+    Clique ................. seleciona
+    Arrastar ............... seleciona vários (caixa)
+    Shift + clique ......... soma à seleção
+    Duplo clique ........... seleciona todas as tropas daquele tipo na tela
+    Botão direito .......... andar, coletar, construir, atacar ou converter
+    Botão direito c/ prédio  marca o ponto de encontro das tropas novas
+    Roda do mouse .......... zoom
+    Minimapa ............... clique ou arraste para mover a câmera
+    Muralha, fosso, ponte .. clique no início e depois no fim da linha
+
+  TECLADO
+    W A S D ou setas ....... mover a câmera
+    1 a 0 (com peão) ....... construir: 1 Casa, 2 Fazenda, 3 Quartel, 4 Torre,
+                             5 Arquearia, 6 Mosteiro, 7 Mercado, 8 Muralha,
+                             9 Portão, 0 Taberna
+    Q W Z X T (com prédio) . treinar a 1ª, 2ª, 3ª, 4ª ou 5ª tropa do prédio
+    R (com o castelo) ...... avançar de era
+    C / B / F (com monges) . converter / Raio Divino / Chuva de Fogo
+    E ...................... selecionar o exército
+    . (ponto) .............. próximo aldeão parado
+    H ...................... ir até o castelo
+    Espaço ................. ir até o último alarme
+    J ...................... abre e fecha o Conselho
+    V ...................... velocidade 1x / 2x / 3x
+    P ...................... pausar
+    M ...................... som liga/desliga
+    Esc .................... cancelar / limpar seleção
+    Delete ................. demolir o prédio selecionado
+
+  CELULAR E TABLET
+    Toque numa unidade sua para selecionar.
+    Com algo selecionado, toque no chão, árvore, ouro ou inimigo para mandar.
+    Um dedo arrasta a câmera; pinça faz zoom.
+    Os botões de construir e treinar ficam no painel de baixo (deslize para
+    o lado para ver todos). A barra de cima também desliza para o lado.
+    Muralhas, fossos e pontes: toque no ponto inicial e depois no final.
+
+
+==============================================================================
+ 6. REGRAS DO JOGO
+==============================================================================
+
+------------------------------------------------------------------------------
+ 6.1 OBJETIVO
+------------------------------------------------------------------------------
+  Campanha ....... cumprir os objetivos do capítulo (canto da tela). Se o rei
+                   cair, perde.
+  Batalha Rápida . derrubar o castelo do Reino Vermelho. Se o seu cair, perde.
+  Defesa do Rei .. aguentar o máximo de ondas sem perder o rei.
+
+------------------------------------------------------------------------------
+ 6.2 RECURSOS E POPULAÇÃO
+------------------------------------------------------------------------------
+  Madeira ... árvores.
+  Ouro ...... pedras douradas (minas de 800 de ouro).
+  Comida .... ovelhas (100), cordeiros (50), ovelhas negras (160), ovelha
+              dourada (100 de comida + 80 de ouro, rara) e fazendas (comida
+              sem fim para um peão de cada vez).
+  Peões entregam no castelo ou nas casas.
+  População: o castelo dá 10 vagas e cada casa mais 5.
+  Aldeões ganham profissão com o trabalho (Lenhador, Minerador, Coletor,
+  Construtor): até 40% mais rápidos. A Taberna recupera aldeões cansados e
+  feridos (5 por vez); quanto mais descansam, maior o bônus.
+
+------------------------------------------------------------------------------
+ 6.3 AS CINCO ERAS (avance no castelo)
+------------------------------------------------------------------------------
+  Era                  Custo                          Pede        Libera
+  -------------------  -----------------------------  ----------  ------------
+  I   Aldeias          -                              -           o básico
+  II  Feudal           300 comida, 100 madeira        Quartel     Torre,
+                                                                  Arquearia,
+                                                                  Arqueiro;
+                                                                  coleta +15%
+  III Castelos         500 comida, 250 ouro           Arquearia   Mosteiro,
+                                                                  Monge,
+                                                                  Lanceiro,
+                                                                  Aríete;
+                                                                  tropas +15%
+                                                                  de vida
+  IV  Imperial         800 comida, 250 madeira,       Mosteiro    Arqueiro
+                       500 ouro                                   real,
+                                                                  Paladino,
+                                                                  Mago,
+                                                                  Catapulta,
+                                                                  Raio Divino;
+                                                                  dano +20%
+  V   Lendária         1100 comida, 400 madeira,      Torre e     Chuva de
+                       800 ouro                       Mosteiro    Fogo;
+                                                                  tropas
+                                                                  lendárias
+  Enquanto o castelo pesquisa uma era, ele não treina peões.
+
+------------------------------------------------------------------------------
+ 6.4 CONSTRUÇÕES  (M = madeira, O = ouro)
+------------------------------------------------------------------------------
+  Castelo ..... já começa pronto; treina peões, atira flechas, +10 vagas.
+  Casa ........ 50 M ........ +5 de população; ponto de entrega.
+  Fazenda ..... 60 M ........ comida sem fim.
+  Quartel ..... 120 M ....... Guerreiro, Batedor, Lanceiro, Aríete, Catapulta.
+  Torre ....... 80 M 40 O ... Era II. Atira flechas. Pode SUBIR de nível.
+  Arquearia ... 110 M 20 O .. Era II. Arqueiro e Arqueiro real.
+  Mosteiro .... 150 M 80 O .. Era III. Monge, Paladino e Mago.
+  Mercado ..... 150 M ....... troca 100 de madeira/comida por ouro (e o
+                              contrário); preços sobem e descem com o uso.
+                              Treina mercadores.
+  Taberna ..... 150 M 40 O .. descanso dos aldeões.
+  Muralha ..... 8 M o bloco . bloqueia; arqueiros encostados atiram mais longe.
+  Portão ...... 30 M ........ suas tropas passam, inimigos não.
+  Fosso ....... só trabalho . buraco que ninguém atravessa a pé.
+  Ponte ....... 20 M o bloco  atravessa água estreita ou fosso.
+  Cais ........ 120 M ....... na beira da água; constrói barcos.
+
+------------------------------------------------------------------------------
+ 6.5 TROPAS  (C = comida, M = madeira, O = ouro)
+------------------------------------------------------------------------------
+  Peão ............ Castelo   I    50 C ......... coleta, constrói, conserta.
+  Guerreiro ....... Quartel   I    50 C 15 M 20 O  vence arqueiros.
+  Batedor ......... Quartel   I    45 C 10 O ..... o mais rápido; caça peões e
+                                                   mercadores; enxerga longe.
+  Arqueiro ........ Arquearia II   45 M 25 O ..... de longe; vence lanceiros.
+  Lanceiro ........ Quartel   III  60 C 40 O ..... lança; vence guerreiros.
+  Monge ........... Mosteiro  III  90 O .......... converte inimigos e cura.
+  Aríete .......... Quartel   III  180 M 40 O .... derruba muralhas, portões
+                                                   e prédios; flechas quase
+                                                   não o ferem; não ataca
+                                                   soldados.
+  Arqueiro real ... Arquearia IV   60 M 55 O ..... o maior alcance.
+  Paladino ........ Mosteiro  IV   90 C 110 O .... cura quem está em volta;
+                                                   não pode ser convertido.
+  Mago ............ Mosteiro  IV   40 C 120 O .... bolas de fogo em área;
+                                                   frágil de perto.
+  Catapulta ....... Quartel   IV   220 M 120 O ... pedras de muito longe, em
+                                                   área; não acerta quem
+                                                   chega perto.
+  Mercador ........ Mercado   I    50 C 60 O ..... leva presentes aos bandidos.
+  Barco ........... Cais      I    110 M 10 O .... leva até 6 unidades.
+
+  Pedra-papel-tesoura: GUERREIRO vence ARQUEIRO, ARQUEIRO vence LANCEIRO,
+  LANCEIRO vence GUERREIRO (60% a mais de dano). Monges convertem qualquer
+  tropa, até bandidos (menos paladinos, heróis e chefes).
+
+  Monges: curam aliados. Na Era IV viram Sacerdotes com o Raio Divino (dano
+  alto e atordoa); na Era V, Sumo-sacerdotes com a Chuva de Fogo e conversão
+  de prédios.
+
+------------------------------------------------------------------------------
+ 6.6 PATENTES E MÉDICOS
+------------------------------------------------------------------------------
+  A cada 3 soldados inimigos derrotados (ou convertidos) a tropa sobe de
+  patente: +10% de vida, +12% de dano e cura metade da vida.
+    Recruta 0 · Soldado 3 · Cabo 6 · Sargento 9 · Tenente 12 · Capitão 15 ·
+    Major 18 · Comandante 21
+  A partir de Sargento as feridas se curam sozinhas fora de combate, e o
+  soldado pode pedir para virar médico de campo (você autoriza ou não).
+
+------------------------------------------------------------------------------
+ 6.7 RELEVO, TORRES, ÁGUA E DEFESAS
+------------------------------------------------------------------------------
+  O terreno tem até 4 alturas. Cada nível acima do inimigo dá mais dano
+  (+20%, +35%, +50%) e arqueiros atiram mais longe; atacar morro acima
+  enfraquece. Só dá para subir por rampas e escadas.
+  Torre: botão "Subir torre" ergue o terreno embaixo dela, nível por nível
+  (até 4): cada nível dá +20% de alcance e +15% de dano. O engenheiro faz os
+  degraus e as escadas sozinho.
+  Muralhas e portões fecham a base; fossos cortam caminhos; pontes cruzam rios
+  e fossos; barcos levam tropas pela água (selecione tropas e toque no barco).
+
+------------------------------------------------------------------------------
+ 6.8 O ENGENHEIRO-CHEFE (Mestre Gaspar)
+------------------------------------------------------------------------------
+  Ele organiza a vila: põe aldeões parados para trabalhar, constrói casas e
+  fazendas quando faltam, conserta, faz escadas e cais. Para obras maiores
+  (mercado, taberna, cais, subir torres, pedir ajuda às vilas) ele PEDE SUA
+  AUTORIZAÇÃO num cartão: "Autorizar" ou "Agora não".
+
+------------------------------------------------------------------------------
+ 6.9 BANDIDOS
+------------------------------------------------------------------------------
+  Na Campanha e na Defesa do Rei há tocas, covis e fortalezas de bandidos:
+  destrua (dão recompensa) ou faça amizade levando presentes com um mercador.
+  Na Batalha Rápida, bandos de saqueadores aparecem de surpresa nas bordas do
+  mapa, atacam os reinos, as vilas e as carroças nas estradas, e vão embora
+  depois de um tempo.
+
+------------------------------------------------------------------------------
+ 6.10 VILAS NEUTRAS E ECONOMIA (Batalha Rápida)
+------------------------------------------------------------------------------
+  Quatro vilas livres negociam com você e com o Reino Vermelho:
+    Moinho ..... vende comida barata, paga bem por madeira.
+    Serraria ... vende madeira barata, paga bem por comida.
+    Ouroverde .. paga caro por armas, aluga mercenários, vende conhecimento.
+    Rochedo .... vila de mineiros: rica em ouro, paga bem por comida.
+
+  Selecione uma vila: o painel tem três abas.
+    Comércio ..... vender e comprar recursos (o preço depende do estoque
+                   dela), vender armas (Era II), comprar e trocar tecnologias.
+    Contratos .... tropas de elite, herói, guarnição, proteção, aliança e
+                   rota fixa (veja 6.17).
+    Diplomacia ... embaixada, pedir ajuda, ceder soldados, festa na vila
+                   (vassala), libertar (vassala do Vermelho) e conquistar.
+
+  TECNOLOGIAS DAS VILAS
+    Arado de ferro ...... comida e fazendas 15% mais rápidas
+    Serra de aço ........ madeira 15% mais rápida
+    Picareta fina ....... ouro 15% mais rápido
+    Flechas de aço ...... arqueiros e torres +12% de dano
+    Cantaria ............ muralhas, portões e torres +25% de vida
+    Rodas reforçadas .... carroças 25% mais rápidas e 30% mais resistentes
+    Mapas das estradas .. emboscadas 35% menos prováveis
+    Botas de marcha ..... soldados 8% mais rápidos
+
+  AS VILAS CRESCEM: têm aldeões próprios (amarelos) que cortam lenha, plantam
+  e garimpam, um cofre próprio, e sobem de nível construindo casas, fazendas,
+  torres e quartel, com guardas e arqueiros:
+    Aldeia → Vila → Burgo → Cidade → Grande cidade
+
+------------------------------------------------------------------------------
+ 6.11 SERVIÇOS DE ENTREGA (regras)
+------------------------------------------------------------------------------
+  Quem pede: tropeiros (vender e comprar), o quartel (armas), mercadores das
+  vilas (escolta), comandantes longe de casa (suprimentos) e o Mestre Gaspar
+  (tecnologia). TODOS PEDEM SUA AUTORIZAÇÃO antes de sair. Na vila você também
+  pode encomendar direto.
+  Pagamento: a carga sai do estoque na partida. Venda é paga na chegada;
+  compra é paga na saída.
+  Escolta: os soldados livres mais perto vão junto (sempre fica alguém em
+  casa). Para reforçar, selecione tropas e toque na carroça. A carroça espera
+  a escolta que ficou para trás.
+  Risco de emboscada: cresce com a distância, com carga valiosa (armas, ouro)
+  e perto do castelo inimigo; cai com cada soldado de escolta e com Mapas das
+  estradas.
+  Emboscada: bandidos saem do mato na frente da carroça. Se a carroça cair, a
+  carga fica com quem a destruiu e o serviço fracassa.
+  Prazo: chegar atrasado paga 30% menos.
+  Carroças ao mesmo tempo: 1 na Era I, 2 nas Eras II e III, 3 nas IV e V.
+  RELATÓRIO: no fim, quem voltou conta o que aconteceu: duração, emboscadas,
+  bandidos derrubados, perdas, pagamento e amizade.
+  Livre mercado: o Reino Vermelho também negocia e mexe nos preços. As
+  carroças dele podem ser saqueadas: metade da carga fica com você.
+  Outros serviços: guarda da vila (seus soldados protegem a vila por um
+  tempo; a vila paga 150 de ouro e ganha amizade), embaixada, mercenários e
+  cessão de soldados.
+  Tecla J (Conselho → Estradas): serviços em andamento e relatórios.
+
+------------------------------------------------------------------------------
+ 6.12 AMIZADE COM AS VILAS (★)
+------------------------------------------------------------------------------
+  Cada serviço cumprido, presente, embaixada ou ajuda dá amizade; fracassos e
+  ajudar o inimigo delas tiram.
+    ☆☆☆☆☆ Estranhos ........ preços normais; a vila não se mete nas brigas
+    ★☆☆☆☆ Conhecidos ....... preços 4% melhores; trocam tecnologia
+    ★★☆☆☆ Parceiros ........ mercenários e tecnologias; ajudam se você pagar
+    ★★★☆☆ Amigos ........... mandam presentes e notícias; ajuda mais barata
+    ★★★★☆ Aliados .......... ajudam de graça contra bandidos, e contra o
+                             Reino Vermelho se não forem amigos dele
+    ★★★★★ Irmãos de armas .. ajudam sempre de graça; 20% de desconto em
+                             tecnologia
+
+------------------------------------------------------------------------------
+ 6.13 PEDIR AJUDA
+------------------------------------------------------------------------------
+  Quando sua vila é atacada aparece o botão vermelho "Pedir ajuda". Ele lista
+  cada vila com a amizade e os guardas livres. Um mensageiro vai e a vila
+  responde: vem DE GRAÇA, PEDE OURO (quanto mais amizade, mais barato) ou
+  RECUSA. Não é obrigatório: as vilas são neutras.
+    - Contra bandidos é mais fácil conseguir ajuda.
+    - Contra o Reino Vermelho é mais difícil se a vila gostar mais dele.
+    - A vila que ajuda perde amizade com o reino que você está enfrentando.
+    - Depois de ajudar, a vila espera 2min30 para ajudar de novo.
+    - Com amizade boa, o Mestre Gaspar sugere pedir ajuda sozinho.
+  As vilas também pedem SUA ajuda quando bandidos as atacam: salvar uma vila
+  dá +1 de amizade. O Reino Vermelho segue as mesmas regras e também pode
+  receber ajuda.
+
+------------------------------------------------------------------------------
+ 6.14 EMBAIXADORES
+------------------------------------------------------------------------------
+  Os embaixadores das vilas visitam o seu castelo: trazem presentes, notícias
+  do inimigo, pedidos urgentes de recursos (pagando bem) e pedidos de
+  soldados para guardar a vila. Você responde no cartão.
+  Você também manda o seu: no painel da vila, botão "Embaixada" (60 de ouro;
+  uma vez a cada 2min30). O diplomata vai a pé até a vila e volta com
+  amizade (mais ainda se a vila tiver convidado você).
+
+------------------------------------------------------------------------------
+ 6.15 CAMPANHA: A COROA DE PEDRAVALE
+------------------------------------------------------------------------------
+  1. Cinzas na Aldeia ......... construa a vila, forje as Ferramentas de Ferro
+                                e aguente 3 ataques do Corvo Negro.
+  2. A Trilha dos Bandidos .... conquiste 2 tocas (destruindo ou com
+                                presentes), forje o Estandarte Real e derrote
+                                o Corvo Negro.
+  3. O Mosteiro Esquecido ..... chegue à Era dos Castelos, construa um
+                                mosteiro, recupere 3 relíquias, forje o
+                                Relicário e derrote a Capitã Violeta.
+  4. O Cerco de Pedravale ..... tenha 3 torres, forje Armas e Escudos, aguente
+                                6 ondas e derrote o Capitão Rubro.
+  5. A Queda do Duque Rubro ... recupere 2 lingotes de aço, forje o Aríete
+                                Real, derrote Malvar e derrube o castelo
+                                vermelho.
+
+  A FORJA (no castelo, Campanha e Defesa do Rei)
+    Ferramentas de Ferro ... 150 M 50 O ........ peões +20% de coleta
+    Armas Forjadas ......... 100 M 150 O ....... tropas +15% de dano
+    Escudos Reforçados ..... 200 M 100 O ....... tropas -15% de dano recebido
+    Estandarte Real ........ 150 C 100 O + 2 retalhos . treino 30% mais rápido
+    Relicário Sagrado ...... 150 O + 3 relíquias ...... monges curam em dobro
+                                                       e convertem 40% mais
+                                                       rápido
+    Aríete Real ............ 300 M 150 O + 2 lingotes . derruba o portão
+                                                       vermelho
+
+------------------------------------------------------------------------------
+ 6.16 DEFESA DO REI
+------------------------------------------------------------------------------
+  Ondas sem fim vindas das bordas, alternando bandidos, saqueadores e o
+  exército vermelho. Cada onda é maior; a cada 5 vem um chefe (Corvo Negro,
+  Capitã Violeta, Capitão Rubro, Duque Rubro). As ondas trazem tropas de eras
+  mais altas com o tempo (aríetes, paladinos, magos, catapultas). Intervalo
+  entre ondas: cerca de 1min30 no Normal, diminuindo aos poucos.
+
+------------------------------------------------------------------------------
+ 6.17 CONTRATOS COM AS VILAS E HONRA
+------------------------------------------------------------------------------
+  Cada vila tem tropas de elite e um herói próprios:
+    Moinho ..... Guarda de escudo (escudo grande: 30% menos dano)
+                 Heroína: Mãe Moleira (cura e alimenta a tropa: +15% de dano)
+    Serraria ... Machadeiro (forte contra tudo, derruba prédios em dobro)
+                 Herói: Tora, o Lenhador (cada machadada acerta todos em volta)
+    Ouroverde .. Besteiro (atira de muito longe e fura escudos)
+                 Heroína: Capitã Ourela (atira em três inimigos de uma vez)
+    Rochedo .... Sapador (abre muralhas e portões 3x mais rápido)
+                 Herói: Grão-Mineiro (derruba portões e atordoa)
+
+  Na aba Contratos você propõe:
+    Contrato              Amizade  Preço (cai com amizade e honra)
+    --------------------  -------  -------------------------------------------
+    Mercenários 5/10/15   ★        4 tropas de elite por 5, 10 ou 15 minutos
+                                   (190 / 320 / 430 de ouro). Renovar sai 10%
+                                   mais barato.
+    Fiéis até a morte     ★★       4 tropas de elite até o último cair (500)
+    Herói da vila         ★★★★     o herói luta por você até cair (650); se
+                                   cair, a vila demora para ter outro
+    Guarnição             ★★       4 guardas nos seus portões e torres por
+                                   10 minutos (210)
+    Proteção              ★★       a vila defende você quando for atacado;
+                                   você paga 8% da produção por minuto
+    Aliança juramentada   ★★★      a vila não negocia com o Vermelho, manda
+                                   tropas para as suas guerras, faz 15% de
+                                   desconto e defende você; 120 na assinatura
+                                   + 15% da produção por minuto
+    Rota fixa             ★        por 10 minutos, uma caravana a cada 1min40
+                                   com 150 da especialidade da vila, por um
+                                   preço travado
+
+  MENSAGEIRO: a proposta vai a pé, levada por um batedor seu (mais rápido)
+  ou por um embaixador. Ele pode ser emboscado. A vila decide quando ele
+  chega: aceita, recusa (e diz por quê) ou pede mais.
+  Dois pagamentos atrasados de proteção ou aliança encerram o contrato.
+  Um minuto antes de um contrato acabar, a vila pergunta se você quer
+  renovar (ou o Conselho renova sozinho, se você liberar).
+
+  HONRA (0 a 100, começa em 50; todas as vilas enxergam)
+    Cumprir um contrato +3 · defender uma vila +2 · quebrar um contrato -15
+    atacar uma vila -15 · conquistar -10 · saquear uma caravana -10
+    Com honra baixa os preços sobem; abaixo de 40 a vila pede 25% a mais;
+    abaixo de 20 ninguém fecha contrato.
+
+  LEILÃO: se o Reino Vermelho oferecer mais por uma vila jurada a você, ela
+  avisa e você pode cobrir a oferta. Vale o mesmo para você roubar uma vila
+  dele: a vila só quebra o juramento por bem mais ouro.
+
+------------------------------------------------------------------------------
+ 6.18 CONQUISTA E VASSALOS
+------------------------------------------------------------------------------
+  Uma vila pode ser tomada à força: na aba Diplomacia toque em Conquistar
+  (ou mande o exército contra ela). Se as suas tropas ficarem 15 segundos na
+  vila sem guardas dela por perto, ela vira VASSALA: paga tributo a cada
+  minuto, manda guardas quando você é atacado e enxerga para você na névoa.
+  Lealdade (0 a 100): cai com impostos de guerra e abandono, sobe com festas
+  na vila e tropas suas por perto. Abaixo de 15, sem tropas suas, ela se
+  revolta. O outro reino pode comprá-la de volta (Libertar) se a lealdade
+  estiver abaixo de 70. Atacar uma vila custa 25 de honra no total.
+
+------------------------------------------------------------------------------
+ 6.19 O EXÉRCITO: HIERARQUIA E GENERAIS
+------------------------------------------------------------------------------
+  O soldado de MAIOR PATENTE comanda o exército (o general). Entre iguais,
+  até entre recrutas, a tropa VOTA (você vê os votos nos balões).
+  Grupos: Sargentos e acima lideram grupos quando há gente suficiente;
+  patentes menores só quando os outros grupos estão cheios.
+    Patente      Comanda   Subchefes   Regeneração   Comando especial
+    Soldado      3         -           normal        -
+    Cabo         4         -           normal        -
+    Sargento     6         -           normal        -
+    Tenente      8         1           1,5x          Parede de escudos
+    Capitão      12        2           2x            Avante!
+    Major        16        3           2,5x          Segurar a linha
+    Comandante   todos     todos       3x            Grito de guerra
+  Comandos: Parede de escudos (flechas e torres -40% por 10 s), Avante!
+  (+35% de velocidade por 8 s), Segurar a linha (-15% de dano e sem perder o
+  moral por 12 s), Grito de guerra (cura 20% de todos em volta e +20% de
+  dano por 10 s). Os chefes usam sozinhos (regra do Conselho) ou você usa
+  no painel de baixo com tropas selecionadas.
+  Se um chefe cai, o próximo assume e o grupo fica abalado por 8 segundos.
+  Ordens ao general (Conselho → Exército ou botão "Ordens do general"):
+    Livre (você comanda) · Defender a base (cada grupo guarda uma entrada)
+    Atacar o inimigo (reúne, marcha, manda um grupo pelo flanco e deixa uma
+    reserva; recua sozinho se estiver perdendo feio) · Recuar para o castelo
+    · Patrulhar as vilas aliadas.
+  Você continua podendo mandar em qualquer soldado: a sua ordem vale mais.
+  Bandeirinhas mostram os chefes; a bandeira com estrela é o general.
+
+------------------------------------------------------------------------------
+ 6.20 BATEDORES, PLANO DE GUERRA E NÉVOA
+------------------------------------------------------------------------------
+  Conselho → Exército → "Reconhecer o terreno": um batedor dá a volta no
+  reino e o general monta um PLANO DE DEFESA, com o motivo de cada obra:
+    Muralha com portão no estreito · Torre no morro · Elevar o terreno para
+    uma torre · Fosso no campo aberto · Ponto de emboscada para os arqueiros
+  Cada obra aparece numerada no mapa; você autoriza uma por uma (ou todas).
+  "Espiar o Reino Vermelho": o batedor conta as torres em volta do castelo
+  inimigo e acha o lado mais fraco; o plano de ataque manda o exército por
+  lá. O Reino Vermelho faz o mesmo com o batedor e o engenheiro dele, o
+  Mestre Rubro.
+
+------------------------------------------------------------------------------
+ 6.21 ECONOMIA INTERNA (Conselho → Economia)
+------------------------------------------------------------------------------
+  IMPOSTOS (ouro por aldeão por minuto · humor por minuto)
+    Sem imposto 0 · +3     Baixo 1 · +1     Normal 2 · 0
+    Alto 3,5 · -3          Abusivo 5 · -6
+  HUMOR DO POVO (0 a 100): sobe com comida sobrando, taberna, feira famosa
+  e festas (150 comida + 60 ouro, +18); cai com impostos, casas lotadas,
+  ataques e soldo atrasado. Feliz (75+) trabalha 10% mais rápido; abaixo de
+  45, 10% mais devagar; abaixo de 25, 20%; abaixo de 15 aldeões vão embora.
+  FEIRA: com um mercado, aldeões abrem barracas (1 + metade da era) e vendem
+  a sobra de madeira e comida (acima de 350). Cada venda dá fama (até ★5):
+  vendedor famoso vende mais caro e a fama atrai caravanas das vilas.
+  SOLDO: cada soldado custa 0,6 de ouro por minuto (máquinas, paladinos e
+  magos mais). Sem ouro, lutam 10% pior e, depois de 1 minuto, um recruta
+  deserta. Mercenários de contrato e heróis não entram no soldo.
+  CARAVANAS: as vilas negociam entre si pelas estradas. Bandidos podem
+  emboscar. Saquear uma caravana dá metade da carga, mas custa honra.
+  PEDÁGIO (regra do Conselho): caravanas que passam pelos seus portões e
+  pontes pagam 8% da carga; as vilas não gostam.
+
+------------------------------------------------------------------------------
+ 6.22 O CONSELHO
+------------------------------------------------------------------------------
+  O botão Conselho (tecla J) reúne tudo:
+    Mensagens ... pedidos esperando resposta e notícias do reino
+    Exército .... general, grupos, comandos, batedores e plano de guerra
+    Contratos ... honra, contratos seus e do Vermelho, todas as vilas
+    Estradas .... serviços de entrega e relatórios
+    Economia .... impostos, humor, festa, feira, soldo e pedágio
+    Regras ...... o que o povo pode decidir sozinho (obras, entregas,
+                  socorro, renovar mercenários, médicos, reconhecimento,
+                  comandos dos chefes) e o limite de gasto sem perguntar.
+                  Tudo o que uma regra decide aparece nas Notícias.
+
+
+==============================================================================
+ 7. DICAS PARA COMEÇAR
+==============================================================================
+
+  - Mantenha o castelo treinando peões o tempo todo no começo.
+  - Faça casas antes de faltar população e fazendas antes das ovelhas
+    acabarem (no mapa grande, as ovelhas perto de casa enganam: plante cedo).
+  - Quartel cedo; avance para a Era II assim que der.
+  - Misture tropas: guerreiros + arqueiros + lanceiros vencem qualquer bloco
+    de um tipo só. Monges atrás do exército curam e roubam tropas.
+  - Torres no alto do morro são muito mais fortes.
+  - Na Batalha Rápida, faça amizade com pelo menos duas vilas: elas vendem
+    tecnologia e mandam guardas quando o Vermelho atacar.
+  - Proteja as carroças com escolta; leia os relatórios.
+  - Antes de atacar, alugue mercenários de 10 ou 15 minutos e mande o
+    batedor espiar: o general ataca pelo lado mais fraco.
+  - Cumpra os contratos: com honra alta tudo fica mais barato.
+  - Imposto Normal e uma feira famosa pagam o soldo sem irritar o povo.
+
+
+==============================================================================
+ 8. PROBLEMAS COMUNS
+==============================================================================
+
+  "Abriu a tela, mas sem imagens / tudo branco"
+    Use um navegador atualizado (Chrome, Edge, Firefox ou Safari). Navegadores
+    muito antigos (Internet Explorer) não rodam o jogo.
+  "Perdi meu progresso"
+    O progresso fica no navegador e no lugar onde o arquivo está. Limpar os
+    dados do navegador, usar janela anônima ou mudar o arquivo de pasta
+    começa do zero. Os apps de Windows e Mac usam uma pasta fixa para isso.
+  "Os bonecos não falam"
+    No menu Som escolha "Voz". Se o aparelho não tiver voz em português,
+    instale (Windows: Configurações → Hora e idioma → Fala; Android: veja a
+    seção Android) ou use "Murmúrio".
+  "O som não toca"
+    Os navegadores só liberam som depois do primeiro toque/clique na tela.
+  "Ficou lento"
+    Velocidade 1x, feche outras abas, prefira o mapa menor (Campanha/Defesa).
+  "A atualização não terminou"
+    Nada muda: você continua na versão que tinha. Tente de novo com
+    internet. Se uma versão nova não abrir, o jogo volta sozinho para a
+    anterior; no menu há "Voltar à versão original".
+  "Windows/Mac não deixa abrir"
+    É a proteção contra programas sem assinatura paga. Siga os passos da
+    seção 2. Se preferir, abra o arquivo .html direto ou use o site.
+
+
+==============================================================================
+ 9. ATUALIZAÇÕES
+==============================================================================
+
+  Na tela inicial, o botão "Procurar atualização" mostra a versão que você
+  tem. Com internet, ele confere o endereço de atualização do jogo
+  (https://github.com/Braiantech-br/Reino-Pequeno) e, se houver versão nova, mostra o que mudou e baixa
+  (uns 3,5 MB). A partida em andamento fica salva. Depois disso o jogo
+  continua funcionando sem internet. O jogo também confere sozinho, no
+  máximo a cada 6 horas, e avisa quando aparece versão nova.
+
+  Segurança: o arquivo baixado é conferido (tamanho e assinatura SHA-256)
+  antes de ser usado. Se a versão nova não abrir, o jogo volta sozinho para
+  a anterior. O botão "Voltar à versão original" (ou abrir o arquivo .html
+  com ?original no fim do endereço) apaga a cópia baixada e volta à versão
+  que veio no pacote.
+
+  O site (https://braiantech-br.github.io/Reino-Pequeno/) e o web app do iPhone se atualizam sozinhos.
+
+==============================================================================
+10. CRÉDITOS E VERSÃO
+==============================================================================
+
+  Reino Pequeno · produzido por Braian Tech (www.braiantech.com.br)
+  Arte: Tiny Swords (Free Pack), de Pixel Frog. Antes de vender ou distribuir
+  o jogo, confira a licença do pacote de arte.
+  Música e vozes: geradas pelo próprio jogo, no aparelho.
+  Fontes: Jersey 10 e Pixelify Sans (SIL Open Font License).
+
+  Código-fonte e versões: https://github.com/Braiantech-br/Reino-Pequeno
+
+  Versão 2.0 (21 de outubro de 2026)
+    - Contratos com as vilas: mercenários por 5, 10 ou 15 minutos ou até a morte, herói da vila, guarnição, proteção, aliança juramentada e rota fixa.
+    - Um mensageiro leva cada proposta a pé; a vila aceita, recusa ou pede mais. Renovar sai 10% mais barato.
+    - Honra: quem cumpre contratos paga menos; quem quebra, saqueia ou ataca vilas paga mais e é recusado.
+    - Cada vila tem tropas de elite e um herói próprios.
+    - Exército com hierarquia: o de maior patente comanda, empates vão a voto, grupos com chefes e subchefes.
+    - Comandos de patente: Parede de escudos, Avante!, Segurar a linha e Grito de guerra.
+    - Ordens ao general: defender, atacar pelo flanco, recuar, patrulhar ou deixar livre.
+    - Batedores estudam o terreno e o general propõe um plano de defesa e de ataque, obra por obra, com o motivo.
+    - Névoa de guerra opcional.
+    - Economia interna: impostos, humor do povo, feira com fama, soldo, caravanas e pedágio.
+    - Conquista de vilas, vassalos, revoltas e leilão; o Reino Vermelho faz tudo isso também, com o Mestre Rubro.
+    - Conselho: um lugar só para pedidos, exército, contratos, estradas, economia e regras.
+
+  Versão 1.15 (outubro de 2026)
+    - Sino das vilas: pedir e dar socorro, favores entre vilas e reino.
+    - Botão "Procurar atualização" na versão baixada.
+
+  Versão 1.14 (outubro de 2026)
+    - Versão offline para Windows, Mac, Linux, Android e iPhone/iPad.
+    - Partida salva sozinha e botão "Continuar partida salva".
+    - Pausa automática ao trocar de app; vozes do próprio celular no Android.
+    - Layout compacto para celular deitado.
+    - Vilas que crescem, pedidos de ajuda, embaixadores e mapa maior (v14).
+    - Economia entre reinos, serviços de entrega com relatório (v13).
+    - Trilha sonora gerada, falas dos personagens, 4 alturas, novas tropas
+      (v12).

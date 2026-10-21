@@ -10,3 +10,5 @@ node_modules/
 *.jks
 __pycache__/
 .DS_Store
+# downloads montados (vão para os Releases, não para o repositório)
+dist/

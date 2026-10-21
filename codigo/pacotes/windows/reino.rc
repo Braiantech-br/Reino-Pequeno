@@ -1,0 +1,26 @@
+#include <winver.h>
+1 ICON "icon.ico"
+101 RCDATA "ReinoPequeno.html"
+1 24 "app.manifest"
+1 VERSIONINFO
+FILEVERSION @V1@,@V2@,@V3@,0
+PRODUCTVERSION @V1@,@V2@,@V3@,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "041604B0"
+    BEGIN
+      VALUE "CompanyName", "Braian Tech"
+      VALUE "FileDescription", "Reino Pequeno"
+      VALUE "FileVersion", "@VERSION_NAME@"
+      VALUE "ProductName", "Reino Pequeno"
+      VALUE "ProductVersion", "@VERSION_NAME@"
+      VALUE "LegalCopyright", "Braian Tech"
+      VALUE "OriginalFilename", "Reino Pequeno.exe"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0416, 1200
+  END
+END

@@ -395,6 +395,20 @@ function command(wx,wy){
   for(const u of units)if(u.ally)u.home=null;
   const isB=u=>u.kind==='pawn'||u.kind==='engineer';const pawns=units.filter(isB),monks=units.filter(u=>u.kind==='monk'),army=units.filter(u=>!isB(u)&&u.kind!=='monk');
   for(const u of units)if(DEF[u.kind].king)u.home=null;
+  // a neutral caravan: looting costs honour, so ask first
+  if(hit&&!hit.team&&DEF[hit.kind].cart&&hit.trip&&army.length){
+    const T=S.towns&&S.towns[hit.trip.from],go=()=>{for(const u of army){clearU(u);u.order={type:'attack',id:hit.id,loot:true};}mark(hit.x,hit.y,'#ff5a4a');};
+    if(ui.lootOk)go();else confirmBox('Saquear a caravana?',`A caravana é de ${T?T.name:'uma vila neutra'}. Você fica com metade da carga, mas perde 10 de honra e todas as vilas vão saber.`,'Saquear',()=>{ui.lootOk=true;go();});
+    return;
+  }
+  // a town: its guards and buildings are only targets during a conquest
+  if(hit&&!hit.team&&hit.town!=null&&S.towns&&S.towns[hit.town]&&army.length&&(DEF[hit.kind].neutral&&DEF[hit.kind].mil||DEF[hit.kind].townb||hit.kind==='town'||DEF[hit.kind].building)){
+    const T=S.towns[hit.town],go=()=>{for(const u of army){clearU(u);u.order=hit.kind==='town'?{type:'move',x:T.x+(Math.random()-.5)*90,y:T.y+40+(Math.random()-.5)*60,amove:true}:{type:'attack',id:hit.id};}mark(hit.x,hit.y,'#ff5a4a');};
+    if(T.owner===1){/* our own vassal: just walk there */}
+    else if(townFoe(T.i,1)){go();return;}
+    else if(!T.siege){confirmBox(`Conquistar ${T.name}?`,`Atacar uma vila neutra custa 25 de honra no total, quebra os contratos com ela e todas as vilas vão desconfiar de você. Se o seu exército ficar 15 segundos na vila sem guardas por perto, ela vira sua vassala: paga tributo e manda guardas, mas pode se revoltar.`,'Atacar a vila',()=>{if(startConquest(1,T.i)==='ok')go();});return;}
+    else{toast(`${T.name} já está sendo atacada pelo ${teamName(T.siege.team)}.`,'warn');}
+  }
   if(hit&&(hit.team===2||hit.team===3)){
     for(const u of pawns.concat(army)){clearU(u);u.order={type:'attack',id:hit.id};}
     for(const u of monks){clearU(u);
@@ -657,7 +671,7 @@ function refreshPanel(force){
     const av=e.hero&&HEROES[S.heroKey]?`assets/${HEROES[S.heroKey].av}.png`:CHAR[e.kind]?`assets/${CHAR[e.kind].av}.png`:null;
     h=`<img class="por" alt="" src="${av||iconFor(e.kind,e.team||1)}"><div class="txt"><h3>${unitName(e)}</h3>`+
       (e.maxhp&&e.kind!=='town'?`<div class="hp"><i style="width:${Math.max(0,e.hp/e.maxhp*100)}%"></i></div>`:'')+
-      `<p>${e.hero?'Herói · ':''}${statusOf(e)}${e.maxhp&&e.kind!=='town'?` · ${Math.ceil(e.hp)}/${e.maxhp} PV`:''}${rankText(e)}</p></div>`;
+      `<p>${e.hero?'Herói · ':''}${statusOf(e)}${e.maxhp&&e.kind!=='town'?` · ${Math.ceil(e.hp)}/${e.maxhp} PV`:''}${rankText(e)}${squadText(e)}${e.ctr?' · <b>contratado</b>':''}</p></div>`;
   }else{
     const cnt={};for(const e of sel)cnt[e.kind]=(cnt[e.kind]||0)+1;
     const first=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
@@ -671,8 +685,8 @@ function refreshPanel(force){
   const cds=monks.length?[Math.ceil(Math.min(...monks.map(m=>m.boltCd||0))),Math.ceil(Math.min(...monks.map(m=>m.meteorCd||0))),monks.some(m=>m.faith>=1)]:0;
   // the buttons are rebuilt only when what they offer changes; costs, cooldowns and bars update in place,
   // so a press is never lost because the panel was redrawn under the finger or the mouse
-  const key=JSON.stringify([single&&single.kind==='town'&&S.towns&&S.towns[single.town]?[svcActive(1),repOf(S.towns[single.town],1),townPrice(S.towns[single.town],'wood',false,1),townPrice(S.towns[single.town],'food',false,1),townPrice(S.towns[single.town],'wood',true,1),townPrice(S.towns[single.town],'food',true,1),armsPrice(S.towns[single.town],1),S.towns[single.town].lvl,Math.floor(S.towns[single.town].gold/50),!!underAttack(1),Object.keys(S.tech&&S.tech[1]||{}).length]:0,single&&single.reno?1:0,single&&single.level,single&&DEF[single.kind].building&&single.tx!=null?elev[idx(single.tx,single.ty)]:-1,ui.placing,ui.moveId,!!ui.wallA,S.autoBuild,ui.targeting,!!ui.ghost,ui.touchPlace,pawns.length>0,monks.length,trainer&&trainer.id,trainer&&trainer.queue.join(),T.era,T.research&&T.research.era,
-    trainer&&trainer.kind==='castle'&&eraReqMet(1,T.era+1),sel.length===1&&sel[0].id,sel.some(e=>e.team===1&&DEF[e.kind].unit),S.itemsVer,monks.some(m=>m.hero),trainer&&trainer.kind==='market'&&S.market&&[S.market.wood,S.market.food],sel.some(e=>e.team===1&&DEF[e.kind].envoy)]);
+  const key=JSON.stringify([single&&single.kind==='town'&&S.towns&&S.towns[single.town]?[svcActive(1),repOf(S.towns[single.town],1),townPrice(S.towns[single.town],'wood',false,1),townPrice(S.towns[single.town],'food',false,1),townPrice(S.towns[single.town],'wood',true,1),townPrice(S.towns[single.town],'food',true,1),armsPrice(S.towns[single.town],1),S.towns[single.town].lvl,Math.floor(S.towns[single.town].gold/50),!!underAttack(1),Object.keys(S.tech&&S.tech[1]||{}).length,ui.townTab,ctrList().filter(c=>c.state==='active'&&c.town===single.town).map(c=>c.kind+c.team).join(),S.towns[single.town].owner,!!S.towns[single.town].siege,Math.floor((S.towns[single.town].loyal||0)/10),Math.round(honorOf(1)/5),friendOf(S.towns[single.town],1),svcList().list.some(m=>m.state==='run'&&m.type==='contract'&&m.town===single.town),S.t<(S.towns[single.town].festT||0)]:0,single&&single.reno?1:0,single&&single.level,single&&DEF[single.kind].building&&single.tx!=null?elev[idx(single.tx,single.ty)]:-1,ui.placing,ui.moveId,!!ui.wallA,S.autoBuild,ui.targeting,!!ui.ghost,ui.touchPlace,pawns.length>0,monks.length,trainer&&trainer.id,trainer&&trainer.queue.join(),T.era,T.research&&T.research.era,
+    trainer&&trainer.kind==='castle'&&eraReqMet(1,T.era+1),sel.length===1&&sel[0].id,sel.some(e=>e.team===1&&DEF[e.kind].unit),S.itemsVer,monks.some(m=>m.hero),trainer&&trainer.kind==='market'&&S.market&&[S.market.wood,S.market.food],sel.some(e=>e.team===1&&DEF[e.kind].envoy),panelSqKey(sel)]);
   if((key===ui.actKey||ui.pressing)&&!force){updateLive(trainer);return;}
   ui.actKey=key;
   let a='';
@@ -757,7 +771,8 @@ function refreshPanel(force){
   }else if(sel.some(e=>e.team===1&&DEF[e.kind].unit)){
     const mk=sel.find(e=>DEF[e.kind].mech||DEF[e.kind].aura||e.kind==='wizard'||e.kind==='scout'||e.kind==='royal');
     const tip=mk?{ram:'Aríete: toque num prédio, muralha ou portão inimigo. Ele não ataca soldados, então proteja-o com tropas. Flechas quase não o ferem.',catapult:'Catapulta: atira pedras de muito longe e acerta todos em volta. Mantenha soldados na frente: de perto ela não acerta.',paladin:'Paladino: cura aos poucos os aliados em volta e não pode ser convertido. Ótimo na linha de frente.',wizard:'Mago: bolas de fogo que explodem em área. Deixe-o atrás dos guerreiros.',scout:'Batedor: muito rápido e enxerga longe. Use para espiar e caçar peões inimigos.',royal:'Arqueiro real: o mais longo alcance entre os arqueiros. No alto de um morro, vai ainda mais longe.'}[mk.kind]:'';
-    a+=`<button class="act wide" type="button" data-act="stop">Parar</button><button class="act wide" type="button" data-act="deselect">Desmarcar</button><div class="hint">${tip||'Botão direito (ou toque) num inimigo para atacar, ou no chão para andar. Guerreiro vence arqueiro, arqueiro vence lanceiro, lanceiro vence guerreiro.'}</div>`;
+    a+=armyPanel(sel,btn);
+    a+=`<button class="act wide" type="button" data-act="stop">Parar</button><button class="act wide" type="button" data-act="deselect">Desmarcar</button><div class="hint" style="flex:none;width:40ch">${tip||'Botão direito (ou toque) num inimigo para atacar, ou no chão para andar. Guerreiro vence arqueiro, arqueiro vence lanceiro, lanceiro vence guerreiro. A sua ordem vale mais que a do chefe.'}</div>`;
   }else if(sel.length&&sel.every(e=>e.team===1&&DEF[e.kind].naval)){
     a+=`<button class="act wide" type="button" data-act="unload-near" title="Desembarcar na praia mais próxima">Desembarcar<br>aqui perto</button><button class="act wide" type="button" data-act="stop">Parar</button><button class="act wide" type="button" data-act="deselect">Desmarcar</button>`;
     a+=`<div class="hint">Para embarcar: selecione tropas e toque (ou botão direito) no barco perto da margem. Com o barco selecionado, toque na água para navegar ou na terra para desembarcar lá.</div>`;
@@ -848,7 +863,21 @@ actEl.addEventListener('click',ev=>{
   else if(act==='stop')stopUnits();
   else if(act==='deselect')select([]);
   else if(act==='sos'){renderSos();$('ov-sos').hidden=false;}
-  else if(act==='svc-board'){$('ov-svc').hidden=false;renderSvc();}
+  else if(act==='svc-board')openCouncil('road');
+  else if(act==='genorders')openCouncil('army');
+  else if(act==='sqcmd'){const k=b.dataset.act.split(':')[2];let n=0;for(const q of selSquads(liveSel())){const L=byId.get(q.lead);if(alive(L)&&(L.rank||0)>=CMD[k].rank&&(q.cd[k]||0)<=S.t&&sqCommand(q,k,true)==='ok')n++;}if(!n)toast(b.classList.contains('off')?'Nenhum chefe selecionado tem patente para isso, ou o comando ainda está recarregando.':'Nenhum grupo pôde usar esse comando agora.','warn');ui.actKey='';refreshPanel(true);}
+  else if(act==='ttab'){ui.townTab=arg;ui.actKey='';refreshPanel(true);}
+  else if(act==='ctr'){
+    const p=b.dataset.act.split(':'),kind=p[1],T=S.towns[+p[2]],o={min:+p[3]||5},t=ctrTerms(kind,T,1,o);
+    if(b.classList.contains('off')){const f=friendOf(T,1)+(favOf(T,1)>0?1:0);if(activeCtr(T,kind,1))toast('Esse contrato já está em vigor.','warn');else if(f<CTR[kind].need)toast(`${T.name} ainda não confia tanto: esse contrato pede amizade ${FRIEND[CTR[kind].need]} (${repStars(CTR[kind].need)}).`,'warn');else if(t.cost)toastNeed(t.cost);return;}
+    confirmBox(`${CTR[kind].name} com ${T.name}?`,ctrConfirmText(kind,T,t),'Mandar o mensageiro',()=>{
+      const r=proposeContract(1,kind,T.i,o);
+      const msg={ok:`O mensageiro partiu para ${T.name} com a proposta.`,rep:'A vila ainda não confia tanto em você.',cost:'Faltam recursos para esse contrato.',dup:'Esse contrato já está em vigor.',busy:`Já há um mensageiro seu a caminho de ${T.name}.`}[r]||'Não foi possível mandar o mensageiro agora.';
+      toast(msg,r==='ok'?'good':'warn',{x:T.x,y:T.y});ui.actKey='';refreshPanel(true);});
+  }
+  else if(act==='tfest'){const r=townFestival(1,+arg);toast(r==='ok'?'Festa na vila! A lealdade cresceu.':r==='cost'?'Faltam recursos para a festa.':'A última festa foi há pouco.',r==='ok'?'good':'warn');ui.actKey='';refreshPanel(true);}
+  else if(act==='conquer'){const T=S.towns[+arg];confirmBox(`Conquistar ${T.name}?`,'Atacar uma vila neutra custa 25 de honra no total, quebra os contratos com ela e todas as vilas vão desconfiar de você. Selecione o exército e toque na vila: se ele ficar 15 segundos lá sem guardas da vila por perto, ela vira sua vassala.','Declarar o ataque',()=>{const r=startConquest(1,T.i);if(r==='ok'){toast(`Você declarou guerra a ${T.name}. Mande o exército!`,'warn',{x:T.x,y:T.y});armyOrder(1,'free');}ui.actKey='';refreshPanel(true);});}
+  else if(act==='siegego'){const T=S.towns[+arg],U=armyUnits(1);for(const u of U){if(u.svc||u.ctr&&u.leaving)continue;clearU(u);u.order={type:'move',x:T.x+(Math.random()-.5)*90,y:T.y+40+(Math.random()-.5)*60,amove:true};}toast(`${U.length} soldados marcham contra ${T.name}.`,'warn',{x:T.x,y:T.y});}
   else if(act==='place-ok')confirmPlace();
   else if(act==='cancel')cancelModes();
 });
@@ -922,7 +951,10 @@ function svcMsg(r){
   toast({wait:'O seu embaixador esteve lá há pouco. Espere um pouco para voltar.',slots:`Todas as carroças estão na estrada (${svcActive(1)}/${svcSlots(1)}). Espere uma voltar.`,cost:'Faltam recursos para esse serviço.',rep:'A vila ainda não confia o bastante em vocês: faça mais entregas para ela.',pop:'Sem população livre para 3 mercenários.',era:'Armas só a partir da Era II.',nobody:'Não há soldados livres para ceder.',noescort:'Não há soldados livres para a escolta.'}[r]||'Não deu para começar esse serviço.','warn');
 }
 function townPanel(T,btn){
-  let a='';const R=S.teams[1].res,free=svcActive(1)<svcSlots(1),rep=repOf(T,1),img=k=>RES_IMG[k];
+  const tab=ui.townTab||'com';let a=townTabs(T);
+  if(tab==='ctr')return a+townCtrPanel(T,btn);
+  if(tab==='dip')return a+townDipPanel(T,btn);
+  const R=S.teams[1].res,free=svcActive(1)<svcSlots(1),rep=repOf(T,1),img=k=>RES_IMG[k];
   for(const r of['food','wood']){
     const g=Math.round(townPrice(T,r,false,1)*CART_LOAD/100),c=Math.round(townPrice(T,r,true,1)*CART_LOAD/100);
     a+=btn(`svc:sell:${T.i}:${r}`,'',`Vender ${CART_LOAD} de ${RES_NAME[r]} em ${T.name} por ${g} de ouro (o seu mercado paga ${Math.round(sellGain(r)*CART_LOAD/100)})`,`<span class="tr">${img(r)}<b>→</b>${img('gold')}</span><span>Vender ${r==='food'?'comida':'madeira'}</span><span class="cost"><span>-${CART_LOAD} ${img(r)}</span><span>+${g} ${img('gold')}</span></span>`,!free||R[r]<CART_LOAD?'off':'');
@@ -930,16 +962,12 @@ function townPanel(T,btn){
   }
   const ap=armsPrice(T,1),lkA=eraOf(1)<2;
   a+=btn(`svc:arms:${T.i}`,'',`Forjar e levar uma carga de armas: custa ${ARMS_COST.wood} de madeira e ${ARMS_COST.gold} de ouro, ${T.name} paga ${ap}. Risco alto de emboscada.`,`<span class="glyph" style="color:#5a6366">⚔</span><span>Vender armas</span>${lkA?'<span class="lock">Era II</span>':`<span class="cost">${costHTML(ARMS_COST)}<span>+${ap} ${img('gold')}</span></span>`}`,lkA||!free||!afford(1,ARMS_COST)?'off':'');
-  a+=btn(`svc:merc:${T.i}`,'',`Contratar 3 mercenários de ${T.name}: eles vêm a pé até o castelo`,`<img alt="" src="${iconFor('merc',1)}"><span>Mercenários (3)</span>${rep<2?'<span class="lock">★★</span>':`<span class="cost">${costHTML(MERC_COST)}</span>`}`,rep<2||!free||!afford(1,MERC_COST)?'off':'');
-  a+=btn(`svc:soldiers:${T.i}`,'',`Ceder 2 soldados livres para a guarda de ${T.name}: eles vão a pé e a vila paga por eles`,`<img alt="" src="${iconFor('warrior',1)}"><span>Ceder soldados</span><span class="cost">+ouro</span>`,!free?'off':'');
   for(const k of T.techs){
     if(techHas(1,k))continue;const r=T.want==='arms'?'gold':T.want,n=r==='gold'?180:250;
     a+=btn(`svc:tech:${T.i}:${k}`,'',`${TECHS[k].name}: ${TECHS[k].desc} Preço: levar ${n} de ${RES_NAME[r]} até ${T.name}.`,`<span class="glyph">${TECHS[k].glyph}</span><span>${TECHS[k].name}</span>${rep<2?'<span class="lock">★★</span>':`<span class="cost">${costHTML({[r]:n})}</span>`}`,rep<2||!free||R[r]<n?'off':'');
   }
   const mine=Object.keys(TECHS).filter(k=>techHas(1,k)&&!T.known[k]),theirs=T.techs.filter(k=>!techHas(1,k));
   if(mine.length&&theirs.length){const k=theirs[0],g=mine[0];a+=btn(`svc:swap:${T.i}:${k}:${g}`,'',`Trocar tecnologia: vocês ensinam ${TECHS[g].name} e aprendem ${TECHS[k].name}. Um sábio leva os pergaminhos de carroça.`,`<span class="glyph">⇄</span><span>Trocar: ${TECHS[k].name}</span>${rep<1?'<span class="lock">★</span>':'<span class="cost">só a viagem</span>'}`,rep<1||!free?'off':'');}
-  a+=btn(`svc:embassy:${T.i}`,'',`Mandar um embaixador com 60 de ouro de presente: a amizade com ${T.name} cresce`,`<span class="glyph" style="color:#b07a3a">✉</span><span>Embaixador</span><span class="cost">${costHTML({gold:60})}</span>`,!free||R.gold<60||S.t<(T.embT||0)?'off':'');
-  a+=`<button class="act wide${underAttack(1)?' go':''}" type="button" data-act="sos" title="Pedir ajuda às vilas durante um ataque">Pedir<br>ajuda</button>`;
   a+=`<div class="hint" style="flex:none;width:36ch"><b>${TOWN_TITLE[T.lvl||1]} nível ${T.lvl||1}</b> · ${T.pop||0} moradores · tesouro ${Math.floor(T.gold||0)}. <b>Amizade: ${FRIEND[friendOf(T,1)]}</b> ${repStars(rep)}. ${FRIEND_PERKS[friendOf(T,1)]} Carroças: ${svcActive(1)}/${svcSlots(1)}.</div>`;
   return a;
 }
@@ -976,8 +1004,8 @@ HOOK.svc=(what,m,x)=>{
 function renderSvc(){
   if(!S)return;
   const L=svcList(),run=L.list.filter(m=>m.team===1&&m.state==='run');
-  const n=$('svc-n');n.hidden=!run.length;n.textContent=run.length;
-  if($('ov-svc').hidden)return;
+  councilBadge();
+  if(!councilOpen()||COUNCIL.tab!=='road')return;
   $('svc-sum').textContent=`Carroças na estrada: ${run.length}/${svcSlots(1)}. ${S.towns&&S.towns.length?`Vilas neutras: ${S.towns.map(t=>`${t.name} (${TOWN_TITLE[t.lvl||1].toLowerCase()} nível ${t.lvl||1}, ${t.pop||0} moradores) ${repStars(repOf(t,1))} ${FRIEND[friendOf(t,1)]}`).join(' · ')}.`:'Neste modo não há vilas neutras: só os suprimentos para a tropa.'}`;
   $('svc-run').innerHTML=run.length?run.map(m=>{
     const lead=byId.get(m.lead),Lg=m.legs[m.leg],p=Lg&&lead?legPoint(m,Lg):null,prog=p&&Lg.len?Math.max(0,Math.min(1,1-hyp(lead.x-p.x,lead.y-p.y)/Lg.len)):0;
@@ -985,9 +1013,7 @@ function renderSvc(){
     return `<div class="svc-item"><div class="grow"><b>${SVC_NAME[m.type]}</b>${T?` · ${m.type==='escort'?T.name+' → '+S.towns[m.town2].name:T.name}`:''} · ${stage} · escolta ${svcEsc(m).length} · risco ${riskName(m.risk)} · prazo ${fmtT(m.deadline-S.t)}<div class="bar"><i style="width:${Math.round(prog*100)}%"></i></div></div><button class="btn alt sm-btn" type="button" data-see="${m.lead}">Ver</button></div>`;}).join(''):'<p class="meta">Nenhuma carroça na estrada agora.</p>';
   $('svc-log').innerHTML=L.log.length?L.log.slice(0,10).map(r=>`<div class="svc-item ${r.ok?'good':'bad'}"><div class="grow"><b>${r.title}</b> · ${r.who} · ${fmtT(r.t)}<ul>${r.lines.map(l=>`<li>${l}</li>`).join('')}</ul></div></div>`).join(''):'<p class="meta">Ainda não chegou nenhum relatório.</p>';
 }
-$('b-svc').addEventListener('click',()=>{audioInit();$('ov-svc').hidden=false;renderSvc();});
-$('b-svc-close').addEventListener('click',()=>{$('ov-svc').hidden=true;});
-$('svc-run').addEventListener('click',ev=>{const b=ev.target.closest('[data-see]');if(!b)return;const e=byId.get(+b.dataset.see);if(e&&!e.dead){$('ov-svc').hidden=true;centerOn(e.x,e.y);if(e.team===1)select([e]);}});
+$('svc-run').addEventListener('click',ev=>{const b=ev.target.closest('[data-see]');if(!b)return;const e=byId.get(+b.dataset.see);if(e&&!e.dead){$('ov-council').hidden=true;centerOn(e.x,e.y);if(e.team===1)select([e]);}});
 
 // ---------------------------------------------------------------- HUD
 function fmt(s){s=Math.max(0,Math.ceil(s));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
@@ -1018,7 +1044,8 @@ function hud(){
   $('b-idle').textContent=`Ociosos (${idle})`;
   $('b-pause').textContent=ui.paused?'Continuar':'Pausar';
   $('b-speed').textContent=ui.speed+'x';
-  ui.svcT=(ui.svcT||0)+1;if(ui.svcT>=5){ui.svcT=0;renderSvc();sosTick();if(!$('ov-sos').hidden)renderSos();}
+  ui.svcT=(ui.svcT||0)+1;if(ui.svcT>=5){ui.svcT=0;renderSvc();sosTick();if(!$('ov-sos').hidden)renderSos();if(councilOpen())renderCouncil();}
+  moodChip();
   {const tb=$('top').getBoundingClientRect().bottom+6,ts=$('toasts');if(Math.abs((parseFloat(ts.style.top)||0)-tb)>1)ts.style.top=tb+'px';}
   $('b-sound').textContent=SND.on||MUS.on?'Som':'Mudo';$('b-sound').classList.toggle('on',!SND.on&&!MUS.on);
 }
@@ -1215,11 +1242,11 @@ function showMenu(){
 function startGame(p){
   p=p||{};
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
-  const opts={mode,relief:p.relief};
+  const opts={mode,relief:p.relief,fog:p.fog!=null?p.fog:!!$('opt-fog').checked};
   if(mode!=='skirmish'){const key=p.hero||radio('hero')||ui.save.hero||'warrior';ui.save.hero=key;writeSave();const h=ui.save.heroes[key]||{};opts.hero={key,kills:h.kills||0,rank:h.rank||0};}
   if(mode==='campaign')opts.chapter=p.chapter||ui.chapter;
   const c=newGame(ui.seed,diff,opts);
-  ui.last={mode,diff,chapter:opts.chapter,hero:opts.hero&&opts.hero.key};
+  ui.last={mode,diff,chapter:opts.chapter,hero:opts.hero&&opts.hero.key,fog:opts.fog};COUNCIL.log.length=0;COUNCIL.last='';ui.townTab='com';
   ui.seed=newSeed();
   audioInit();
   ui.started=true;ui.paused=false;ui.sel=[];ui.placing=null;ui.targeting=null;ui.foeAttacking=false;ui.speed=1;ui.goalsHTML='';ui.goalsMin=VW<760;
@@ -1281,8 +1308,8 @@ $('b-start').addEventListener('click',()=>startGame());
 $('b-resume').addEventListener('click',()=>{ui.paused=false;$('ov-start').hidden=true;audioInit();});
 $('b-load').addEventListener('click',resumeMatch);
 window.addEventListener('pagehide',saveMatch);
-$('b-again').addEventListener('click',()=>{const L=ui.last||{};startGame({mode:L.mode,diff:L.diff,chapter:L.chapter,hero:L.hero});});
-$('b-next').addEventListener('click',()=>{const L=ui.last||{};ui.chapter=Math.min(5,(L.chapter||1)+1);startGame({mode:'campaign',diff:L.diff,chapter:ui.chapter,hero:L.hero});});
+$('b-again').addEventListener('click',()=>{const L=ui.last||{};startGame({mode:L.mode,diff:L.diff,chapter:L.chapter,hero:L.hero,fog:L.fog});});
+$('b-next').addEventListener('click',()=>{const L=ui.last||{};ui.chapter=Math.min(5,(L.chapter||1)+1);startGame({mode:'campaign',diff:L.diff,chapter:ui.chapter,hero:L.hero,fog:L.fog});});
 $('b-menu').addEventListener('click',showMenu);
 $('c-era').addEventListener('click',()=>{renderEras();$('ov-eras').hidden=false;ui.erasPaused=!ui.paused;ui.paused=true;});
 $('c-foe').addEventListener('click',()=>{if(!S)return;
@@ -1386,13 +1413,13 @@ window.addEventListener('keydown',ev=>{
   if(!S||!ui.started)return;
   const sel=liveSel(),single=sel.length===1?sel[0]:null;
   if(ui.confirm){if(k==='escape')closeConfirm(false);else if(k==='enter')closeConfirm(true);return;}
-  if(k==='escape'){if(ui.placing||ui.targeting)cancelModes();else select([]);}
+  if(k==='escape'){if(councilOpen())$('ov-council').hidden=true;else if(!$('ov-sos').hidden)$('ov-sos').hidden=true;else if(ui.placing||ui.targeting)cancelModes();else select([]);}
   else if((k==='delete'||k==='backspace')&&single&&single.team===1&&DEF[single.kind].building){ev.preventDefault();askDemolish(single);}
   else if(k==='p'){ui.paused=!ui.paused;hud();}
   else if(k===' '){ev.preventDefault();if(ui.lastAlarm)centerOn(ui.lastAlarm.x,ui.lastAlarm.y);}
   else if(k==='.')selectIdle();
   else if(k==='e')selectArmy();
-  else if(k==='j'){$('ov-svc').hidden=!$('ov-svc').hidden;renderSvc();}
+  else if(k==='j'){if(councilOpen())$('ov-council').hidden=true;else openCouncil();}
   else if(k==='v'){ui.speed=ui.speed===1?2:ui.speed===2?3:1;hud();}
   else if(k==='m'){const on=!(SND.on||MUS.on);sndSave({sfx:on,mus:on});}
   else if(k==='h'){const c=castleOf(1);if(c)centerOn(c.x,c.y-40);}
@@ -1447,7 +1474,7 @@ function boot(data){
     const c=newGame(ui.seed,'dificil');
     cam.z=VW<700?1.15:1.5;centerOn(c.x+30,c.y-10);
   }
-  renderMenu();loadBtn();updButton();
+  councilBind();renderMenu();loadBtn();updButton();
   try{localStorage.removeItem('rp.try');}catch(e){}
   if(updOn()){let last=0;try{last=+localStorage.getItem('rp.check')||0;}catch(e){}if(Date.now()-last>6*3600e3)setTimeout(()=>checkUpdate(false),6000);}
   loadAssets(ok=>{
@@ -1463,4 +1490,5 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==='function')hot.snapshot(()=>({S,cam:{x:cam.x,y:cam.y,z:cam.z},started:ui.started}));
 if(hot&&typeof hot.ready==='function')hot.ready(boot);else boot((hot&&hot.data)||{});
 window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTick,startPlacing,townRaid,townHelpAnswer,svcOrder,svcList,MUS,musStep,musSection,musEnter,SND,musInit,MOODS,voxSay,VOX,startGame,showMenu,forgeItem,giveItem,waveInfo,goalState,CHAPTERS,ITEMS,talk,__addKill:addKill,spawnUnit,autoJob,afford,unlocked,castleOf,update,render,command,select,newGame,pick,confirmPlace,startPlacing,trainAt,ui,cam,DEF,byId,canPlace,refreshPanel,hud,drawMini,popUsed,popCap,startResearch,castAt,startTargeting,placeBuilding,ghostFor,ERAS,eraOf,FX,setRally,
+  proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
   setAT(v){AT=v;}};

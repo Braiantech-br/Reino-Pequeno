@@ -18,7 +18,7 @@ const TECHS={
   mapas:{name:'Mapas das estradas',glyph:'🗺',desc:'Emboscadas na estrada 35% menos prováveis.'},
   botas:{name:'Botas de marcha',glyph:'👢',desc:'Soldados andam 8% mais rápido.'},
 };
-const SVC_NAME={garrison:'Guarda da vila',embassy:'Embaixada',sell:'Venda',buy:'Compra',arms:'Transporte de armas',escort:'Escolta de mercador',supply:'Suprimentos para a tropa',merc:'Mercenários',soldiers:'Cessão de soldados',tech:'Compra de tecnologia',swap:'Troca de tecnologia'};
+const SVC_NAME={contract:'Mensageiro',garrison:'Guarda da vila',embassy:'Embaixada',sell:'Venda',buy:'Compra',arms:'Transporte de armas',escort:'Escolta de mercador',supply:'Suprimentos para a tropa',merc:'Mercenários',soldiers:'Cessão de soldados',tech:'Compra de tecnologia',swap:'Troca de tecnologia'};
 const ARMS_COST={wood:80,gold:40},MERC_COST={gold:260},CART_LOAD=200;
 const FOLK=['Bento','Lia','Tomé','Inês','Joana','Duarte','Rui','Beatriz','Afonso','Leonor','Nuno','Teresa','Vasco','Clara','Gil','Mafalda','Álvaro','Isaura','Fernão','Brites','Martim','Urraca'];
 function folkName(u){if(!u)return 'alguém';if(!u.nm)u.nm=FOLK[Math.floor(hash(u.id*31+7)*FOLK.length)];return u.nm;}
@@ -40,8 +40,8 @@ const repOf=(t,team)=>Math.min(5,Math.max(0,t.rep[team]||0));
 const repStars=n=>{n=Math.floor(n);return '★'.repeat(n)+'☆'.repeat(5-n);};
 // gold paid (or asked) for 100 of a resource: the fuller the town's stock, the cheaper it gets; reputation helps both ways
 function townPrice(t,r,buy,team){
-  const st=Math.max(40,t.stock[r]||450),f=Math.pow(500/st,.55),rep=repOf(t,team||1);
-  return Math.round(clamp(buy?100*f*(1-.04*rep):88*f*(1+.04*rep),buy?45:35,buy?200:180));
+  const st=Math.max(40,t.stock[r]||450),f=Math.pow(500/st,.55),rep=repOf(t,team||1),side=typeof loyalTo==='function'&&loyalTo(t)===(team||1);
+  return Math.round(clamp(buy?100*f*(1-.04*rep)*(side?.85:1):88*f*(1+.04*rep)*(side?1.12:1),buy?40:35,buy?200:200));
 }
 function armsPrice(t,team){return Math.round(t.arms*(1+.05*repOf(t,team||1)));}
 
@@ -102,7 +102,7 @@ function updTowns(){
 const SVC_ACTIVE=m=>m.state==='run';
 function svcList(){S.svc=S.svc||{list:[],log:[],n:0,offerT:70,cd:{}};return S.svc;}
 function svcSlots(team){return 1+Math.floor(eraOf(team)/2);}
-function svcActive(team){return svcList().list.filter(m=>m.team===team&&SVC_ACTIVE(m)).length;}
+function svcActive(team){return svcList().list.filter(m=>m.team===team&&SVC_ACTIVE(m)&&m.type!=='contract').length;}
 function walkNear(x,y){const w=nearestWalk(clamp(tileOf(x),0,MW-1),clamp(tileOf(y),0,MH-1));return w?{x:w[0]*TS+16,y:w[1]*TS+16}:{x,y};}
 function homePoint(team){
   const mk=BLDS.find(b=>!b.dead&&b.team===team&&b.kind==='market'&&b.built),c=mk||castleOf(team);if(!c)return null;
@@ -170,6 +170,7 @@ function svcLegs(m){
     case 'soldiers':return [{to:town,amb:true,act:'enlist',walk:true}];
     case 'garrison':return [{to:town,act:'stay',walk:true},{to:town,act:'stayend',walk:true,stay:true},{to:home,act:'home',walk:true}];
     case 'embassy':return [{to:town,amb:true,act:'visit',walk:true},{to:home,act:'home',walk:true}];
+    case 'contract':return [{to:town,amb:true,act:'propose',walk:true},{to:home,act:'home',walk:true}];
   }
   return [];
 }
@@ -204,8 +205,10 @@ function svcStart(m){
   }else if(m.type==='garrison'){
     const sol=freeSoldiers(m.team,m.from.x,m.from.y).slice(0,3);if(sol.length<2){refund(m.team,m.cost);L.list.splice(L.list.indexOf(m),1);m.state='declined';return 'noescort';}
     m.ids=sol.map(u=>u.id);m.lead=m.ids[0];sol[0].svc=m.id;for(const u of sol.slice(1))svcJoin(m,u);m.escCount=sol.length;m.bossName=rankedName(sol.sort((a,b)=>(b.rank||0)-(a.rank||0))[0]);
-  }else if(m.type==='embassy'){
-    const p=walkNear(m.from.x,m.from.y),d=spawnUnit('diplomat',m.team,p.x,p.y,{svc:m.id});d.nm=['Dom Gil','Dona Inês','Mestre Rui','Dona Beatriz'][m.id%4];m.lead=d.id;m.ids=[d.id];m.driver=d.nm;
+  }else if(m.type==='embassy'||m.type==='contract'){
+    const sc=m.type==='contract'&&m.scoutId&&byId.get(m.scoutId);
+    if(alive(sc)&&!sc.svc&&sc.team===m.team){sc.svc=m.id;sc.order=null;sc.path=null;m.lead=sc.id;m.ids=[sc.id];m.driver=`${RANKS[sc.rank||0].n} ${folkName(sc)}`;m.byScout=true;}
+    else{const p=walkNear(m.from.x,m.from.y),d=spawnUnit('diplomat',m.team,p.x,p.y,{svc:m.id});d.nm=['Dom Gil','Dona Inês','Mestre Rui','Dona Beatriz'][m.id%4];m.lead=d.id;m.ids=[d.id];m.driver=d.nm;}
   }else if(m.type==='escort'){
     const lead=m.esc.map(id=>byId.get(id)).find(alive);m.lead=lead?lead.id:0;
   }else{
@@ -375,6 +378,20 @@ function svcArrive(m,lg,lead){
       else if(f>=4){m.got=[`a promessa de ajuda de graça se formos atacados`];}
       else m.got=[`a amizade de ${T.name} (agora: ${FRIEND[f]})`];
       break;}
+    case 'propose':{
+      const t=m.terms;m.delivered=true;
+      if(t.kind==='help'){const r=askHelp(team,T.i,t.foe,t.p);m.helpRes=r.kind;m.got=[r.kind==='free'?`${r.n} guardas de graça`:r.kind==='paid'?`uma proposta: ${r.n} guardas por ${r.cost.gold} de ouro`:'uma recusa'];
+        if(r.kind==='paid'){if(team===1)ask({kind:'help',town:T.i,foe:t.foe,p:t.p,terms:r,cost:r.cost,who:`${T.name} responde ao mensageiro`,av:'av14',text:`Podemos mandar ${r.n} guardas, mas a guerra não é nossa: pedimos ${r.cost.gold} de ouro pela ajuda. (Amizade: ${FRIEND[friendOf(T,team)]})`,loc:t.p});else if(afford(2,r.cost))payHelp(2,T.i,t.foe,t.p,r);}
+        HOOK.ctr('helpAnswer',{team,town:T.i},r);break;}
+      const d=townDecide(T,team,t);m.decision=d;
+      if(d.ok){const c=ctrActivate(team,t);m.ctrId=c.id;m.got=[CTR[t.kind].name];}
+      else if(d.counter){
+        m.got=[`uma contraproposta: ${d.counter.gold} de ouro`];
+        if(team===1)ask({kind:'counter',town:T.i,terms:t,price:d.counter,outbid:d.outbid,who:`${T.name} responde ao mensageiro`,av:'av14',text:`${d.why} Pedem ${d.counter.gold} de ouro por: ${CTR[t.kind].name}. Fechar?`,cost:d.counter,loc:{x:T.x,y:T.y}});
+        else if(afford(2,d.counter)&&d.counter.gold<=S.teams[2].res.gold*.6){t.cost=d.counter;t.raised=true;if(d.outbid)t.outbid=d.outbid;ctrActivate(2,t);}
+      }else m.failedWhy=d.why;
+      if(team===1)HOOK.ctr('answer',{team,town:T.i,terms:t},d);
+      break;}
     case 'arrive':for(const id of m.ids||[]){const u=byId.get(id);if(alive(u)){u.svc=null;u.order=null;}}m.delivered=true;svcDone(m,true);return;
     case 'enlist':{
       let n=0;for(const id of m.ids){const u=byId.get(id);if(!alive(u))continue;const g=spawnUnit('guard',0,u.x,u.y,{home:{x:u.x,y:u.y},town:m.town});g.nm=folkName(u);removeQuiet(u);n++;}
@@ -413,13 +430,19 @@ function svcReport(m,rep){
   if(m.type==='merc')lines.push(`Três mercenários vieram a pé de ${T.name}.`);
   else if(m.type==='garrison')lines.push(`${m.escCount||m.ids.length} soldados guardaram ${T.name} por dois minutos${m.bossName?`, sob o comando de ${m.bossName}`:''}.`);
   else if(m.type==='embassy')lines.push(`${m.driver||'Nosso embaixador'} levou ${m.cost.gold} de ouro de presente a ${T.name}.`);
+  else if(m.type==='contract'){const t=m.terms,d=m.decision;
+    lines.push(`${m.byScout?'O batedor':'O mensageiro'} ${m.driver||''} levou a proposta: ${CTR[t.kind].name}.`);
+    if(t.kind==='help')lines.push(m.helpRes==='free'?`${T.name} mandou guardas de graça.`:m.helpRes==='paid'?`${T.name} pediu ouro para mandar guardas.`:`${T.name} não pôde ajudar desta vez.`);
+    else if(d&&d.ok)lines.push(`${T.name} aceitou. ${{merc:'Os mercenários já estão a caminho.',mercLife:'Os mercenários já estão a caminho.',hero:'O herói já está a caminho.',garrison:'A guarnição já marcha para os seus postos.',protect:'A partir de agora, a vila manda guardas quando vocês forem atacados.',loyalty:'Juraram lealdade: não negociam mais com o inimigo.',route:'A primeira caravana já está saindo.',liberate:'A vila agora está do nosso lado.'}[t.kind]||''}`);
+    else if(d&&d.counter)lines.push(`${T.name} fez uma contraproposta: ${d.counter.gold} de ouro.`);
+    else if(d)lines.push(`${T.name} recusou: ${d.why}`);}
   else if(m.type==='soldiers')lines.push(`${m.ids.length} ${m.ids.length===1?'soldado foi':'soldados foram'} servir a guarda de ${T.name}.`);
   else lines.push(escN?`Escolta de ${escN} ${escN===1?'soldado':'soldados'}${m.bossName?`, comandada por ${m.bossName}`:''}. Carroça de ${m.driver||'um tropeiro'}.`:`Sem escolta. Carroça de ${m.driver||'um tropeiro'}.`);
   if(m.stats.amb.length){const n=m.stats.amb.reduce((a,b)=>a+b.n,0);lines.push(`Emboscada na estrada: ${n} bandidos. Derrubamos ${m.stats.killed}${m.stats.fled?`, ${m.stats.fled} fugiram`:''}.`);}
   else lines.push('Estrada tranquila: nenhuma emboscada.');
   lines.push(m.stats.lost.length?`Perdas: ${m.stats.lost.join(', ')}.`:'Ninguém da comitiva morreu.');
   if(m.ok){
-    if(m.got&&m.got.length)lines.push(`${m.type==='tech'||m.type==='swap'?'Aprendemos':m.type==='supply'?'Resultado:':m.type==='embassy'?'Conquistamos':'Recebemos'} ${m.got.join(' e ')}${m.type==='swap'?` em troca de ${TECHS[m.give].name}`:''}.`);
+    if(m.got&&m.got.length&&m.type!=='contract')lines.push(`${m.type==='tech'||m.type==='swap'?'Aprendemos':m.type==='supply'?'Resultado:':m.type==='embassy'?'Conquistamos':'Recebemos'} ${m.got.join(' e ')}${m.type==='swap'?` em troca de ${TECHS[m.give].name}`:''}.`);
   }else{
     const by2=m.killer===2?'o Reino Vermelho':m.killer===3?'os bandidos':'o inimigo';
     const why={cart:m.type==='escort'?`A carroça do mercador foi destruída por ${by2}: não recebemos nada.`:`A carroça foi destruída e a carga ficou com ${by2}.`,all:'Ninguém chegou ao destino.',stuck:'A carroça não achou caminho e voltou.'}[m.failed]||'O serviço fracassou.';
@@ -504,6 +527,8 @@ function svcAnswer(q,yes){
 // the player orders a service straight from the town's market
 function svcOrder(type,townI,arg,arg2){
   const T=S.towns[townI];if(!T)return 'notown';
+  {const side=loyalTo(T);if(side&&side!==1&&type!=='embassy')return 'sworn';}
+  if(townFoe(townI,1))return 'hostile';
   if(svcActive(1)>=svcSlots(1))return 'slots';
   const c=castleOf(1);const sol=freeSoldiers(1,c.x,c.y);
   let m=null;
@@ -530,7 +555,7 @@ function aiTrade(dt){
   S.aiTradeT=(S.aiTradeT??240)-dt;if(S.aiTradeT>0)return;S.aiTradeT=150+Math.random()*80;
   if(svcActive(2)>=1)return;
   const R=S.teams[2].res;let best=null,bp=0;
-  for(const T of S.towns)for(const r of['wood','food']){if(R[r]<380)continue;const p=townPrice(T,r,false,2);if(p>bp){bp=p;best={T,r};}}
+  for(const T of S.towns)for(const r of['wood','food']){if(R[r]<380||(loyalTo(T)&&loyalTo(T)!==2)||townFoe(T.i,2))continue;const p=townPrice(T,r,false,2);if(p>bp){bp=p;best={T,r};}}
   if(!best||bp<90)return;
   const m=svcNew('sell',2,{town:best.T.i,res:best.r,n:CART_LOAD});if(!m)return;m.escN=2;
   if(svcStart(m)==='ok'){m.aiTech=true;}

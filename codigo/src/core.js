@@ -3,7 +3,7 @@ const TS=32;let MW=96, MH=64, N=MW*MH;
 // Batalha Rápida plays on a bigger island (twice the area and more); the story chapters keep the classic size
 const mapSizeFor=mode=>mode==='skirmish'?[136,92]:[96,64];
 const WATER=0, GRASS=1, SAND=2, TREE=3, STUMP=4, ROAD=5, PIT=6;
-const HOOK={sos(){},townGrow(){},envoy(){},report(){},ambush(){},svc(){},trained(){},fear(){},village(){},terrain(){},skill(){},tired(){},rested(){},renovated(){},ask(){},raid(){},wildNews(){},engineer(){},diplo(){},built(){},toast(){},sfx(){},tile(){},loaded(){},era(){},over(){},alarm(){},idle(){},rank(){},wild(){},talk(){},goal(){},item(){},wave(){},waveDone(){}};
+const HOOK={council(){},honor(){},ctr(){},town(){},army(){},scout(){},econ(){},sos(){},townGrow(){},envoy(){},report(){},ambush(){},svc(){},trained(){},fear(){},village(){},terrain(){},skill(){},tired(){},rested(){},renovated(){},ask(){},raid(){},wildNews(){},engineer(){},diplo(){},built(){},toast(){},sfx(){},tile(){},loaded(){},era(){},over(){},alarm(){},idle(){},rank(){},wild(){},talk(){},goal(){},item(){},wave(){},waveDone(){}};
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const hyp=Math.hypot;
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -110,7 +110,7 @@ const SPELL={
 // counters: warrior > archer > lancer > warrior
 const BONUS={warrior:{archer:1.6,monk:1.3},archer:{lancer:1.6,monk:1.3,building:.35},lancer:{warrior:1.6,monk:1.3,building:.9},pawn:{building:.7},
   scout:{pawn:2.2,merchant:2,monk:1.5,building:.4},wizard:{building:.6},ram:{building:1},catapult:{building:2.2,unit:.75}};
-function bonus(ak,tk){const b=BONUS[ak]||BONUS[baseKind(ak)];if(!b)return 1;if(DEF[tk].building)return b.building!=null?b.building:1;const m=DEF[tk].mech&&!DEF[ak].mech?.8:1;return (b[tk]||b[baseKind(tk)]||b.unit||1)*m;}
+function bonus(ak,tk){if(DEF[ak]&&DEF[ak].wallx&&DEF[tk]&&DEF[tk].wall)return DEF[ak].wallx;const b=BONUS[ak]||BONUS[baseKind(ak)];if(!b)return 1;if(DEF[tk].building)return b.building!=null?b.building:1;const m=DEF[tk].mech&&!DEF[ak].mech?.8:1;return (b[tk]||b[baseKind(tk)]||b.unit||1)*m;}
 const healable=e=>!!DEF[e.kind].unit&&!DEF[e.kind].mech;
 const DIFF={
   normal: {key:'normal',name:'Normal',gather:.9,think:1.6,attackBase:12,start:0,harass:false,pawnBonus:-3,monks:1,peace:480,eraMin:[0,0,300,660,1020,1380]},
@@ -152,14 +152,14 @@ function canStep(a,b){const ea=elev[a],eb=elev[b];if(ea===eb)return true;if(ramp
 const tileIdx=(x,y)=>idx(clamp(tileOf(x),0,MW-1),clamp(tileOf(y),0,MH-1));
 const elevAt=(x,y)=>elev[tileIdx(x,y)];
 const byId=new Map();
-const FX={speech:[],orders:[],floats:[],marks:[],puffs:[],pings:[],booms:[],rings:[],bolts:[],meteors:[],banners:[],sparks:[],ranks:[]};
+const FX={speech:[],orders:[],floats:[],marks:[],puffs:[],pings:[],booms:[],rings:[],bolts:[],meteors:[],banners:[],sparks:[],ranks:[],cmds:[]};
 const treeShake=new Map();
 let AT=0;
 
 const eraOf=t=>(S&&S.teams[t])?S.teams[t].era:1;
 const has=k=>!!(S&&S.items&&S.items[k]);
-function gatherMult(t){const e=eraOf(t);return (1+(e>=2?.15:0)+(e>=4?.15:0)+(e>=5?.1:0))*(t===2?S.diff.gather:1)*(t===1&&has('ferramentas')?1.2:1);}
-function atkMult(u){return (u.hero?1.8:1)*(u.team===1&&has('armas')?1.15:1)*(u.medic?.5:1)*(u.supT>S.t?1.15:1)*(DEF[u.kind].ranged&&techHas(u.team,'flechas')?1.12:1);}
+function gatherMult(t){const e=eraOf(t);return econWork(t)*(1+(e>=2?.15:0)+(e>=4?.15:0)+(e>=5?.1:0))*(t===2?S.diff.gather:1)*(t===1&&has('ferramentas')?1.2:1);}
+function atkMult(u){return (u.sq?sqAtk(u):1)*(u.team&&u.team<3&&S.econ&&S.econ[u.team]&&S.econ[u.team].unpaid&&DEF[u.kind].mil?.9:1)*(u.hero?1.8:1)*(u.team===1&&has('armas')?1.15:1)*(u.medic?.5:1)*(u.supT>S.t?1.15:1)*(DEF[u.kind].ranged&&techHas(u.team,'flechas')?1.12:1);}
 function carryCap(t){const e=eraOf(t);return e>=5?16:e>=3?13:10;}
 // wild creatures grow tougher as the game goes on
 function wildMult(){return 1+Math.min(1,(S?S.t:0)/1800)*.8;}
@@ -227,7 +227,7 @@ function addEnt(e){S.ents.push(e);byId.set(e.id,e);return e;}
 function spawnUnit(kind,team,x,y,extra){
   const D=DEF[kind];
   const hp=Math.round(D.hp*(team?hpMult(team,kind):1));
-  const e={id:S.nextId++,kind,team,x,y,hp:Math.round(hp*(D.cart&&techHas(team,'rodas')?1.3:1)),maxhp:Math.round(hp*(D.cart&&techHas(team,'rodas')?1.3:1)),order:null,path:null,carry:null,cd:0,face:team===2?-1:1,scan:Math.random()*.4};
+  const e={id:S.nextId++,born:S.t,kind,team,x,y,hp:Math.round(hp*(D.cart&&techHas(team,'rodas')?1.3:1)),maxhp:Math.round(hp*(D.cart&&techHas(team,'rodas')?1.3:1)),order:null,path:null,carry:null,cd:0,face:team===2?-1:1,scan:Math.random()*.4};
   if(D.critter){e.amount=D.food;e.team=0;}
   if(D.boss||D.king)e.face=team===1?1:-1;
   if(D.holy){e.faith=1;e.boltCd=0;e.meteorCd=0;}
@@ -691,6 +691,7 @@ function newGame(seed,diffKey,opts){
   S.cfg=modeConfig(mode,S.chapter);
   {const sz=opts.size||mapSizeFor(mode);setMapSize(sz[0],sz[1]);S.mw=MW;S.mh=MH;}
   if(opts.oldWild){S.cfg.towns=false;S.cfg.camps=true;}
+  if(opts.fog)S.cfg=Object.assign({},S.cfg,{fog:true});
   const castles=setupWorld();
   if(S.cfg.redAI)aiInit();
   afterLoad();
@@ -837,7 +838,7 @@ function pathToRect(u,r){
 }
 
 // ================================================================ movement: right-hand avoidance, mass-based separation, anti-stuck
-function speedOf(u){const D=DEF[u.kind];return D.speed*(u.slowT>0?.5:1)*(D.cart&&techHas(u.team,'rodas')?1.25:1)*(D.mil&&!D.mech&&techHas(u.team,'botas')?1.08:1);}
+function speedOf(u){const D=DEF[u.kind];return D.speed*(u.sq?sqSpeed(u):1)*(u.slowT>0?.5:1)*(D.cart&&techHas(u.team,'rodas')?1.25:1)*(D.mil&&!D.mech&&techHas(u.team,'botas')?1.08:1);}
 function avoid(u,nx,ny){
   let sx=0,sy=0;const ru=DEF[u.kind].r;
   forNear(u.x,u.y,30,o=>{
@@ -961,7 +962,7 @@ function resolveCrowd(u){
 }
 
 // ================================================================ queries
-function popUsed(t){let n=0;for(const e of S.ents){if(e.dead||e.team!==t)continue;if(e.cargo)n+=e.cargo.length;if(DEF[e.kind].unit&&!DEF[e.kind].king&&!DEF[e.kind].boss&&!DEF[e.kind].noPop&&!e.hero&&!e.ally)n++;if(e.queue)n+=e.queue.length;}return n;}
+function popUsed(t){let n=0;for(const e of S.ents){if(e.dead||e.team!==t)continue;if(e.cargo)n+=e.cargo.length;if(DEF[e.kind].unit&&!DEF[e.kind].king&&!DEF[e.kind].boss&&!DEF[e.kind].noPop&&!e.hero&&!e.ally&&!e.ctr)n++;if(e.queue)n+=e.queue.length;}return n;}
 function popCap(t){let n=0;for(const e of S.ents)if(!e.dead&&e.team===t&&e.built&&DEF[e.kind].pop)n+=e.kind==='house'?housePop(e):DEF[e.kind].pop;return Math.min(100,n);}
 function afford(t,c){if(!c)return true;const r=S.teams[t].res;for(const k in c)if(r[k]<c[k])return false;return true;}
 function pay(t,c){const r=S.teams[t].res;for(const k in c)r[k]-=c[k];}
@@ -973,11 +974,11 @@ function pickTarget(u,range,opts){
   let best=null,bs=1e9;const D=DEF[u.kind]||{},raid=opts&&opts.raid;
   if(D.siege&&opts&&opts.unitsOnly)return null;
   // town folk only fight bandits (or whoever they were sent against); bandits on a raid may go for a town
-  const neu=u.team===0,foes=neu?(u.aid&&S.t<u.aid.until?u.aid.foes:[3]):null;
+  const neu=u.team===0,foes=neu?neuFoes(u):null,focus=u.sq?sqFocus(u):0;
   if(!D.siege)forNear(u.x,u.y,range,e=>{
     if(e.dead||e.team===u.team||!DEF[e.kind].unit)return;
     if(neu){if(!foes.includes(e.team))return;}
-    else if(!e.team&&!(u.vsTown!=null&&DEF[e.kind].neutral&&e.town===u.vsTown)&&!(e.aid&&S.t<e.aid.until&&e.aid.foes.includes(u.team)))return;
+    else if(!e.team&&!(u.vsTown!=null&&DEF[e.kind].neutral&&e.town===u.vsTown)&&!(e.aid&&S.t<e.aid.until&&e.aid.foes.includes(u.team))&&!(e.town!=null&&townFoe(e.town,u.team))&&!(u.team===3&&DEF[e.kind].cart))return;
     if(u.team===3&&DEF[e.kind].envoy)return;
     const d=hyp(e.x-u.x,e.y-u.y);if(d>range)return;
     let s=d-(1-e.hp/e.maxhp)*(D.ranged?70:35);
@@ -985,13 +986,14 @@ function pickTarget(u,range,opts){
     if(e.kind==='monk')s-=60;
     if(e.kind==='pawn')s+=raid?-50:70;
     if(e.order&&e.order.type==='attack'){const tt=byId.get(e.order.id);if(tt&&tt.team===u.team)s-=35;}
+    if(focus&&e.id===focus)s-=70;
     if(s<bs){bs=s;best=e;}
   });
   if(best||(opts&&opts.unitsOnly))return best;
   if(neu)return null;
   for(const b of BLDS){
     if(b.dead||b.team===u.team)continue;
-    if(!b.team&&!(u.vsTown!=null&&DEF[b.kind].townb&&b.town===u.vsTown))continue;
+    if(!b.team&&!(u.vsTown!=null&&DEF[b.kind].townb&&b.town===u.vsTown)&&!(DEF[b.kind].townb&&b.town!=null&&townFoe(b.town,u.team)))continue;
     let d=distRect(u.x,u.y,rectOf(b));if(d>range)continue;
     if(DEF[b.kind].dmg)d-=30;
     if(b.kind==='farm')d+=20;
@@ -1100,6 +1102,10 @@ function update(dt){
   updWild(dt);
   tradeTick(dt);
   townsTick(dt);
+  diploTick(dt);
+  armyTick(dt);
+  scoutTick(dt);
+  econTick(dt);
   S.mkt1=(S.mkt1||0)+dt;if(S.mkt1>=1){S.mkt1=0;updMarket();}
   engineerBrain(dt);
   villageMind(dt);
@@ -1144,7 +1150,12 @@ function updUnit(u,dt){
   u.anim=null;PT=u.team||0;PNAV=!!D.naval;
   if(D.naval){updBoat(u,dt);PNAV=false;return;}
   if(u.breach){const w=byId.get(u.breach);u.breach=0;if(alive(w)&&w.team!==u.team&&DEF[u.kind].mil){const bk=u.order&&u.order.type!=='attack'?u.order:(u.order&&u.order.type==='attack'?u.order:null);u.order={type:'attack',id:w.id,back:bk};u.path=null;}}
-  if((D.regen||u.hero||(u.rank||0)>=3||u.supT>S.t)&&u.hp<u.maxhp&&S.t-(u.lastHit||-99)>4)u.hp=Math.min(u.maxhp,u.hp+(D.regen||u.maxhp*(u.supT>S.t?.018:.012))*dt);
+  if((D.regen||u.hero||D.thero||(u.rank||0)>=3||u.supT>S.t)&&u.hp<u.maxhp){
+    const calm=S.t-(u.lastHit||-99)>4,rk=u.rank||0,rf=REGEN[rk]||1;
+    if(calm)u.hp=Math.min(u.maxhp,u.hp+(D.regen||u.maxhp*(u.supT>S.t?.018:.012)*Math.max(1,rf))*dt);
+    else if(rk>=6)u.hp=Math.min(u.maxhp,u.hp+u.maxhp*.012*rf*.4*dt);
+  }
+  if(D.feed){u.feedT=(u.feedT||0)-dt;if(u.feedT<=0){u.feedT=4;forNear(u.x,u.y,120,e=>{if(e.dead||e.team!==u.team||!DEF[e.kind].mil||!healable(e)||hyp(e.x-u.x,e.y-u.y)>120)return;e.supT=Math.max(e.supT||0,S.t+6);});}}
   if(u.stunT>0){u.stunT-=dt;u.moving=false;return;}
   if(!walkPt(u.x,u.y)){const w=nearestWalk(clamp(tileOf(u.x),0,MW-1),clamp(tileOf(u.y),0,MH-1));if(w){u.x=w[0]*TS+16;u.y=w[1]*TS+16;u.path=null;}}
   if(u.kind==='pawn'||u.kind==='engineer'||u.kind==='bpawn')pawnSafety(u,dt);
@@ -1170,6 +1181,9 @@ function updUnit(u,dt){
   else if(o2.type==='twork')doTWork(u,dt);
   else if(o2.type==='tbuild')doTBuild(u,dt);
   else if(o2.type==='envoy')doEnvoy(u,dt);
+  else if(o2.type==='haul')doHaul(u,dt);
+  else if(o2.type==='sweep')doSweep(u,dt);
+  else if(o2.type==='trade')doTrader(u,dt);
   lifeTick(u,dt);
   antiStuck(u,dt);
 }
@@ -1184,9 +1198,13 @@ function idleBrain(u,dt){
   const D=DEF[u.kind];
   u.scan-=dt;if(u.scan>0)return;
   u.scan=.4;
-  if(D.neutral){if(u.kind==='npawn')townPawnBrain(u);else if(u.kind==='envoyN'){}else if(aidActive(u))aidBrain(u);else{u.aid=null;neutralBrain(u);}return;}
-  if(u.kind==='diplomat')return;
   if(D.cart)return;
+  if(D.neutral||u.team===0&&D.unit){
+    if(u.leaving)return;
+    if(u.guardOf){cartGuardBrain(u);return;}
+    if(u.kind==='npawn'){if(u.master)masterBrain(u);else townPawnBrain(u);}else if(u.kind==='envoyN'){}else if(aidActive(u))aidBrain(u);else{u.aid=null;neutralBrain(u);}return;}
+  if(u.kind==='diplomat')return;
+  if(u.trader){traderIdle(u);return;}
   if(u.kind==='bpawn'){if(u.team===3)wildWorker(u);else autoJob(u);return;}
   if(u.medic){medicBrain(u);return;}
   if(D.king||u.guard||u.ally){guardBrain(u);return;}
@@ -1271,8 +1289,9 @@ function onWall(u){
 function doAttack(u,dt){
   const o=u.order,D=DEF[u.kind],t=byId.get(o.id);
   const tAid=t&&t.aid&&S.t<t.aid.until&&t.aid.foes.includes(u.team),uAid=u.aid&&S.t<u.aid.until&&t&&u.aid.foes.includes(t.team);
-  const tTown=t&&u.vsTown!=null&&t.town===u.vsTown&&(DEF[t.kind].neutral||DEF[t.kind].townb);
-  if(!alive(t)||t.team===u.team||(!t.team&&!tAid&&!tTown)||(D.neutral&&t.team!==3&&!uAid)){finish(u);return;}
+  const tTown=t&&((u.vsTown!=null&&t.town===u.vsTown&&(DEF[t.kind].neutral||DEF[t.kind].townb))||(!t.team&&t.town!=null&&t.kind!=='town'&&townFoe(t.town,u.team))||(o.loot&&DEF[t.kind].cart)||(u.team===3&&DEF[t.kind].cart));
+  const uTown=u.team===0&&u.town!=null&&t&&townFoe(u.town,t.team);
+  if(!alive(t)||t.team===u.team||(!t.team&&!tAid&&!tTown)||(D.neutral&&t.team!==3&&!uAid&&!uTown)){finish(u);return;}
   const TD=DEF[t.kind],tb=!!TD.building;
   if(D.siege&&!tb){finish(u);return;}
   // smarter target choice while auto-fighting: switch to units that threaten us
@@ -1312,6 +1331,9 @@ function doAttack(u,dt){
       u.cd=D.cd;u.atkT=.45;
       const dmg=D.dmg*dmgMult(u.team)*rankDmg(u.rank||0)*bonus(u.kind,t.kind)*atkMult(u)*hiMult(u,t);
       if(D.ranged)shoot(u,t,dmg,u,D.proj,D.splash);else damage(t,dmg,u);
+      if(D.cleave&&!tb)forNear(t.x,t.y,D.cleave+10,e=>{if(e===t||e.dead||!e.team||e.team===u.team||!DEF[e.kind].unit||hyp(e.x-t.x,e.y-t.y)>D.cleave)return;damage(e,dmg*.55,u);});
+      if(D.volley&&!tb){let k=D.volley-1;forNear(u.x,u.y,D.range,e=>{if(k<=0||e===t||e.dead||!e.team||e.team===u.team||!DEF[e.kind].unit||hyp(e.x-u.x,e.y-u.y)>D.range)return;k--;shoot(u,e,dmg*.7,u);});}
+      if(D.stun&&!tb&&DEF[t.kind].unit&&!DEF[t.kind].boss)t.stunT=Math.max(t.stunT||0,D.stun);
       if(D.siege)HOOK.sfx('ram',t.x,t.y,u.team);
 
     }
@@ -1695,7 +1717,7 @@ function updBuilding(b,dt){
     if(b.cd<=0){
       const c=centerOf(b),ox=c.x,oy=c.y-D.h*TS*.3;
       const lv=elev[idx(b.tx,b.ty)];
-      const e=pickTarget({x:ox,y:oy,team:b.team,kind:'archer'},D.range*towerReach(lv),{unitsOnly:true});
+      const e=pickTarget({x:ox,y:oy,team:b.team,kind:'archer',town:b.town},D.range*towerReach(lv),{unitsOnly:true});
       if(e){b.cd=D.cd;shoot({x:ox,y:oy,team:b.team},e,D.dmg*towerMult(b.team)*(1+.15*lv)*(techHas(b.team,'flechas')?1.12:1),b);}else b.cd=.3;
     }
   }
@@ -1771,10 +1793,13 @@ function damage(t,dmg,src){
   if(!alive(t))return;
   const TD=DEF[t.kind];
   if(t.team===1&&TD.unit&&has('escudos'))dmg*=.85;
+  const SDp=src&&DEF[src.kind];
+  if(TD.armor&&!(SDp&&SDp.pierce))dmg*=1-TD.armor;
+  if(t.sq&&TD.unit)dmg*=sqGuard(t,SDp);
   if(TD.unit&&DEF[t.kind].ranged&&src&&DEF[src.kind]&&DEF[src.kind].ranged&&onWall(t))dmg*=.7;
-  if(TD.mech&&src&&DEF[src.kind]){const SD=DEF[src.kind];if((SD.ranged||SD.building)&&!SD.splash)dmg*=t.kind==='ram'?.2:.6;else if(!SD.ranged&&!SD.building&&!TD.cart)dmg*=1.3;}
+  if(TD.mech&&src&&DEF[src.kind]){const SD=DEF[src.kind];if((SD.ranged||SD.building)&&!SD.splash)dmg*=SD.pierce?.9:t.kind==='ram'?.2:.6;else if(!SD.ranged&&!SD.building&&!TD.cart)dmg*=1.3;}
   else if(TD.mech&&src&&!DEF[src.kind])dmg*=t.kind==='ram'?.2:.6;
-  if(t.gate&&!has('ariete')&&!(src&&DEF[src.kind]&&DEF[src.kind].siege)){dmg*=.08;if(src&&src.team===1&&S.t-(S.gateT||-99)>12){S.gateT=S.t;HOOK.toast('O portão do castelo vermelho é reforçado demais. Forje o Aríete Real.','warn',{x:t.x,y:t.y});}}
+  if(t.gate&&!has('ariete')&&!(src&&DEF[src.kind]&&(DEF[src.kind].siege||DEF[src.kind].wallx>=6))){dmg*=.08;if(src&&src.team===1&&S.t-(S.gateT||-99)>12){S.gateT=S.t;HOOK.toast('O portão do castelo vermelho é reforçado demais. Forje o Aríete Real.','warn',{x:t.x,y:t.y});}}
   t.hp-=dmg;t.hitT=.18;t.lastHit=S.t;
   loot(t,dmg,src);
   if(t.team===3&&src&&src.team&&src.team!==3){const c=campOf(t);if(c){c.hitT=S.t;c.hitBy=src.team;}}
@@ -1801,6 +1826,8 @@ function kill(t,src){
   const D=DEF[t.kind];
   if(isFixed(t))occupy(t,false);
   if(t.svc||t.amb||t.kind==='cart')svcOnDeath(t,src);
+  if(t.sq)armyOnDeath(t,src);
+  if(t.kind==='cart'&&!t.team&&(t.route||t.trip))caravanLost(t,src);
   if(t.kind==='pit'&&t.built){S.tiles[idx(t.tx,t.ty)]=GRASS;reachDirty=true;HOOK.tile(t.tx,t.ty);}
   if(t.kind==='bridge'){recomputeBridges();HOOK.tile(t.tx,t.ty);}
   if(t.cargo&&t.cargo.length){for(const c of t.cargo){c.aboard=false;c.dead=true;if(S.teams[c.team])S.teams[c.team].stats.lost++;}t.cargo=[];}

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="br.com.braiantech.reinopequeno"
+    android:versionCode="@VERSION_CODE@"
+    android:versionName="@VERSION_NAME@"
+    android:installLocation="auto">
+
+    <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="34" />
+    <!-- only to download updates from the GitHub address; the game itself runs without internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
+    <application
+        android:label="Reino Pequeno"
+        android:icon="@drawable/ic_launcher"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="unspecified"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

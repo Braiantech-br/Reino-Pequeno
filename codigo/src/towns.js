@@ -31,6 +31,7 @@ function initTown(t){
   t.lvl=1;t.gold=180;t.blds=[];t.growT=6+t.i*3;t.envT=110+t.i*45;t.target=500;t.helpCd={1:0,2:0};t.fav={1:0,2:0};
   const T0=byId.get(t.id);
   for(let k=0;k<3;k++){const p=walkNear(t.x+(k-1)*30,t.y+18);spawnUnit('npawn',0,p.x,p.y,{town:t.i,home:{x:p.x,y:p.y}});}
+  {const p=walkNear(t.x+44,t.y+20),m=spawnUnit('npawn',0,p.x,p.y,{town:t.i,master:true,home:{x:p.x,y:p.y}});m.nm=MASTER_NAMES[t.i%MASTER_NAMES.length];m.title='Mestre de obras '+m.nm;m.maxhp=m.hp=140;t.master=m.id;}
   if(T0)T0.town=t.i;
 }
 // walking with patience: paths are asked for again only now and then, and a place that cannot be reached is given up
@@ -96,6 +97,16 @@ function doTWork(u,dt){
   }
 }
 function banditNear(x,y,r){let b=null,bd=r;forNear(x,y,r,e=>{if(e.dead||e.team!==3||!DEF[e.kind].mil)return;const d=hyp(e.x-x,e.y-y);if(d<bd){bd=d;b=e;}});return b;}
+const MASTER_NAMES=['Ambrósio','Celeste','Valdemar','Rosinda','Quitéria','Bartolomeu'];
+// the master builder: first on every building site; plans what the town needs after a raid
+function masterBrain(u){
+  const t=S.towns&&S.towns[u.town];if(!t)return;
+  const b=t.blds.map(id=>byId.get(id)).find(q=>alive(q)&&!q.built);
+  if(b){b.builder=u.id;const r=rectOf(b);u.order={type:'tbuild',id:b.id,x:r[0]+r[2]/2,y:r[1]+r[3]+8};return;}
+  const hurt=t.blds.map(id=>byId.get(id)).find(q=>alive(q)&&q.built&&q.hp<q.maxhp*.8);
+  if(hurt){hurt.prog=1;const r=rectOf(hurt);u.order={type:'tbuild',id:hurt.id,x:r[0]+r[2]/2,y:r[1]+r[3]+8,fix:true};return;}
+  if(hyp(u.x-t.x,u.y-t.y)>90||Math.random()<.2){const a=Math.random()*Math.PI*2;u.order={type:'move',x:t.x+Math.cos(a)*70,y:t.y+10+Math.sin(a)*30};}
+}
 function townPawnBrain(u){
   const t=S.towns&&S.towns[u.town];if(!t)return;
   const b=t.blds.map(id=>byId.get(id)).find(q=>alive(q)&&!q.built);
@@ -103,11 +114,12 @@ function townPawnBrain(u){
   const j=townJob(u,t);if(j){u.order=Object.assign({type:'twork',phase:'go'},j);u.path=null;}
 }
 function doTBuild(u,dt){
-  const o=u.order,b=byId.get(o.id);if(!alive(b)||b.built){u.order=null;return;}
+  const o=u.order,b=byId.get(o.id);if(!alive(b)||(b.built&&!o.fix)||(o.fix&&b.hp>=b.maxhp)){u.order=null;return;}
   const w=walkTo(u,o.x,o.y,dt,30);
   if(w==='fail'){b.builder=0;u.order=null;b.prog=Math.min(1,b.prog+.25);return;}
   if(w!=='here')return;
   u.anim='build';u.face=b.x>u.x?1:-1;
+  if(o.fix){b.hp=Math.min(b.maxhp,b.hp+b.maxhp*.04*dt);return;}
   b.prog=Math.min(1,b.prog+dt/(DEF[b.kind].time||20));b.hp=Math.max(b.hp,b.maxhp*b.prog);
   if(b.prog>=1){b.built=true;b.hp=b.maxhp;b.builder=0;u.order=null;HOOK.townGrow(S.towns[u.town],'built',b);}
 }
@@ -122,7 +134,7 @@ function townSpot(t,k){
   }
   return null;
 }
-function townUnits(t){const v=[],g=[],a=[];for(const e of S.ents){if(e.dead||e.team!==0||e.town!==t.i)continue;if(e.kind==='npawn')v.push(e);else if(e.kind==='guard'&&!e.aid)g.push(e);else if(e.kind==='garcher'&&!e.aid)a.push(e);}return {v,g,a};}
+function townUnits(t){const v=[],g=[],a=[],el=[];for(const e of S.ents){if(e.dead||e.team!==0||e.town!==t.i||e.leaving||e.guardOf||e.ctr)continue;if(e.kind==='npawn')v.push(e);else if(e.kind==='guard'&&!e.aid)g.push(e);else if(e.kind==='garcher'&&!e.aid)a.push(e);else if(DEF[e.kind].elite&&!e.aid){el.push(e);g.push(e);}}return {v,g,a,e:el};}
 function townGrowth(t){
   const hall=byId.get(t.id);if(!hall)return;
   t.blds=t.blds.filter(id=>alive(byId.get(id)));
@@ -132,8 +144,9 @@ function townGrowth(t){
   // the people eat, and pay a little tax
   t.stock.food=Math.max(40,t.stock.food-pop*.35);t.gold+=pop*.5;
   if(pop<cap&&t.stock.food>=70&&t.gold>=35){
-    const wantG=2+t.lvl*2,wantA=t.lvl>=3?t.lvl-1:0,wantV=2+t.lvl*2;
+    const wantG=2+t.lvl*2+(t.raidedT&&S.t-t.raidedT<300?2:0),wantA=t.lvl>=3?t.lvl-1:0,wantV=2+t.lvl*2,wantE=t.lvl>=3?t.lvl-2:0;
     const gate=walkNear(t.x,t.y+16);
+    if(U.e.length<wantE&&t.gold>=110){t.gold-=110;t.stock.food-=50;const g=spawnUnit(eliteOf(t),0,gate.x,gate.y,{town:t.i});g.home=walkNear(t.x+(Math.random()-.5)*110,t.y+20+Math.random()*30);return;}
     if(U.g.length<wantG&&t.gold>=60){t.gold-=60;t.stock.food-=40;const g=spawnUnit('guard',0,gate.x,gate.y,{town:t.i});g.home=walkNear(t.x+(Math.random()-.5)*130,t.y+10+Math.random()*40);return;}
     if(U.a.length<wantA&&t.gold>=80){t.gold-=80;t.stock.food-=30;const g=spawnUnit('garcher',0,gate.x,gate.y,{town:t.i});g.home=walkNear(t.x+(Math.random()-.5)*150,t.y-30+Math.random()*30);return;}
     if(U.v.length<wantV){t.gold-=35;t.stock.food-=50;spawnUnit('npawn',0,gate.x,gate.y,{town:t.i});return;}
@@ -238,6 +251,9 @@ function envoyPropose(u,t){
   if(t.want!=='arms'&&R[t.want]>=CART_LOAD+50)opts.push(['contract',3]);
   if(sol.length>=4)opts.push(['guard',1.5]);
   if(S.ai&&castleOf(2))opts.push(['news',f>=3?2.5:1.2]);
+  if(f>=1&&!activeCtr(t,'merc',1)&&R.gold>=200)opts.push(['offerMerc',2.2]);
+  {const vets=sol.filter(q=>(q.rank||0)>=1&&!q.ctr&&!DEF[q.kind].elite);if(vets.length>=3&&f>=1)opts.push(['buyVets',1.6]);}
+  if(f>=2&&!activeCtr(t,'protect',1)&&!activeCtr(t,'loyalty',1)&&!loyalTo(t))opts.push(['offerProtect',1.4]);
   let tot=opts.reduce((a,o)=>a+o[1],0),x=Math.random()*tot,k=opts[0][0];for(const o of opts){x-=o[1];if(x<=0){k=o[0];break;}}
   const who=`${u.nm}, embaixador de ${t.name}`,lvl=FRIEND[f];
   if(k==='gift-in'){
@@ -252,6 +268,10 @@ function envoyPropose(u,t){
   const q={kind:'envoy',eid:u.id,town:t.i,who:`${who} (${lvl})`,av:'av14',loc:{x:u.x,y:u.y,id:u.id}};
   if(k==='gift'){const g=wr==='gold'?{gold:60}:{[wr]:90};q.what='gift';q.gift=g;q.cost=g;q.text=`${t.name} vai fazer a festa da colheita. Um presente de ${Object.entries(g).map(([r,v])=>`${v} de ${RES_NAME[r]}`).join(', ')} aproximaria os nossos povos. Podemos contar com vocês?`;}
   else if(k==='contract'){const p=Math.round(townPrice(t,t.want,false,1)*1.35*CART_LOAD/100);q.what='contract';q.pay=p;q.text=`${t.name} precisa de ${CART_LOAD} de ${RES_NAME[t.want]} com urgência e paga ${p} de ouro, bem acima do preço de hoje. Vocês levam com escolta? Cumprindo, a amizade cresce em dobro.`;}
+  else if(k==='offerMerc'){const tm=ctrTerms('merc',t,1,{min:10});q.what='merc';q.terms=tm;q.cost=tm.cost;q.text=`${t.name} tem 4 ${DEF[tm.unit].name.toLowerCase()}s livres. Eles lutam por vocês durante 10 minutos por ${tm.cost.gold} de ouro, sem ocupar casa. Fechamos?`;}
+  else if(k==='buyVets'){const vets=sol.filter(q2=>(q2.rank||0)>=1&&!q2.ctr&&!DEF[q2.kind].elite).sort((a,b)=>(b.rank||0)-(a.rank||0)).slice(0,2);const pay=vets.reduce((a,v)=>a+90+40*(v.rank||0),0);
+    q.what='vets';q.ids=vets.map(v=>v.id);q.pay=pay;q.text=`A guarda de ${t.name} precisa de experiência. Compramos ${vets.map(v=>rankedName(v)).join(' e ')} por ${pay} de ouro. Eles servem na nossa vila e a amizade cresce. Vendem?`;q.loc={x:vets[0].x,y:vets[0].y,id:vets[0].id};}
+  else if(k==='offerProtect'){q.what='protect';q.text=`Os tempos estão perigosos. ${t.name} oferece proteção: vocês dão 8% da produção por minuto e nós mandamos guardas sempre que vocês forem atacados. Aceitam?`;}
   else if(k==='guard'){q.what='guard';q.text=`Bandidos rondam ${t.name}. Mandem 3 soldados para guardar a vila por dois minutos: pagamos 150 de ouro e não esquecemos o favor.`;}
   ask(q);
 }
@@ -265,6 +285,9 @@ function envoyAnswer(q,yes){
   if(!yes){HOOK.envoy(u,t,'say',q.what==='gift'?'Entendemos. Fica para a próxima festa.':'Que pena. Procuraremos outro reino.');addRep(t,1,-.1);return;}
   if(q.what==='gift'){if(!afford(1,q.gift)){HOOK.toast('Faltam recursos para o presente.','warn');return;}pay(1,q.gift);t.gold+=q.gift.gold||20;addRep(t,1,.6);HOOK.envoy(u,t,'say',`Obrigado! ${t.name} não esquece quem lembra dela. (amizade ${FRIEND[friendOf(t,1)]})`);}
   else if(q.what==='contract'){const m=svcNew('sell',1,{town:t.i,res:t.want,n:CART_LOAD,who:'Contrato'});if(!m)return;m.pay={gold:q.pay};m.value=q.pay;m.contract=true;const sol=freeSoldiers(1,m.from.x,m.from.y);m.escN=Math.min(Math.max(0,sol.length-1),2);m.risk=svcRisk(m,m.escN);const r=svcStart(m);if(r!=='ok')HOOK.toast({cost:'Faltam recursos para o contrato.',slots:'Todas as carroças estão ocupadas: o contrato ficou para depois.'}[r]||'Não deu para cumprir o contrato agora.','warn');else HOOK.envoy(u,t,'say','Combinado! Esperamos a carroça.');}
+  else if(q.what==='merc'){if(!afford(1,q.terms.cost)){HOOK.toast('Falta ouro para os mercenários.','warn');return;}const d=townDecide(t,1,q.terms);if(d.ok||d.counter){ctrActivate(1,q.terms);HOOK.envoy(u,t,'say','Combinado! Os nossos já estão indo para o seu castelo.');}else HOOK.envoy(u,t,'say',d.why);}
+  else if(q.what==='protect'){const tm=ctrTerms('protect',t,1);const c=ctrActivate(1,tm);if(c)HOOK.envoy(u,t,'say','Fechado. Quando precisarem, estaremos lá.');}
+  else if(q.what==='vets'){const m=svcNew('soldiers',1,{town:t.i,ids:(q.ids||[]).filter(id=>alive(byId.get(id))),pay:q.pay,who:`Guarda de ${t.name}`});if(!m)return;m.escN=0;const r=svcStart(m);if(r==='ok'){addRep(t,1,.5);HOOK.envoy(u,t,'say','Obrigado! Eles vão ensinar muito à nossa guarda.');}else HOOK.toast('Os soldados não puderam ir agora.','warn');}
   else if(q.what==='guard'){const m=svcNew('garrison',1,{town:t.i,who:'Pedido da vila'});if(!m)return;const r=svcStart(m);if(r!=='ok')HOOK.toast(r==='slots'?'Todas as comitivas estão ocupadas.':'Não há 3 soldados livres agora.','warn');else HOOK.envoy(u,t,'say','Obrigado! Os soldados de vocês serão bem recebidos.');}
 }
 
@@ -290,7 +313,7 @@ function townHelpAnswer(q,yes){
   if(!yes){
     t.raid.ans='no';dropTownAsk(t.i);
     // nobody is obliged to go; but turning down someone who helped you hurts
-    const owed=favOf(t,1)<0;addRep(t,1,owed?-1:-.25);HOOK.townGrow(t,owed?'ingrate':'refused');
+    const owed=favOf(t,1)<0;addRep(t,1,owed?-1:-.25);if(owed)addHonor(1,-5,'ingrate');HOOK.townGrow(t,owed?'ingrate':'refused');
     return;
   }
   const c=castleOf(1),sol=c?freeSoldiers(1,t.x,t.y).slice(0,5):[];
@@ -306,8 +329,9 @@ function townRaidCheck(){
     if(left===0||S.t-t.raid.t>200){
       const sent=t.raid.ans==='yes'&&t.raid.helpers.length>0;
       // whoever came to help is owed a favor, even if the bandits got away
-      if(sent){addFav(t,1,1);if(left===0)addRep(t,1,1);HOOK.townGrow(t,left===0?'saved':'tried');}
+      if(sent){addFav(t,1,1);addHonor(1,2,'saved');if(left===0)addRep(t,1,1);HOOK.townGrow(t,left===0?'saved':'tried');}
       else if(!t.raid.ans&&favOf(t,1)<0)addRep(t,1,-.5);
+      t.raidedT=S.t;
       dropTownAsk(t.i);
       t.raid=null;
     }
@@ -327,13 +351,11 @@ function townRepay(){
 // ---------------------------------------------------------------- the Red Kingdom also calls the towns when you attack it
 function aiAskHelp(){
   if(!S.ai||!S.towns)return;
-  const ua=underAttack(2);if(!ua||ua.foe!==1)return;
-  for(const t of S.towns){
-    if(S.t<(t.helpCd[2]||0)||friendOf(t,2)<2)continue;
-    const r=askHelp(2,t.i,1,ua.p);
-    if(r.kind==='paid'&&afford(2,r.cost))payHelp(2,t.i,1,ua.p,r);
-    if(r.kind==='free'||r.kind==='paid'){HOOK.townGrow(t,'helpsRed');break;}
-  }
+  const ua=underAttack(2);if(!ua||ua.foe!==1||S.t<(S.ai.helpMsgT||0))return;
+  const c=castleOf(2);
+  const t=S.towns.filter(t=>S.t>=(t.helpCd[2]||0)&&friendOf(t,2)>=2&&!townFoe(t.i,2)&&(!loyalTo(t)||loyalTo(t)===2)).sort((a,b)=>(friendOf(b,2)-friendOf(a,2))||(hyp(a.x-c.x,a.y-c.y)-hyp(b.x-c.x,b.y-c.y)))[0];
+  if(!t)return;
+  if(proposeContract(2,'help',t.i,{foe:1,p:ua.p})==='ok'){S.ai.helpMsgT=S.t+150;HOOK.townGrow(t,'redMessenger');}
 }
 
 // ---------------------------------------------------------------- once per tick
