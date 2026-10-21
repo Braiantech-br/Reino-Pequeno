@@ -5,6 +5,8 @@
 # What it makes (in dist/ at the root of the repository):
 #   ReinoPequeno-<v>-Windows.zip, -Mac.zip, -Linux.zip, -Android.apk, -iPhone-iPad.zip, <v>.html, -completo.zip
 #   site/  -> copied to the root of the repository: the web app (GitHub Pages) and atualizacao/ (the update channel)
+#   --downloads also puts the installers in downloads/ (fixed names, linked from the README)
+#   --sem-repo only builds dist/, without touching the repository
 #
 # Needs: python3 with Pillow; for Windows: x86_64-w64-mingw32-gcc/windres; for Android: aapt, javac,
 # dalvik-exchange (or d8), zipalign, apksigner and the key (RP_KEYSTORE=path, RP_KEYSTORE_PASS=password).
@@ -85,7 +87,7 @@ def main():
     notas = '\n'.join('    - ' + l for l in build_offline.NOTES) or '    - Melhorias e correções.'
     leia = open(f'{HERE}/LEIA-ME.txt', encoding='utf-8').read()
     for k, v in {'VERSAO': name, 'DATA': data, 'SITE': site_url, 'REPO_URL': repo_url,
-                 'DOWNLOADS': f'{repo_url}/releases', 'NOTAS': notas}.items():
+                 'DOWNLOADS': f'{repo_url}/tree/main/downloads', 'NOTAS': notas}.items():
         leia = leia.replace('{{' + k + '}}', v)
     leia = leia.replace('\n', '\r\n')                       # opens right in Windows Notepad too
     open(f'{work}/LEIA-ME.txt', 'w', encoding='utf-8-sig', newline='').write(leia)
@@ -190,6 +192,14 @@ def main():
         shutil.copy(f'{dist}/LEIA-ME.txt', f'{REPO_DIR}/LEIA-ME.txt')
         open(f'{REPO_DIR}/.nojekyll', 'w').close()
         say('site e atualização copiados para a raiz do repositório')
+    if '--downloads' in sys.argv:
+        # the installers with fixed names in downloads/, so the links in the README never change
+        dl = f'{REPO_DIR}/downloads'; shutil.rmtree(dl, ignore_errors=True); os.makedirs(dl)
+        for k, fixed in [('win', 'ReinoPequeno-Windows.zip'), ('mac', 'ReinoPequeno-Mac.zip'), ('linux', 'ReinoPequeno-Linux.zip'),
+                         ('android', 'ReinoPequeno-Android.apk'), ('ios', 'ReinoPequeno-iPhone-iPad.zip')]:
+            if k in out: shutil.copy(f'{dist}/{out[k]}', f'{dl}/{fixed}')
+        open(f'{dl}/VERSAO.txt', 'w', encoding='utf-8').write(f'Instaladores da versão {name}. Depois de instalados, eles se atualizam sozinhos pelo botão "Procurar atualização".\n')
+        say('instaladores copiados para downloads/')
     say('pronto em', dist)
     for k, f in out.items(): say(f'{f}  {os.path.getsize(f"{dist}/{f}") // 1024} KB')
 

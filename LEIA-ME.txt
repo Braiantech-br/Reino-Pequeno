@@ -9,7 +9,7 @@ fica guardado só no aparelho. A internet só é usada quando VOCÊ toca em
 "Procurar atualização" para baixar uma versão nova.
 
   Jogar no navegador e instalar no iPhone: https://braiantech-br.github.io/Reino-Pequeno/
-  Downloads de todas as versões ......... https://github.com/Braiantech-br/Reino-Pequeno/releases
+  Downloads de todas as versões ......... https://github.com/Braiantech-br/Reino-Pequeno/tree/main/downloads
 
 Índice
   1. O que vem no pacote
@@ -28,16 +28,17 @@ fica guardado só no aparelho. A internet só é usada quando VOCÊ toca em
  1. O QUE VEM NO PACOTE
 ==============================================================================
 
-  Cada sistema tem o seu arquivo para baixar:
+  Cada sistema tem o seu arquivo para baixar (nos Releases, o nome traz o
+  número da versão, como ReinoPequeno-2.0-Windows.zip):
 
-  ReinoPequeno-2.0-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
-  ReinoPequeno-2.0-Mac.zip .......... Reino Pequeno.app
-  ReinoPequeno-2.0-Linux.zip ........ jogar-linux.sh + o jogo + ícone
-  ReinoPequeno-2.0-Android.apk ...... aplicativo instalável (Android 5.0+)
-  ReinoPequeno-2.0-iPhone-iPad.zip .. web app (ou use o site, mais fácil)
-  ReinoPequeno-2.0.html ............. o jogo num arquivo só, qualquer
-                                          sistema com navegador
-  ReinoPequeno-2.0-completo.zip ..... tudo isso junto, com este LEIA-ME
+  ReinoPequeno-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
+  ReinoPequeno-Mac.zip .......... Reino Pequeno.app
+  ReinoPequeno-Linux.zip ........ jogar-linux.sh + o jogo + ícone
+  ReinoPequeno-Android.apk ...... aplicativo instalável (Android 5.0+)
+  ReinoPequeno-iPhone-iPad.zip .. web app (ou use o site, mais fácil)
+  ReinoPequeno.html ............. o jogo num arquivo só (qualquer sistema
+                                  com navegador; vem dentro dos pacotes)
+  ReinoPequeno-completo.zip ..... tudo isso junto, com este LEIA-ME
 
 Todas as versões têm o mesmo jogo, com todas as imagens, fontes, músicas e
 vozes embutidas, e o mesmo botão de atualização.
@@ -58,13 +59,13 @@ vozes embutidas, e o mesmo botão de atualização.
 ------------------------------------------------------------------------------
  QUALQUER COMPUTADOR OU CELULAR (arquivo único)
 ------------------------------------------------------------------------------
-  Dê dois cliques em ReinoPequeno-2.0.html. Ele abre no navegador e
+  Dê dois cliques em ReinoPequeno.html. Ele abre no navegador e
   funciona sem internet. Os jogos salvos ficam nesse navegador, ligados ao
   lugar do arquivo: se mudar o arquivo de pasta, o jogo começa do zero lá.
 
  WINDOWS 10 e 11
 ------------------------------------------------------------------------------
-  1. Descompacte o ReinoPequeno-2.0-Windows.zip e dê dois cliques em
+  1. Descompacte o ReinoPequeno-Windows.zip e dê dois cliques em
      "Reino Pequeno.exe".
   2. Na primeira vez o Windows pode mostrar "O Windows protegeu o computador"
      (o programa não tem assinatura digital paga). Clique em "Mais
@@ -82,7 +83,7 @@ vozes embutidas, e o mesmo botão de atualização.
 ------------------------------------------------------------------------------
  MAC (macOS)
 ------------------------------------------------------------------------------
-  1. Descompacte o ReinoPequeno-2.0-Mac.zip e arraste "Reino Pequeno.app"
+  1. Descompacte o ReinoPequeno-Mac.zip e arraste "Reino Pequeno.app"
      para a pasta Aplicativos (opcional).
   2. Na primeira vez o macOS bloqueia apps sem assinatura da Apple:
        macOS 13 e 14: clique com o botão direito no app → Abrir → Abrir.
@@ -97,7 +98,7 @@ vozes embutidas, e o mesmo botão de atualização.
 ------------------------------------------------------------------------------
  LINUX
 ------------------------------------------------------------------------------
-  Descompacte o ReinoPequeno-2.0-Linux.zip. No terminal, dentro da pasta:
+  Descompacte o ReinoPequeno-Linux.zip. No terminal, dentro da pasta:
       chmod +x jogar-linux.sh      (só se ele não estiver executável)
       ./jogar-linux.sh             abre o jogo
       ./jogar-linux.sh --instalar  coloca o Reino Pequeno no menu de apps
@@ -107,7 +108,7 @@ vozes embutidas, e o mesmo botão de atualização.
 ------------------------------------------------------------------------------
  ANDROID
 ------------------------------------------------------------------------------
-  1. Baixe o ReinoPequeno-2.0-Android.apk no celular ou passe o arquivo (cabo, WhatsApp para
+  1. Baixe o ReinoPequeno-Android.apk no celular ou passe o arquivo (cabo, WhatsApp para
      você mesmo, Google Drive, pendrive...).
   2. Toque no arquivo. O Android pede para permitir "instalar apps
      desconhecidos" para o app que abriu o arquivo (Arquivos, Chrome,

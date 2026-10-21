@@ -10,14 +10,14 @@ Construa a vila, avance pelas cinco eras, negocie com as vilas neutras, contrate
 |---|---|
 | **Navegador (qualquer aparelho)** | https://braiantech-br.github.io/Reino-Pequeno/ |
 | **iPhone e iPad** | Abra o link acima no Safari → Compartilhar → *Adicionar à Tela de Início* |
-| **Windows** | [ReinoPequeno-2.0-Windows.zip](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0-Windows.zip) |
-| **Mac** | [ReinoPequeno-2.0-Mac.zip](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0-Mac.zip) |
-| **Linux** | [ReinoPequeno-2.0-Linux.zip](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0-Linux.zip) |
-| **Android** | [ReinoPequeno-2.0-Android.apk](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0-Android.apk) |
-| **Arquivo único** | [ReinoPequeno-2.0.html](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0.html) (abre em qualquer navegador) |
-| **Tudo junto** | [ReinoPequeno-2.0-completo.zip](https://github.com/Braiantech-br/Reino-Pequeno/releases/download/v2.0/ReinoPequeno-2.0-completo.zip) |
+| **Windows 10/11** | [ReinoPequeno-Windows.zip](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-Windows.zip) |
+| **Mac** | [ReinoPequeno-Mac.zip](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-Mac.zip) |
+| **Linux** | [ReinoPequeno-Linux.zip](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-Linux.zip) |
+| **Android 5.0+** | [ReinoPequeno-Android.apk](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-Android.apk) |
+| **iPhone/iPad em outro site** | [ReinoPequeno-iPhone-iPad.zip](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-iPhone-iPad.zip) (arquivos do web app) |
 
-Todas as versões: [Releases](https://github.com/Braiantech-br/Reino-Pequeno/releases). Instruções de cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
+Os instaladores ficam na pasta [downloads](downloads/). Depois de instalados, eles se atualizam sozinhos.
+Instruções de cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
 
 ## Novidades da versão 2.0
 
@@ -43,6 +43,7 @@ Ou seja: **publicar uma versão nova é só atualizar este repositório.** O pas
 
 ```
 index.html, manifest.webmanifest, sw.js, icon-*.png   o jogo on-line (GitHub Pages) e o web app
+downloads/                                            os instaladores (Windows, Mac, Linux, Android, iPhone)
 atualizacao/versao.json, atualizacao/jogo.html        o canal de atualização dos jogos baixados
 LEIA-ME.txt                                           manual: instalação, regras, controles
 COMO-ATUALIZAR.md                                     como publicar uma versão nova

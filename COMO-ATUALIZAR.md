@@ -23,7 +23,7 @@ Numa conversa do Claude com este repositório conectado, peça por exemplo:
 
 > Atualize o Reino Pequeno: *(o que você quer mudar)*. Publique como versão 2.1 no GitHub.
 
-O Claude muda o código em `codigo/src/`, testa, roda o empacotador, coloca o site e a atualização na raiz do repositório, envia (*push*) e cria o Release com os downloads. Para gerar o APK de Android novo ele precisa da chave: anexe o arquivo `chave-android-reino-pequeno.keystore` e diga a senha. Sem a chave, tudo é publicado do mesmo jeito; só o APK continua o anterior (o que não tem problema: o app de Android se atualiza pelo botão).
+O Claude muda o código em `codigo/src/`, testa, roda o empacotador, coloca o site, a atualização e (se você pedir) os instaladores novos no repositório e envia (*push*). Para gerar o APK de Android novo ele precisa da chave: anexe o arquivo `chave-android-reino-pequeno.keystore` e diga a senha. Sem a chave, tudo é publicado do mesmo jeito; só o APK continua o anterior (o que não tem problema: o app de Android se atualiza pelo botão).
 
 ---
 
@@ -41,7 +41,13 @@ Em 1 ou 2 minutos o site já abre a versão nova, e os jogos instalados passam a
 
 > Importante: o arquivo `atualizacao/versao.json` é o que avisa os jogos. Ele tem o número da versão (`"ver": 210`) e a assinatura do `jogo.html` (`"sha256"`). Os dois arquivos precisam subir **juntos**, da mesma montagem. Se subir só um, o jogo recusa a atualização (por segurança) e continua na versão que tinha.
 
-### b) Publicar os downloads (Release)
+### b) Trocar os instaladores (opcional)
+
+Os instaladores ficam na pasta `downloads/`, com nomes fixos (`ReinoPequeno-Windows.zip`, `-Mac.zip`, `-Linux.zip`, `-Android.apk`, `-iPhone-iPad.zip`), então os links do README nunca mudam. Só precisa trocar quando quiser que quem baixa pela primeira vez já receba a versão nova; quem já instalou se atualiza pelo botão. Para trocar: abra https://github.com/Braiantech-br/Reino-Pequeno/upload/main/downloads, arraste os arquivos novos com esses mesmos nomes e faça *Commit changes*.
+
+### c) Publicar também como Release (opcional)
+
+O Release é uma página com a lista de versões e os arquivos de cada uma.
 
 1. Abra https://github.com/Braiantech-br/Reino-Pequeno/releases/new
 2. Em **Choose a tag**, digite `v2.1` e clique em *Create new tag*.
@@ -49,7 +55,6 @@ Em 1 ou 2 minutos o site já abre a versão nova, e os jogos instalados passam a
 4. Arraste os arquivos da pasta `dist`: `ReinoPequeno-2.1-Windows.zip`, `-Mac.zip`, `-Linux.zip`, `-Android.apk`, `-iPhone-iPad.zip`, `ReinoPequeno-2.1.html` e `-completo.zip`.
 5. Clique em **Publish release**.
 
-Depois troque os links da tabela no `README.md` (de `2.0` para `2.1`): abra o arquivo no GitHub, clique no lápis, troque e faça *Commit changes*.
 
 ---
 
@@ -84,7 +89,7 @@ Depois troque os links da tabela no `README.md` (de `2.0` para `2.1`): abra o ar
    ```
    python codigo/pacotes/empacotar.py 2.1
    ```
-   Isso cria a pasta `dist/` com todos os downloads e já coloca o site, o `LEIA-ME.txt` e a pasta `atualizacao/` na raiz do repositório.
+   Isso cria a pasta `dist/` com todos os downloads e já coloca o site, o `LEIA-ME.txt` e a pasta `atualizacao/` na raiz do repositório. Com `--downloads` no fim, troca também os instaladores da pasta `downloads/`.
    - O `.exe` do Windows só é montado onde existe o compilador *mingw*, e o APK só onde existem as ferramentas de Android e a chave (`RP_KEYSTORE` e `RP_KEYSTORE_PASS`). Se não existirem, o empacotador pula esses dois e avisa. Tudo bem: os instalados se atualizam pelo botão.
 3. Envie:
    ```
@@ -92,7 +97,7 @@ Depois troque os links da tabela no `README.md` (de `2.0` para `2.1`): abra o ar
    git commit -m "Versão 2.1"
    git push
    ```
-4. Crie o Release com os arquivos de `dist/` (Caminho 2, item b).
+4. Se quiser, crie o Release com os arquivos de `dist/` (Caminho 2, item c).
 
 ---
 
