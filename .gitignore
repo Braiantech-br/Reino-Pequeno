@@ -1,0 +1,12 @@
+# Arte da Tiny Swords: a licença não permite publicar as imagens soltas.
+# Elas ficam só dentro do jogo pronto (atualizacao/jogo.html) e são extraídas de lá para montar uma versão nova.
+codigo/assets/
+# montagens locais de teste
+codigo/index.html
+codigo/preview.html
+node_modules/
+# a chave que assina o app de Android é secreta: guarde fora do repositório
+*.keystore
+*.jks
+__pycache__/
+.DS_Store

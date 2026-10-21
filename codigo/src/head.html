@@ -1,0 +1,389 @@
+<title>Reino Pequeno</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/*BASECSS*/
+/* eras, difficulty, banners */
+.chip.era{cursor:pointer;position:relative;overflow:hidden;font:inherit;font-family:var(--f-display);font-size:24px}
+.chip.era b{font-weight:400;color:var(--blue-dk)}
+.chip.era i{position:absolute;left:0;bottom:0;height:4px;background:var(--blue);width:0}
+.chip.foe{border-color:var(--red-dk);box-shadow:0 3px 0 var(--red-dk);cursor:pointer;font:inherit;font-family:var(--f-display);font-size:24px}
+.chip.foe b{font-weight:400;color:var(--red-dk)}
+.chip.foe.warn{animation:throb 1s ease-in-out infinite;background:#ffe2d9}
+.chip.foe i{position:absolute;left:0;bottom:0;height:4px;background:var(--red);width:0}
+.chip.foe{position:relative;overflow:hidden}
+.tbtn.on{background:var(--wood-dk)}
+#banner{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;text-align:center;
+  background:var(--parch);border:4px solid var(--wood);border-radius:14px;box-shadow:0 5px 0 var(--wood-dk);padding:10px 26px 12px;width:min(92%,460px);
+  animation:bannerIn .5s cubic-bezier(.2,1.4,.4,1)}
+#banner small{display:block;font:600 12px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--wood)}
+#banner strong{display:block;font:400 46px/1 var(--f-display);color:var(--blue-dk);text-wrap:balance}
+#banner.foe strong{color:var(--red-dk)}
+#banner span{display:block;font-size:13px;color:var(--ink-soft);margin-top:4px;line-height:1.35}
+@keyframes bannerIn{from{transform:translate(-50%,-30px) scale(.8);opacity:0}}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:block;padding:8px 14px;border:3px solid var(--wood);border-radius:10px;background:#fff6dd;font:600 14px var(--f-ui);box-shadow:0 3px 0 var(--wood-dk)}
+.seg span em{display:block;font-style:normal;font-weight:400;font-size:12px;color:var(--ink-soft)}
+.seg input:checked+span{background:var(--blue);border-color:var(--blue-dk);color:#fff;box-shadow:0 3px 0 var(--blue-dk)}
+.seg input:checked+span em{color:#dfe8ff}
+.seg input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
+.eras{display:grid;gap:8px;margin-top:12px}
+.eras li{list-style:none;display:grid;grid-template-columns:58px 1fr;gap:10px;align-items:start;background:#fff6dd;border:2px solid var(--parch-dk);border-radius:10px;padding:8px 10px}
+.eras li.now{border-color:var(--blue);background:#e6eeff}
+.eras li.done{opacity:.7}
+.eras .num{font:400 34px/1 var(--f-display);color:var(--wood);text-align:center}
+.eras li.now .num{color:var(--blue-dk)}
+.eras h5{margin:0;font:400 24px/1 var(--f-display)}
+.eras p{margin:3px 0 0;font-size:13px;line-height:1.4}
+.eras .meta{font-size:12px;color:var(--ink-soft)}
+.eras{padding:0;margin-bottom:0}
+.act .cd{position:absolute;top:3px;right:4px;min-width:24px;padding:1px 6px;border-radius:9px;background:var(--wood-dk);color:var(--parch);font:400 17px/1.1 var(--f-display);font-variant-numeric:tabular-nums}
+.act .rn{font:400 40px/46px var(--f-display);color:var(--blue-dk);height:46px}
+.act .glyph{font:400 34px/46px var(--f-display);height:46px}
+.act .lock{font:600 11px var(--f-ui);color:var(--red-dk)}
+.act.research{width:128px;background:#e6eeff}
+.act.research .bar{width:100%;height:6px;border-radius:3px;background:#c9d6f5;overflow:hidden}
+.act.research .bar i{display:block;height:100%;background:var(--blue)}
+.sheet.wide{max-width:680px}
+.sm{display:none}
+@media (max-width:760px){.chip.era,.chip.foe{font-size:19px}#banner strong{font-size:34px}#banner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px)}
+  .top{flex-wrap:wrap;gap:5px;padding-block:6px;overflow:visible}.top .chip{font-size:18px;padding:1px 6px 1px 4px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.top .chip img{height:17px}.top .tbtn{padding:3px 7px;font-size:12px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.spacer{display:none}
+  .lg{display:none}.sm{display:inline!important}
+  .hint{font-size:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.info p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px}
+  .act .rn{font-size:32px;height:38px;line-height:38px}.act .glyph{font-size:28px;height:38px;line-height:38px}}
+.lead{margin-top:6px!important}
+.lbl{margin-top:14px!important;font-size:22px!important}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.modes label,.heroes label{position:relative;cursor:pointer;display:flex}
+.modes input,.heroes input{position:absolute;opacity:0;pointer-events:none}
+.modes span{flex:1;display:block;padding:9px 12px;border:3px solid var(--wood);border-radius:12px;background:#fff6dd;box-shadow:0 3px 0 var(--wood-dk)}
+.modes b{display:block;font:400 26px/1 var(--f-display);color:var(--blue-dk)}
+.modes em{display:block;font-style:normal;font-size:12px;line-height:1.35;color:var(--ink-soft);margin-top:3px}
+.modes input:checked+span{background:var(--blue);border-color:var(--blue-dk);box-shadow:0 3px 0 var(--blue-dk)}
+.modes input:checked+span b,.modes input:checked+span em{color:#fff}
+.modes input:focus-visible+span,.heroes input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
+.heroes{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.heroes span{flex:1;display:grid;grid-template-columns:44px 1fr;gap:2px 8px;align-items:center;padding:6px 8px;border:3px solid var(--wood);border-radius:12px;background:#fff6dd;box-shadow:0 3px 0 var(--wood-dk)}
+.heroes img{grid-row:span 2;width:44px;height:44px;image-rendering:pixelated}
+.heroes b{font:400 21px/1 var(--f-display)}
+.heroes small{font-size:11px;color:var(--ink-soft);line-height:1.2}
+.heroes .rk{grid-column:1/-1;font-size:11px;line-height:1.25;color:var(--ink-soft)}
+.heroes input:checked+span{background:#ffe9a8;border-color:#b07d16;box-shadow:0 3px 0 #7a5410}
+.chapters{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chapters button{font:600 13px var(--f-ui);padding:6px 10px;border:3px solid var(--wood);border-radius:10px;background:#fff6dd;box-shadow:0 3px 0 var(--wood-dk);cursor:pointer;color:var(--ink);text-align:left}
+.chapters button b{display:block;font:400 19px/1 var(--f-display);color:var(--wood)}
+.chapters button.on{background:var(--blue);border-color:var(--blue-dk);color:#fff;box-shadow:0 3px 0 var(--blue-dk)}
+.chapters button.on b{color:#dfe8ff}
+.chapters button:disabled{opacity:.5;cursor:not-allowed}
+.chapters button.done b::after{content:" ✓";color:var(--leaf)}
+.mapbox{display:flex;gap:14px;align-items:center;margin-top:6px}
+.mapbox canvas{width:192px;height:128px;border:3px solid var(--wood-dk);border-radius:10px;image-rendering:pixelated;flex:none;background:#47aba9}
+.mapbox b{font:400 26px/1 var(--f-display);color:var(--blue-dk)}
+.mapbox p{margin:4px 0 8px!important;font-size:13px!important}
+.sm-btn{font-size:21px!important;padding:6px 14px!important}
+.howto{margin-top:14px}
+.howto summary{cursor:pointer;font:400 22px var(--f-display);color:var(--wood-dk)}
+.sheet.story{max-width:620px}
+.speech{display:flex;gap:14px;align-items:flex-start;margin-top:12px;background:#fff6dd;border:2px solid var(--parch-dk);border-radius:12px;padding:12px}
+.speech img{width:84px;height:84px;flex:none;image-rendering:pixelated}
+.speech b{font:400 26px/1 var(--f-display);color:var(--wood-dk)}
+.speech p{margin:4px 0 0!important;font-size:16px!important;line-height:1.5}
+.pg{font-size:12px;color:var(--ink-soft);margin-left:auto}
+#goals{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:66px;z-index:3;width:300px;background:var(--parch);border:3px solid var(--wood);border-radius:12px;box-shadow:0 3px 0 var(--wood-dk);padding:8px 10px;font-size:13px}
+#goals h5{margin:0;font:400 22px/1 var(--f-display);color:var(--blue-dk);display:flex;justify-content:space-between;gap:8px;cursor:pointer}
+#goals h5 small{font:600 11px var(--f-ui);color:var(--wood);align-self:center}
+#goals ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:3px}
+#goals li{display:grid;grid-template-columns:16px 1fr auto;gap:6px;align-items:start;line-height:1.3}
+#goals li i{width:14px;height:14px;border:2px solid var(--wood);border-radius:4px;margin-top:1px;background:#fff6dd;font-style:normal;font-size:11px;line-height:10px;text-align:center;color:#fff}
+#goals li.done{color:var(--ink-soft);text-decoration:line-through}
+#goals li.done i{background:var(--leaf);border-color:#2f6a24}
+#goals li em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--wood)}
+#goals li.hid{color:var(--ink-soft);font-style:italic}
+#goals .king{margin-top:7px;display:flex;gap:6px;align-items:center;cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;width:100%;text-align:left}
+#goals .king img{width:24px;height:24px;image-rendering:pixelated}
+#goals .king .hp{flex:1;margin:0}
+#goals .king.low .hp i{background:#ef4b3c}
+#goals .items{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+#goals .items span{display:flex;align-items:center;gap:3px;padding:1px 6px;border:2px solid var(--parch-dk);border-radius:8px;background:#fff6dd;font:400 16px var(--f-display)}
+#goals .items img{width:16px;height:16px;image-rendering:pixelated}
+#goals .items .g{font:700 13px system-ui,sans-serif}
+#goals.min ul,#goals.min .items{display:none}
+#talk{position:absolute;left:max(16px,env(safe-area-inset-left,0px));bottom:140px;z-index:4;width:min(420px,calc(100% - 32px));display:flex;gap:10px;align-items:flex-start;background:var(--parch);border:3px solid var(--wood);border-radius:12px;box-shadow:0 3px 0 var(--wood-dk);padding:8px 10px;animation:pop .25s ease-out;pointer-events:none}
+#talk img{width:52px;height:52px;flex:none;image-rendering:pixelated}
+#talk b{font:400 21px/1 var(--f-display);color:var(--wood-dk)}
+#talk p{margin:2px 0 0;font-size:13px;line-height:1.4}
+#talk.foe b{color:var(--red-dk)}
+.act.forge{background:#fff0c9}
+#ask{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:150px;z-index:5;width:min(400px,calc(100% - 32px));display:flex;gap:10px;align-items:flex-start;background:var(--parch);border:3px solid var(--gold);border-radius:12px;box-shadow:0 4px 0 #8a6412;padding:10px;animation:pop .25s ease-out}
+#ask img{width:52px;height:52px;image-rendering:pixelated;flex:none}
+#ask b{font:400 21px/1 var(--f-display);color:var(--wood-dk)}
+#ask p{margin:3px 0 0;font-size:13px;line-height:1.4}
+#ask .ak-cost{display:flex;gap:6px;align-items:center;font:600 13px var(--f-ui);color:var(--ink-soft)}#ask .ak-cost img{height:14px}
+#ask .ak-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+@media (max-width:760px){#ask{right:auto;left:max(16px,env(safe-area-inset-left,0px))}}
+.act.warn{background:#ffe2d9;color:var(--red-dk)}
+.sheet.confirm{max-width:420px}.sheet.confirm h2{font-size:42px}
+.btn.danger{background:var(--red);border-color:var(--red-dk);box-shadow:0 4px 0 var(--red-dk)}
+.act .tr{display:flex;align-items:center;justify-content:center;gap:3px;height:46px;font:700 16px system-ui;color:var(--wood-dk)}.act .tr img{width:24px;height:24px}
+.act .cost img{width:auto!important}
+.act .glyph.it{font:700 30px/46px system-ui,sans-serif}
+@media (max-width:760px){.modes{grid-template-columns:1fr}.heroes{grid-template-columns:1fr 1fr}.mapbox canvas{width:150px;height:100px}
+  #goals{width:auto;left:max(16px,env(safe-area-inset-left,0px));right:auto;max-width:calc(100% - 32px);padding:5px 8px}#goals h5{font-size:18px}
+  .speech img{width:60px;height:60px}.speech p{font-size:14px!important}}
+@media (prefers-reduced-motion:reduce){#banner,.chip.foe.warn,#talk{animation:none}}
+#b-upd small{display:block;font:600 12px/1.3 var(--f-ui);opacity:.9;margin-top:3px}
+#b-upd.new{background:#2f8a3a;border-color:#1d5c24;box-shadow:0 4px 0 #1d5c24;color:#fff}
+.upd-bar{height:14px;border-radius:8px;background:#5b3b22;overflow:hidden;margin:10px 0}.upd-bar i{display:block;height:100%;width:0;background:#5cc04a;transition:width .2s}
+#ver-info{display:block;opacity:.8}
+#b-load small{display:block;font:600 12px/1.3 var(--f-ui);opacity:.85;margin-top:3px;max-width:34ch;white-space:normal}
+/* phones turned sideways: everything shrinks so the map keeps most of the screen */
+@media (orientation:landscape) and (max-height:500px){
+  .top{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:5px;padding-block:4px}
+  .top .chip{font-size:17px;padding:1px 6px 1px 4px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}
+  .top .chip img{height:15px}
+  .top .chip.era,.top .chip.foe{font-size:17px}
+  .top .tbtn{padding:3px 8px;font-size:12px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}
+  .spacer{display:block}
+  .panel{grid-template-columns:minmax(140px,200px) 1fr auto;grid-template-areas:"info actions mini";gap:6px;padding-block:5px;border-top-width:3px}
+  .info{padding:4px 6px;gap:6px;grid-area:info} .actions{grid-area:actions} .mini{grid-area:mini}
+  .info .por{width:34px;height:34px}
+  .info h3{font-size:18px}
+  .info p{font-size:11px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hp{height:6px;margin-top:3px}
+  .act{width:66px;padding:3px 2px 2px;font-size:10px;gap:0;border-width:2px}
+  .act img{width:28px;height:28px}
+  .act .cost{font-size:12px}
+  .act .cost img{height:10px}
+  .act kbd{display:none}
+  .mini{padding:2px}
+  #mini{width:96px;height:64px}
+  #talk{width:min(340px,44vw);padding:4px 8px;gap:6px}
+  #talk img{width:32px;height:32px} #talk b{font-size:16px} #talk p{font-size:11px;line-height:1.3}
+  #ask{width:min(340px,46vw);padding:6px 8px;gap:6px}
+  #ask img{width:32px;height:32px} #ask b{font-size:16px} #ask p{font-size:11px;line-height:1.3}
+  #ask .ak-row{margin-top:4px} #ask .btn{font-size:18px;padding:4px 12px}
+  .toast{font-size:12px;padding:3px 8px}
+  #banner{top:46px;bottom:auto} #banner strong{font-size:30px}
+}
+</style>
+
+<div id="app">
+  <canvas id="game" aria-label="Mapa do reino"></canvas>
+
+  <div class="top" id="top">
+    <div class="chip" title="Madeira"><img src="assets/ic_wood.png" alt=""><span id="r-wood">0</span></div>
+    <div class="chip" title="Ouro"><img src="assets/ic_gold.png" alt=""><span id="r-gold">0</span></div>
+    <div class="chip" title="Comida"><img src="assets/ic_food.png" alt=""><span id="r-food">0</span></div>
+    <div class="chip" title="População"><img src="assets/ic_pawn.png" alt=""><span id="r-pop">0/0</span></div>
+    <button class="chip era" id="c-era" type="button" title="Ver as eras"><img src="assets/ic_monk.png" alt=""><span id="r-era">Era I</span><i id="r-era-bar"></i></button>
+    <button class="chip foe" id="c-foe" type="button" title="Reino Vermelho"><img src="assets/ic_enemy.png" alt=""><span id="r-foe">Era I</span><i id="r-foe-bar"></i></button>
+    <div class="spacer"></div>
+    <button class="tbtn" id="b-idle" type="button" title="Selecionar peão ocioso (.)">Ociosos</button>
+    <button class="tbtn" id="b-army" type="button" title="Selecionar todo o exército (E)">Exército</button>
+ <button class="tbtn bell" id="b-sos" type="button" title="Sino das vilas: pedir ajuda e responder pedidos de socorro" hidden><svg class="bell-ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1.2c.6 0 1 .4 1 1v.7a4.6 4.6 0 0 1 3.6 4.5v2.9l1.4 1.7v.8H2v-.8l1.4-1.7V7.4A4.6 4.6 0 0 1 7 2.9v-.7c0-.6.4-1 1-1zM6.2 13.4h3.6a1.8 1.8 0 0 1-3.6 0z"/></svg><span id="sos-lbl">Vilas</span><i id="sos-n" hidden>0</i></button>
+    <button class="tbtn" id="b-svc" type="button" title="Serviços de entrega e relatórios (J)">Serviços<b id="svc-n" hidden></b></button>
+    <button class="tbtn" id="b-speed" type="button" title="Velocidade do jogo (V)">1x</button>
+    <button class="tbtn" id="b-sound" type="button" title="Som (M)">Som</button>
+    <button class="tbtn" id="b-pause" type="button" title="Pausar (P)">Pausar</button>
+    <button class="tbtn" id="b-help" type="button">Ajuda</button>
+  </div>
+
+  <div id="sndpop" class="sndpop" hidden role="dialog" aria-label="Som">
+    <b class="sp-h">Som</b>
+    <label class="sw"><input type="checkbox" id="sp-sfx"><span>Efeitos</span></label>
+    <label class="sw"><input type="checkbox" id="sp-mus"><span>Trilha sonora</span></label>
+    <label class="vol"><span>Volume da música</span><input type="range" id="sp-vol" min="0" max="100" value="50"></label>
+    <div class="vx" role="radiogroup" aria-label="Falas dos personagens"><span>Falas dos personagens</span>
+      <label><input type="radio" name="vox" value="voz"><i>Voz</i></label>
+      <label><input type="radio" name="vox" value="murmurio"><i>Murmúrio</i></label>
+      <label><input type="radio" name="vox" value="texto"><i>Só balões</i></label>
+      <label><input type="radio" name="vox" value="off"><i>Desligadas</i></label>
+    </div>
+    <p id="sp-novoice" class="sp-note" hidden>Este navegador não tem voz em português: os personagens vão murmurar.</p>
+  </div>
+  <div id="toasts" aria-live="polite"></div>
+  <div id="goals" hidden></div>
+  <div id="ask" hidden role="dialog" aria-label="Pedido de autorização"><img id="ak-av" src="assets/av05.png" alt=""><div><b id="ak-who">Mestre Gaspar pede autorização</b><p id="ak-text"></p><p class="ak-cost" id="ak-cost"></p><div class="ak-row"><button class="btn sm-btn" id="b-ak-yes" type="button">Autorizar</button><button class="btn alt sm-btn" id="b-ak-no" type="button">Agora não</button></div></div></div>
+  <div id="report" hidden role="dialog" aria-label="Relatório de serviço"><img id="rp-av" src="assets/av01.png" alt=""><div><b id="rp-who"></b><small id="rp-title"></small><ul id="rp-lines"></ul><div class="ak-row"><button class="btn sm-btn" id="b-rp-ok" type="button">Entendido</button><button class="btn alt sm-btn" id="b-rp-see" type="button">Ver no mapa</button></div></div></div>
+  <div id="talk" hidden><img id="tk-av" alt="" src="assets/av11.png"><div><b id="tk-who"></b><p id="tk-text"></p></div></div>
+  <div id="banner" hidden><small id="bn-kicker"></small><strong id="bn-title"></strong><span id="bn-text"></span></div>
+
+  <div class="panel" id="panel">
+    <div class="card info" id="info"></div>
+    <div class="actions" id="actions"></div>
+    <div class="card mini"><canvas id="mini" width="192" height="128" aria-label="Minimapa"></canvas></div>
+  </div>
+
+  <div class="overlay" id="ov-start">
+    <div class="sheet wide">
+      <div class="kicker">Estratégia em tempo real</div>
+      <h1>Reino Pequeno</h1>
+      <p class="lead">Um mapa novo a cada partida, cheio de florestas, ouro, ovelhas e covis de bandidos. Escolha como quer jogar.</p>
+      <h4 class="lbl">Modo de jogo</h4>
+      <div class="modes" role="radiogroup" aria-label="Modo de jogo">
+        <label><input type="radio" name="mode" value="campaign" checked><span><b>Campanha</b><em>A Coroa de Pedravale: 5 capítulos com história, herói e o rei para proteger.</em></span></label>
+        <label><input type="radio" name="mode" value="skirmish"><span><b>Batalha Rápida</b><em>Você contra o Reino Vermelho num mapa grande. Quatro vilas neutras crescem, negociam e podem te ajudar; bandidos rondam as estradas.</em></span></label>
+        <label><input type="radio" name="mode" value="survival"><span><b>Defesa do Rei</b><em>Ondas sem fim e um chefe a cada cinco. Quantas você aguenta?</em></span></label>
+      </div>
+      <div id="hero-box">
+        <h4 class="lbl">Seu herói</h4>
+        <div class="heroes" id="hero-list" role="radiogroup" aria-label="Herói"></div>
+      </div>
+      <div id="chap-box">
+        <h4 class="lbl">Capítulo</h4>
+        <div class="chapters" id="chap-list"></div>
+      </div>
+      <h4 class="lbl">Dificuldade</h4>
+      <div class="seg" role="radiogroup" aria-label="Dificuldade">
+        <label><input type="radio" name="diff" id="d-normal" value="normal"><span>Normal<em>Inimigo sem pressa</em></span></label>
+        <label><input type="radio" name="diff" id="d-dificil" value="dificil" checked><span>Difícil<em>Ataques mais fortes</em></span></label>
+        <label><input type="radio" name="diff" id="d-insano" value="insano"><span>Insano<em>Sem trégua</em></span></label>
+      </div>
+      <h4 class="lbl">Mapa</h4>
+      <div class="mapbox">
+        <canvas id="map-prev" width="192" height="128" aria-label="Prévia do mapa"></canvas>
+        <div>
+          <b id="map-name">Ilha</b>
+          <p id="map-desc">Cada partida sorteia um mapa novo.</p>
+          <button class="btn alt sm-btn" id="b-reroll" type="button">Sortear outro mapa</button>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="b-start" type="button">Começar</button>
+        <button class="btn alt" id="b-resume" type="button" hidden>Continuar</button>
+        <button class="btn alt" id="b-load" type="button" hidden>Continuar partida salva<small id="load-info"></small></button>
+        <button class="btn alt" id="b-eras" type="button">Ver as eras</button>
+        <button class="btn alt" id="b-sound2" type="button" title="Trilha sonora e falas">♪ Som</button>
+        <button class="btn alt" id="b-upd" type="button" hidden title="Baixar a versão mais nova do jogo">⟳ Procurar atualização<small id="upd-info"></small></button>
+      </div>
+      <details class="howto">
+        <summary>Como jogar</summary>
+        <div class="cols">
+          <div>
+            <h4>No computador</h4>
+            <ul>
+              <li>Clique para selecionar, arraste para selecionar vários</li>
+              <li>Botão direito: andar, coletar, construir, atacar ou converter</li>
+              <li>Com um prédio selecionado, botão direito marca o ponto de encontro</li>
+              <li>WASD ou setas movem a câmera; teclas 1 a 6 constroem</li>
+            </ul>
+          </div>
+          <div>
+            <h4>No celular</h4>
+            <ul>
+              <li>Toque numa unidade sua para selecionar</li>
+              <li>Com algo selecionado, toque no chão, na árvore, no ouro ou no inimigo para dar a ordem</li>
+              <li>Arraste com um dedo para mover a câmera, pinça para zoom</li>
+            </ul>
+          </div>
+        </div>
+        <p style="font-size:13px">Ovelhas, cordeiros e ovelhas negras dão comida. A ovelha dourada é rara: além da comida, rende ouro. Na campanha e na Defesa do Rei, o castelo tem uma forja: junte recursos e itens para forjar ferramentas, armas, escudos e tesouros da história. Se o rei cair, a partida acaba.</p>
+      </details>
+      <p class="fine">Arte: Tiny Swords, de Pixel Frog. Produzido por Braian Tech.<span id="ver-info"></span></p>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-story" hidden>
+    <div class="sheet story">
+      <div class="kicker" id="st-kicker">Capítulo 1</div>
+      <h2 id="st-title">Cinzas na Aldeia</h2>
+      <div class="speech">
+        <img id="st-av" alt="" src="assets/av11.png">
+        <div><b id="st-who">Rei Aldebrando</b><p id="st-text"></p></div>
+      </div>
+      <div class="row"><button class="btn" id="b-st-next" type="button">Continuar</button><button class="btn alt" id="b-st-skip" type="button">Pular</button><span class="pg" id="st-pg"></span></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-upd" hidden>
+    <div class="sheet">
+      <div class="kicker">Atualização</div>
+      <h2 id="upd-title">Procurando atualização...</h2>
+      <p id="upd-text"></p>
+      <ul id="upd-notes" class="rules"></ul>
+      <div class="upd-bar" id="upd-bar" hidden><i id="upd-fill"></i></div>
+      <div class="row">
+        <button class="btn" id="b-upd-go" type="button" hidden>Atualizar agora</button>
+        <button class="btn alt" id="b-upd-close" type="button">Fechar</button>
+        <button class="btn alt sm-btn" id="b-upd-reset" type="button" hidden>Voltar à versão original</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-sos" hidden>
+    <div class="sheet">
+      <div class="kicker">Diplomacia</div>
+      <h2>O sino das vilas</h2>
+      <p>Ajuda é uma via de mão dupla e ninguém é obrigado a ir. Quando uma vila te ajuda de graça, você fica devendo um favor; quando você defende uma vila, ela fica te devendo. Quem te deve favores vem mais fácil e de graça. Recusar socorro a quem já te ajudou magoa a amizade.</p>
+      <div id="sos-list" class="svc-list"></div>
+      <div class="row"><button class="btn alt" id="b-sos-close" type="button">Fechar</button></div>
+    </div>
+  </div>
+  <div class="overlay" id="ov-svc" hidden>
+    <div class="sheet wide">
+      <div class="kicker">Economia e estradas</div>
+      <h2>Serviços de entrega</h2>
+      <p id="svc-sum"></p>
+      <h4 class="lbl">Em andamento</h4>
+      <div id="svc-run" class="svc-list"></div>
+      <h4 class="lbl">Relatórios</h4>
+      <div id="svc-log" class="svc-list"></div>
+      <details class="howto" open>
+        <summary>Regras dos serviços</summary>
+        <ol class="rules">
+          <li><b>Quem pede:</b> tropeiros (vender e comprar), o quartel (armas), mercadores das vilas (escolta), comandantes longe de casa (suprimentos) e o Mestre Gaspar (tecnologia). Todos pedem a sua autorização antes de sair. Na vila neutra você também pode encomendar direto.</li>
+          <li><b>Pagamento:</b> a carga sai do estoque na partida. Venda é paga na chegada; compra é paga na saída.</li>
+          <li><b>Escolta:</b> os soldados livres mais perto do mercado vão junto. Para reforçar, selecione tropas e toque na carroça. A carroça espera a escolta que ficou para trás.</li>
+          <li><b>Risco de emboscada:</b> cresce com a distância e com carga valiosa (armas, ouro); cai com cada soldado de escolta e com a tecnologia Mapas das estradas.</li>
+          <li><b>Emboscada:</b> bandidos saem do mato à frente da carroça. Se a carroça cair, a carga fica com quem a destruiu e o serviço fracassa.</li>
+          <li><b>Prazo:</b> chegar atrasado paga 30% menos.</li>
+          <li><b>Reputação:</b> cada serviço cumprido dá ★ com a vila; fracasso tira ★. Cada ★ melhora os preços. Mercenários e tecnologias pedem ★★; troca de tecnologia pede ★.</li>
+          <li><b>Carroças ao mesmo tempo:</b> 1 na Era I, 2 nas Eras II e III, 3 nas Eras IV e V.</li>
+          <li><b>Relatório:</b> no fim, quem voltou conta o que aconteceu: duração, emboscadas, bandidos derrubados, perdas, pagamento e reputação.</li>
+          <li><b>Livre mercado:</b> o Reino Vermelho também negocia com as vilas e mexe nos preços. As carroças dele podem ser saqueadas: metade da carga fica com você.</li>
+        </ol>
+      </details>
+      <div class="row"><button class="btn" id="b-svc-close" type="button">Fechar</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-eras" hidden>
+    <div class="sheet wide">
+      <div class="kicker">Evolução</div>
+      <h2>As cinco eras</h2>
+      <p>Avance de era no castelo. Cada era custa recursos, pede um prédio da era atual e deixa todo o seu reino mais forte. Enquanto o castelo pesquisa, ele não treina peões.</p>
+      <ul class="eras" id="era-list"></ul>
+      <p class="meta" style="font-size:13px;margin-top:12px">Contra-ataques: guerreiro vence arqueiro, arqueiro vence lanceiro, lanceiro vence guerreiro. Monges convertem qualquer tropa, até bandidos.</p>
+      <h4 style="margin-top:14px">Tropas especiais</h4>
+      <p style="font-size:13px"><b>Batedor</b> (Quartel, Era I): o mais rápido, caça peões. <b>Aríete</b> (Quartel, Era III): derruba muralhas e portões, quase imune a flechas, não ataca soldados. <b>Catapulta</b> (Quartel, Era IV): pedras de longe que acertam em área. <b>Arqueiro real</b> (Arquearia, Era IV): o maior alcance. <b>Paladino</b> e <b>Mago</b> (Mosteiro, Era IV): o paladino cura quem está em volta e não pode ser convertido; o mago lança bolas de fogo.</p>
+      <h4 style="margin-top:14px">Morros: até 4 alturas</h4>
+      <p style="font-size:13px">Cada nível acima do inimigo dá mais dano (+20%, +35%, +50%) e arqueiros atiram mais longe; atacar morro acima enfraquece. Torres sobem com o botão Subir torre: cada nível dá +20% de alcance e +15% de dano. O engenheiro faz os degraus e as escadas sozinho.</p>
+      <h4 style="margin-top:14px">Patentes</h4>
+      <p style="font-size:13px">A cada 3 soldados inimigos derrotados (do Reino Vermelho ou bandidos) a unidade sobe uma patente: +10% de vida, +12% de dano e cura metade da vida. A partir de Sargento (3ª patente) as feridas se curam sozinhas fora de combate, e o soldado pode pedir para virar médico de campo: você decide. Converter com o monge também conta.</p>
+      <p class="meta" style="font-size:12px">Aldeões também evoluem: cada recurso coletado treina a profissão (Lenhador, Minerador, Coletor, Construtor), até +40% de velocidade. Feridos bebem na taberna e se curam. Soldado 3 · Cabo 6 · Sargento 9 · Tenente 12 · Capitão 15 · Major 18 · Comandante 21</p>
+      <div class="row"><button class="btn" id="b-eras-close" type="button">Fechar</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-confirm" hidden>
+    <div class="sheet confirm" role="alertdialog" aria-labelledby="cf-title">
+      <h2 id="cf-title">Demolir?</h2>
+      <p id="cf-text"></p>
+      <div class="row"><button class="btn danger" id="b-cf-yes" type="button">Sim</button><button class="btn alt" id="b-cf-no" type="button">Não</button></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="ov-end" hidden>
+    <div class="sheet">
+      <div class="kicker" id="end-kicker">Fim de jogo</div>
+      <h2 id="end-title">Vitória!</h2>
+      <p id="end-text"></p>
+      <div class="stats" id="end-stats"></div>
+      <div class="row"><button class="btn" id="b-next" type="button" hidden>Próximo capítulo</button><button class="btn" id="b-again" type="button">Jogar de novo</button><button class="btn alt" id="b-menu" type="button">Menu</button></div>
+    </div>
+  </div>
+</div>
