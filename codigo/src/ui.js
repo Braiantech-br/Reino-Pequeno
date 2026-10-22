@@ -1490,5 +1490,6 @@ const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==='function')hot.snapshot(()=>({S,cam:{x:cam.x,y:cam.y,z:cam.z},started:ui.started}));
 if(hot&&typeof hot.ready==='function')hot.ready(boot);else boot((hot&&hot.data)||{});
 window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTick,startPlacing,townRaid,townHelpAnswer,svcOrder,svcList,MUS,musStep,musSection,musEnter,SND,musInit,MOODS,voxSay,VOX,startGame,showMenu,forgeItem,giveItem,waveInfo,goalState,CHAPTERS,ITEMS,talk,__addKill:addKill,spawnUnit,autoJob,afford,unlocked,castleOf,update,render,command,select,newGame,pick,confirmPlace,startPlacing,trainAt,ui,cam,DEF,byId,canPlace,refreshPanel,hud,drawMini,popUsed,popCap,startResearch,castAt,startTargeting,placeBuilding,ghostFor,ERAS,eraOf,FX,setRally,
+  walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
   setAT(v){AT=v;}};
