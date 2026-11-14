@@ -6,12 +6,12 @@
  "bytes": 3544036,
  "sha256": "1460628aaa32bd0b063cf3359000eba7041d1f548c36a46d49b52020431313b2",
  "notas": [
-  "Novo: modo observador na Batalha Rápida. Escolha quem joga cada reino: Você, Computador ou Claude no Azul; Computador ou Claude no Vermelho. Dá até Claude contra Claude.",
-  "No modo observador as duas máquinas jogam e você assiste: placar, câmera automática que segue as batalhas e os pensamentos e provocações do Claude na tela. Bom para transmitir ao vivo.",
-  "Bem menos notificações na tela, principalmente no celular e no tablet. Em Som e avisos você escolhe Poucos, Normais ou Todos; o resto fica no Conselho, em Notícias.",
-  "A barra de cima não esconde mais Pausar, Som e Menu: eles ficam sempre visíveis, com ícones nas telas pequenas.",
+  "Novo modo observador na Batalha Rápida: escolha quem joga cada reino (Você, Computador ou Claude no Azul; Computador ou Claude no Vermelho). Dá até para ver Claude contra Claude.",
+  "No modo observador, as duas máquinas jogam e você assiste, com placar, câmera automática que acompanha as batalhas e os pensamentos e as provocações do Claude na tela. Ideal para transmissões ao vivo.",
+  "Bem menos notificações na tela, principalmente no celular e no tablet. Em \"Som e avisos\", você escolhe Poucos, Normais ou Todos; os demais avisos ficam guardados no Conselho, em Notícias.",
+  "A barra de cima não esconde mais os botões Pausar, Som e Menu: eles ficam sempre visíveis, como ícones nas telas pequenas.",
   "Ao voltar para o jogo (tela desbloqueada, app reaberto, partida salva), aparece um cartão grande \"Jogo pausado\" com o botão Continuar.",
-  "No Android, as barras do sistema voltam a se esconder depois de desbloquear a tela.",
-  "As versões antigas ficam na pasta downloads/old do GitHub."
+  "No Android, as barras do sistema voltam a se esconder depois que a tela é desbloqueada.",
+  "As versões antigas ficam guardadas na pasta downloads/old do GitHub."
  ]
 }

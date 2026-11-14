@@ -211,7 +211,7 @@ def main():
         for k, fixed in [('win', 'ReinoPequeno-Windows.zip'), ('mac', 'ReinoPequeno-Mac.zip'), ('linux', 'ReinoPequeno-Linux.zip'),
                          ('android', 'ReinoPequeno-Android.apk'), ('ios', 'ReinoPequeno-iPhone-iPad.zip')]:
             if k in out: shutil.copy(f'{dist}/{out[k]}', f'{dl}/{fixed}')
-        open(f'{dl}/VERSAO.txt', 'w', encoding='utf-8').write(f'Instaladores da versão {name}. Depois de instalados, eles se atualizam sozinhos pelo botão "Procurar atualização".\n')
+        open(f'{dl}/VERSAO.txt', 'w', encoding='utf-8').write(f'Instaladores da versão {name}. Depois de instalado, o jogo se atualiza sozinho pelo botão "Procurar atualização".\n')
         say('instaladores copiados para downloads/')
     say('pronto em', dist)
     for k, f in out.items(): say(f'{f}  {os.path.getsize(f"{dist}/{f}") // 1024} KB')
@@ -224,12 +224,12 @@ def oldreadme(dl):
     rows = []
     for v in vs:
         fs = sorted(f for f in os.listdir(f'{od}/{v}') if f.startswith('ReinoPequeno'))
-        rows.append(f'| **{v}** | ' + ' · '.join(f'[{f.replace("ReinoPequeno-", "").rsplit(".", 1)[0]}]({v}/{f})' for f in fs) + ' |')
+        rows.append(f'| **{v}** | ' + ' · '.join(f'[{f.replace("ReinoPequeno-", "").rsplit(".", 1)[0].replace("iPhone-iPad", "iPhone e iPad")}]({v}/{f})' for f in fs) + ' |')
     open(f'{od}/LEIA-ME.md', 'w', encoding='utf-8').write(
         '# Versões antigas do Reino Pequeno\n\n'
-        'A versão mais nova fica sempre na pasta [downloads](..). Aqui ficam as anteriores, caso você precise de uma delas.\n'
+        'A versão mais nova fica sempre na pasta [downloads](..). Aqui estão as anteriores, caso você precise de alguma delas.\n'
         'Uma versão antiga instalada se atualiza sozinha para a mais nova pelo botão "Procurar atualização"; '
-        'se quiser ficar nela, não toque nesse botão.\n\n| Versão | Pacotes |\n|---|---|\n' + '\n'.join(rows) + '\n')
+        'se quiser continuar nela, não toque nesse botão.\n\n| Versão | Pacotes |\n|---|---|\n' + '\n'.join(rows) + '\n')
 
 if __name__ == '__main__':
     main()
