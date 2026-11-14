@@ -246,7 +246,7 @@ HOOK.army=(what,team,u,x)=>{
   renderCouncil();
 };
 HOOK.scout=(what,team,u,x)=>{
-  if(what==='openPlan'){ui.showPlan=true;openCouncil('army');return;}
+  if(what==='openPlan'){if(watching()){for(const p of intelOf(1).plan.filter(p=>p.st==='new'))planApprove(1,p.id);return;}ui.showPlan=true;openCouncil('army');return;}
   if(team!==1){if(what==='rubro'&&u)cLog('O Reino Vermelho tem um engenheiro-chefe: Mestre Rubro.','bad',{x:u.x,y:u.y});return;}
   const loc=u?{x:u.x,y:u.y,id:u.id}:null;
   if(what==='start'){toast(x.kind==='spy'?'O batedor partiu para espiar a base vermelha.':'O batedor partiu para reconhecer o terreno.','good',loc);cLog(x.kind==='spy'?'Batedor a caminho da base vermelha.':'Batedor reconhecendo o terreno.','',loc);}

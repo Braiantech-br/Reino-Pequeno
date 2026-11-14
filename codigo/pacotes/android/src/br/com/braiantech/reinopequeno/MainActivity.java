@@ -3,6 +3,8 @@ package br.com.braiantech.reinopequeno;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
@@ -57,6 +59,9 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Store(), "AndroidStore");
         setContentView(web);
         immersive();
+        if (Build.VERSION.SDK_INT >= 19) getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            public void onSystemUiVisibilityChange(int v) { if ((v & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) ui.postDelayed(hideBars, 2500); }
+        });
         web.loadUrl(START);
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -93,7 +98,17 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onWindowFocusChanged(boolean focus) { super.onWindowFocusChanged(focus); if (focus) immersive(); }
+    public void onWindowFocusChanged(boolean focus) { super.onWindowFocusChanged(focus); if (focus) { immersive(); later(); } }
+
+    final Handler ui = new Handler(Looper.getMainLooper());
+    final Runnable hideBars = new Runnable() { public void run() { immersive(); } };
+    /** After the lock screen the system bars can come back over the game: hide them again a little later,
+     *  and tell the page to measure its layout again. */
+    void later() {
+        ui.postDelayed(hideBars, 300);
+        ui.postDelayed(hideBars, 1200);
+        ui.postDelayed(new Runnable() { public void run() { js("window.__relayout&&window.__relayout()"); } }, 400);
+    }
 
     @Override
     protected void onPause() {
@@ -106,6 +121,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         immersive();
+        later();
         js("window.__appPause&&window.__appPause(false)");
     }
 

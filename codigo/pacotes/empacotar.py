@@ -193,8 +193,21 @@ def main():
         open(f'{REPO_DIR}/.nojekyll', 'w').close()
         say('site e atualização copiados para a raiz do repositório')
     if '--downloads' in sys.argv:
-        # the installers with fixed names in downloads/, so the links in the README never change
-        dl = f'{REPO_DIR}/downloads'; shutil.rmtree(dl, ignore_errors=True); os.makedirs(dl)
+        # the installers with fixed names in downloads/, so the links in the README never change;
+        # the version that was there moves to downloads/old/<version>/ (every old version stays available)
+        dl = f'{REPO_DIR}/downloads'; os.makedirs(dl, exist_ok=True)
+        prev = None
+        try:
+            import re as _re
+            m = _re.search(r'versão (\d+(?:\.\d+)*)', open(f'{dl}/VERSAO.txt', encoding='utf-8').read()); prev = m and m.group(1)
+        except OSError: pass
+        olds = [f for f in os.listdir(dl) if os.path.isfile(f'{dl}/{f}')]
+        if prev and prev != name and olds:
+            od = f'{dl}/old/{prev}'; os.makedirs(od, exist_ok=True)
+            for f in olds: shutil.move(f'{dl}/{f}', f'{od}/{f}')
+            say(f'versão {prev} guardada em downloads/old/{prev}/')
+        for f in [f for f in os.listdir(dl) if os.path.isfile(f'{dl}/{f}')]: os.remove(f'{dl}/{f}')
+        oldreadme(dl)
         for k, fixed in [('win', 'ReinoPequeno-Windows.zip'), ('mac', 'ReinoPequeno-Mac.zip'), ('linux', 'ReinoPequeno-Linux.zip'),
                          ('android', 'ReinoPequeno-Android.apk'), ('ios', 'ReinoPequeno-iPhone-iPad.zip')]:
             if k in out: shutil.copy(f'{dist}/{out[k]}', f'{dl}/{fixed}')
@@ -202,6 +215,21 @@ def main():
         say('instaladores copiados para downloads/')
     say('pronto em', dist)
     for k, f in out.items(): say(f'{f}  {os.path.getsize(f"{dist}/{f}") // 1024} KB')
+
+def oldreadme(dl):
+    """downloads/old/LEIA-ME.md: the list of the old versions kept in the repository."""
+    od = f'{dl}/old'
+    if not os.path.isdir(od): return
+    vs = sorted([v for v in os.listdir(od) if os.path.isdir(f'{od}/{v}')], key=lambda v: [int(x) for x in v.split('.') if x.isdigit()], reverse=True)
+    rows = []
+    for v in vs:
+        fs = sorted(f for f in os.listdir(f'{od}/{v}') if f.startswith('ReinoPequeno'))
+        rows.append(f'| **{v}** | ' + ' · '.join(f'[{f.replace("ReinoPequeno-", "").rsplit(".", 1)[0]}]({v}/{f})' for f in fs) + ' |')
+    open(f'{od}/LEIA-ME.md', 'w', encoding='utf-8').write(
+        '# Versões antigas do Reino Pequeno\n\n'
+        'A versão mais nova fica sempre na pasta [downloads](..). Aqui ficam as anteriores, caso você precise de uma delas.\n'
+        'Uma versão antiga instalada se atualiza sozinha para a mais nova pelo botão "Procurar atualização"; '
+        'se quiser ficar nela, não toque nesse botão.\n\n| Versão | Pacotes |\n|---|---|\n' + '\n'.join(rows) + '\n')
 
 if __name__ == '__main__':
     main()

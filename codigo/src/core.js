@@ -158,7 +158,7 @@ let AT=0;
 
 const eraOf=t=>(S&&S.teams[t])?S.teams[t].era:1;
 const has=k=>!!(S&&S.items&&S.items[k]);
-function gatherMult(t){const e=eraOf(t);return econWork(t)*(1+(e>=2?.15:0)+(e>=4?.15:0)+(e>=5?.1:0))*(t===2?S.diff.gather:1)*(t===1&&has('ferramentas')?1.2:1);}
+function gatherMult(t){const e=eraOf(t);return econWork(t)*(1+(e>=2?.15:0)+(e>=4?.15:0)+(e>=5?.1:0))*(t===2||t===1&&S.cfg&&S.cfg.watch?S.diff.gather:1)*(t===1&&has('ferramentas')?1.2:1);}
 function atkMult(u){return (u.sq?sqAtk(u):1)*(u.team&&u.team<3&&S.econ&&S.econ[u.team]&&S.econ[u.team].unpaid&&DEF[u.kind].mil?.9:1)*(u.hero?1.8:1)*(u.team===1&&has('armas')?1.15:1)*(u.medic?.5:1)*(u.supT>S.t?1.15:1)*(DEF[u.kind].ranged&&techHas(u.team,'flechas')?1.12:1);}
 function carryCap(t){const e=eraOf(t);return e>=5?16:e>=3?13:10;}
 // wild creatures grow tougher as the game goes on
@@ -1816,7 +1816,7 @@ function damage(t,dmg,src){
   }
   if(t.team&&src&&src.team&&src.team!==t.team){
     if(t.team===1){HOOK.alarm(t.x,t.y);if(S.t-(S.hitT||-99)>40){S.hitT=S.t;S.villageHits=(S.villageHits||0)+1;}}
-    if(t.team===2&&S.ai){S.ai.alarm={x:t.x,y:t.y,t:S.t};}
+    if(t.team===2&&S.ai){S.ai.alarm={x:t.x,y:t.y,t:S.t};}else if(t.team===1&&S.ai1){S.ai1.alarm={x:t.x,y:t.y,t:S.t};}
   }
   if(t.hp<=0)kill(t,src);
 }

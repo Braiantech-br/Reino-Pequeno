@@ -1,15 +1,17 @@
 {
- "ver": 210,
- "name": "2.1",
+ "ver": 220,
+ "name": "2.2",
  "date": "2026-11-14",
  "file": "jogo.html",
- "bytes": 3513385,
- "sha256": "5cbaf9c332752ea9199c09d5a5b2c39e874218d6d8995629ba7d160192d7be35",
+ "bytes": 3544036,
+ "sha256": "1460628aaa32bd0b063cf3359000eba7041d1f548c36a46d49b52020431313b2",
  "notas": [
-  "Novo: o Claude pode comandar o Reino Vermelho na Batalha Rápida. Escolha \"Claude\" em \"Quem comanda o Reino Vermelho\".",
-  "A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos.",
-  "O Mestre Rubro provoca você com frases do Claude, e no fim da partida você lê tudo o que ele pensou.",
-  "No link do claude.ai o Claude usa a sua conta; nas versões baixadas e no site, a sua chave da API da Anthropic.",
-  "Modelos Esperto e Rápido. Se o Claude ficar sem resposta, o computador assume o Vermelho e você pode chamá-lo de volta."
+  "Novo: modo observador na Batalha Rápida. Escolha quem joga cada reino: Você, Computador ou Claude no Azul; Computador ou Claude no Vermelho. Dá até Claude contra Claude.",
+  "No modo observador as duas máquinas jogam e você assiste: placar, câmera automática que segue as batalhas e os pensamentos e provocações do Claude na tela. Bom para transmitir ao vivo.",
+  "Bem menos notificações na tela, principalmente no celular e no tablet. Em Som e avisos você escolhe Poucos, Normais ou Todos; o resto fica no Conselho, em Notícias.",
+  "A barra de cima não esconde mais Pausar, Som e Menu: eles ficam sempre visíveis, com ícones nas telas pequenas.",
+  "Ao voltar para o jogo (tela desbloqueada, app reaberto, partida salva), aparece um cartão grande \"Jogo pausado\" com o botão Continuar.",
+  "No Android, as barras do sistema voltam a se esconder depois de desbloquear a tela.",
+  "As versões antigas ficam na pasta downloads/old do GitHub."
  ]
 }

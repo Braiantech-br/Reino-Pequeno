@@ -1,5 +1,5 @@
 ﻿==============================================================================
-  REINO PEQUENO  ·  versão 2.1  ·  14 de novembro de 2026
+  REINO PEQUENO  ·  versão 2.2  ·  14 de novembro de 2026
   Estratégia medieval em tempo real  ·  Braian Tech
 ==============================================================================
 
@@ -29,7 +29,7 @@ fica guardado só no aparelho. A internet só é usada quando VOCÊ toca em
 ==============================================================================
 
   Cada sistema tem o seu arquivo para baixar (nos Releases, o nome traz o
-  número da versão, como ReinoPequeno-2.1-Windows.zip):
+  número da versão, como ReinoPequeno-2.2-Windows.zip):
 
   ReinoPequeno-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
   ReinoPequeno-Mac.zip .......... Reino Pequeno.app
@@ -190,11 +190,19 @@ vozes embutidas, e o mesmo botão de atualização.
     Campanha ........ "A Coroa de Pedravale": 5 capítulos com história, um
                       herói e o rei para proteger. Cada capítulo vencido
                       libera o próximo.
-    Batalha Rápida .. você contra o Reino Vermelho (computador) num mapa
-                      grande (136 × 92), com 4 vilas neutras que crescem,
+    Batalha Rápida .. o Reino Azul contra o Reino Vermelho num mapa grande
+                      (136 × 92), com 4 vilas neutras que crescem,
                       negociam e podem ajudar, e bandidos nas estradas.
+                      Você escolhe quem joga cada reino (veja abaixo).
     Defesa do Rei ... ondas sem fim; um chefe a cada 5 ondas. O jogo guarda
                       o seu recorde em cada dificuldade.
+
+  QUEM JOGA (Batalha Rápida)
+    Reino Azul ....... Você, Computador ou Claude
+    Reino Vermelho ... Computador ou Claude
+    Com Você no Azul, você joga contra a máquina. Com Computador ou Claude
+    no Azul, as duas máquinas jogam e você assiste (modo observador, 6.24):
+    dá para ver Computador contra Claude e até Claude contra Claude.
 
   HERÓI (Campanha e Defesa do Rei)
     Sir Tomás (guerreiro), Dona Isolda (lanceira), Robério (arqueiro),
@@ -217,15 +225,27 @@ vozes embutidas, e o mesmo botão de atualização.
     lagos) e o relevo: plano, colinas ou montanhas com até 4 alturas.
     "Sortear outro mapa" troca antes de começar.
 
-  SOM (botão Som)
+  SOM E AVISOS (botão Som, o alto-falante)
     Efeitos liga/desliga · Música liga/desliga e volume · Vozes:
       Voz ........ os bonecos falam em português (voz do aparelho)
       Murmúrio ... falam "na língua do jogo", com balões de texto
       Texto ...... só os balões, sem som
       Desligado .. sem falas
+    Avisos na tela:
+      Poucos ..... só alertas (ataques, perigo) e as respostas ao que você
+                   acabou de fazer. Padrão no celular e no tablet.
+      Normais .... também as notícias importantes. Padrão no computador.
+      Todos ...... tudo, até "peão pronto" e "construção concluída".
+    Os avisos que não aparecem ficam no Conselho, em Notícias. No celular
+    aparece um aviso por vez; no tablet, dois.
 
   DURANTE A PARTIDA
-    Velocidade 1x / 2x / 3x · Pausar · Ajuda · Ver as eras · Menu.
+    No canto de cima, sempre visíveis: velocidade (1x / 2x / 3x), som e
+    avisos, pausar/continuar e menu (nas telas pequenas viram ícones). O
+    resto da barra (recursos, eras, Conselho) desliza para o lado quando não
+    cabe. Quando o jogo está pausado aparece um cartão "Jogo pausado" com o
+    botão Continuar (também ao desbloquear o celular ou abrir uma partida
+    salva).
     Rosto com número: humor do povo (toque para ver impostos e economia).
     Conselho: pedidos, exército, contratos, estradas, economia e regras.
 
@@ -271,6 +291,7 @@ vozes embutidas, e o mesmo botão de atualização.
     M ...................... som liga/desliga
     Esc .................... cancelar / limpar seleção
     Delete ................. demolir o prédio selecionado
+    C (modo observador) .... liga e desliga a câmera automática
 
   CELULAR E TABLET
     Toque numa unidade sua para selecionar.
@@ -692,34 +713,6 @@ vozes embutidas, e o mesmo botão de atualização.
   pontes pagam 8% da carga; as vilas não gostam.
 
 ------------------------------------------------------------------------------
- 6.23 O CLAUDE COMANDA O REINO VERMELHO (Batalha Rápida)
-------------------------------------------------------------------------------
-  Na tela inicial, em "Quem comanda o Reino Vermelho", escolha Claude.
-  A cada minuto de jogo o Claude, a inteligência artificial da Anthropic,
-  recebe um relatório da guerra (recursos, tropas dos dois lados, vilas,
-  contratos, perdas) e decide a estratégia do Vermelho: economia, quando
-  avançar de era, que tropas treinar, o que construir, quando e onde atacar
-  (castelo, torres, fazendas, quartéis ou uma vila), saques, contratos com
-  as vilas, espionagem e impostos. Os generais e o Mestre Rubro executam.
-  O Mestre Rubro provoca você com frases do Claude, e no fim da partida a
-  tela final mostra tudo o que o Claude pensou, ordem por ordem.
-
-  Como o jogo fala com o Claude:
-    No link do jogo no claude.ai ... usa a sua conta do Claude. Na primeira
-                                     ordem aparece um pedido de permissão.
-    Versões baixadas e site ........ precisa de uma chave da API da
-                                     Anthropic (console.anthropic.com). Cole
-                                     a chave no menu e toque em Testar. A
-                                     chave fica só no aparelho e vai direto
-                                     para a Anthropic; cada ordem é cobrada
-                                     na sua conta da API.
-  Modelos: Esperto (pensa mais, joga melhor) ou Rápido (responde na hora e
-  gasta menos). Uma partida de 30 minutos tem umas 30 ordens.
-  Sem internet, sem resposta ou no limite de uso, o computador assume o
-  Vermelho na hora e o selo "Claude" na barra de cima fica cinza: toque nele
-  para chamar o Claude de volta.
-
-------------------------------------------------------------------------------
  6.22 O CONSELHO
 ------------------------------------------------------------------------------
   O botão Conselho (tecla J) reúne tudo:
@@ -733,6 +726,63 @@ vozes embutidas, e o mesmo botão de atualização.
                   comandos dos chefes) e o limite de gasto sem perguntar.
                   Tudo o que uma regra decide aparece nas Notícias.
 
+
+------------------------------------------------------------------------------
+ 6.23 O CLAUDE NO COMANDO (Batalha Rápida)
+------------------------------------------------------------------------------
+  Em "Quem joga", escolha Claude para o Reino Vermelho (e, no modo
+  observador, também para o Azul). A cada minuto de jogo o Claude, a
+  inteligência artificial da Anthropic, recebe um relatório da guerra
+  (recursos, tropas dos dois lados, vilas, contratos, perdas) e decide a
+  estratégia do reino dele: economia, quando avançar de era, que tropas
+  treinar, o que construir, quando e onde atacar (castelo, torres, fazendas,
+  quartéis ou uma vila), saques, contratos com as vilas, espionagem e
+  impostos. Os generais e o engenheiro (Mestre Rubro no Vermelho, Mestre
+  Gaspar no Azul) executam. O engenheiro provoca o inimigo com frases do
+  Claude, e no fim da partida a tela final mostra tudo o que o Claude
+  pensou, ordem por ordem.
+
+  Como o jogo fala com o Claude:
+    No link do jogo no claude.ai ... usa a sua conta do Claude. Na primeira
+                                     ordem aparece um pedido de permissão.
+    Versões baixadas e site ........ precisa de uma chave da API da
+                                     Anthropic (console.anthropic.com). Cole
+                                     a chave no menu e toque em Testar. A
+                                     chave fica só no aparelho e vai direto
+                                     para a Anthropic; cada ordem é cobrada
+                                     na sua conta da API.
+  Modelos: Esperto (pensa mais, joga melhor) ou Rápido (responde na hora e
+  gasta menos), escolhidos para cada reino. Uma partida de 30 minutos tem
+  umas 30 ordens por Claude (Claude contra Claude: umas 60).
+  Sem internet, sem resposta ou no limite de uso, o computador assume
+  aquele reino na hora; toque no selo do Claude (ou no placar, no modo
+  observador) para chamá-lo de volta.
+
+------------------------------------------------------------------------------
+ 6.24 MODO OBSERVADOR (máquina contra máquina)
+------------------------------------------------------------------------------
+  Na Batalha Rápida, escolha Computador ou Claude para o Reino Azul. As duas
+  máquinas jogam com as mesmas regras e a mesma ajuda da dificuldade, e você
+  assiste, como numa transmissão ao vivo:
+    Placar ............ no alto: quem comanda cada reino, era, tropas,
+                        aldeões, abates e a vida do castelo. A bolinha
+                        mostra o Claude: verde no comando, amarela pensando,
+                        vermelha fora (o computador assumiu).
+    Pensamentos ....... ao lado, o que cada Claude pensou e mandou, as
+                        provocações dos engenheiros e os grandes momentos:
+                        eras, ataques, castelos feridos, vilas conquistadas
+                        e contratos.
+    Câmera automática . segue a maior batalha, depois os exércitos em
+                        marcha e os dois reinos. Arraste o mapa para olhar à
+                        vontade (ela volta sozinha em 15 segundos) ou toque
+                        em "Câmera automática" (tecla C) para desligar.
+    Relógio ........... velocidade 1x, 2x ou 3x e pausa continuam valendo.
+  No modo observador não há névoa de guerra, os pedidos do reino azul são
+  respondidos sozinhos e a partida não pausa quando a janela sai da frente
+  (bom para transmitir). No fim, a tela mostra quem venceu, o placar dos
+  dois lados e o que os Claudes pensaram.
+  Para transmitir: abra o jogo no computador em tela cheia (F11) e capture a
+  janela no OBS ou no programa de live que você usa.
 
 ==============================================================================
  7. DICAS PARA COMEÇAR
@@ -777,6 +827,13 @@ vozes embutidas, e o mesmo botão de atualização.
     Nada muda: você continua na versão que tinha. Tente de novo com
     internet. Se uma versão nova não abrir, o jogo volta sozinho para a
     anterior; no menu há "Voltar à versão original".
+  "A barra de cima sumiu" / "Não acho o Pausar"
+    Pausar, Som e Menu ficam sempre no canto de cima; o resto da barra
+    desliza para o lado com o dedo. Com o jogo pausado, toque em Continuar
+    no cartão do meio da tela.
+  "Aparecem avisos demais"
+    Toque no alto-falante (Som e avisos) e escolha Poucos em "Avisos na
+    tela". Os outros ficam no Conselho, em Notícias.
   "Windows/Mac não deixa abrir"
     É a proteção contra programas sem assinatura paga. Siga os passos da
     seção 2. Se preferir, abra o arquivo .html direto ou use o site.
@@ -801,6 +858,11 @@ vozes embutidas, e o mesmo botão de atualização.
 
   O site (https://braiantech-br.github.io/Reino-Pequeno/) e o web app do iPhone se atualizam sozinhos.
 
+  Versões antigas: a pasta downloads/old do GitHub guarda os pacotes de
+  todas as versões anteriores (https://github.com/Braiantech-br/Reino-Pequeno/tree/main/downloads/old). Uma versão antiga
+  instalada se atualiza para a mais nova se você tocar em "Procurar
+  atualização".
+
 ==============================================================================
 10. CRÉDITOS E VERSÃO
 ==============================================================================
@@ -813,12 +875,14 @@ vozes embutidas, e o mesmo botão de atualização.
 
   Código-fonte e versões: https://github.com/Braiantech-br/Reino-Pequeno
 
-  Versão 2.1 (14 de novembro de 2026)
-    - Novo: o Claude pode comandar o Reino Vermelho na Batalha Rápida. Escolha "Claude" em "Quem comanda o Reino Vermelho".
-    - A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos.
-    - O Mestre Rubro provoca você com frases do Claude, e no fim da partida você lê tudo o que ele pensou.
-    - No link do claude.ai o Claude usa a sua conta; nas versões baixadas e no site, a sua chave da API da Anthropic.
-    - Modelos Esperto e Rápido. Se o Claude ficar sem resposta, o computador assume o Vermelho e você pode chamá-lo de volta.
+  Versão 2.2 (14 de novembro de 2026)
+    - Novo: modo observador na Batalha Rápida. Escolha quem joga cada reino: Você, Computador ou Claude no Azul; Computador ou Claude no Vermelho. Dá até Claude contra Claude.
+    - No modo observador as duas máquinas jogam e você assiste: placar, câmera automática que segue as batalhas e os pensamentos e provocações do Claude na tela. Bom para transmitir ao vivo.
+    - Bem menos notificações na tela, principalmente no celular e no tablet. Em Som e avisos você escolhe Poucos, Normais ou Todos; o resto fica no Conselho, em Notícias.
+    - A barra de cima não esconde mais Pausar, Som e Menu: eles ficam sempre visíveis, com ícones nas telas pequenas.
+    - Ao voltar para o jogo (tela desbloqueada, app reaberto, partida salva), aparece um cartão grande "Jogo pausado" com o botão Continuar.
+    - No Android, as barras do sistema voltam a se esconder depois de desbloquear a tela.
+    - As versões antigas ficam na pasta downloads/old do GitHub.
 
   Versão 1.15 (outubro de 2026)
     - Sino das vilas: pedir e dar socorro, favores entre vilas e reino.

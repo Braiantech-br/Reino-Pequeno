@@ -125,6 +125,8 @@ function autoRule(q){
 function ask(req){
   req=Object.assign({who:'Mestre Gaspar pede autorização',av:'av05'},req,{t:S.t,id:(S.askN=(S.askN||0)+1)});
   if(autoRule(req)){HOOK.council('auto',req);answerQ(req,true);return;}
+  // observer mode: nobody is there to answer, so the kingdom says yes to what it can pay for
+  if(S.cfg&&S.cfg.watch){HOOK.council('auto',req);answerQ(req,afford(1,req.cost||{}));return;}
   if(S.ask){(S.asks=S.asks||[]).push(req);HOOK.council('queued',req);return;}
   S.ask=req;HOOK.ask(S.ask);
 }

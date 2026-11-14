@@ -51,7 +51,7 @@
 .sheet.wide{max-width:680px}
 .sm{display:none}
 @media (max-width:760px){.chip.era,.chip.foe{font-size:19px}#banner strong{font-size:34px}#banner{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 190px)}
-  .top{flex-wrap:wrap;gap:5px;padding-block:6px;overflow:visible}.top .chip{font-size:18px;padding:1px 6px 1px 4px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.top .chip img{height:17px}.top .tbtn{padding:3px 7px;font-size:12px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.spacer{display:none}
+  .top{gap:5px;padding-block:6px;align-items:flex-start}.top .chip{font-size:18px;padding:1px 6px 1px 4px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.top .chip img{height:17px}.top .tbtn{padding:3px 7px;font-size:12px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}.spacer{display:none}
   .lg{display:none}.sm{display:inline!important}
   .hint{font-size:12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.info p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:12px}
   .act .rn{font-size:32px;height:38px;line-height:38px}.act .glyph{font-size:28px;height:38px;line-height:38px}}
@@ -142,7 +142,7 @@
 #b-load small{display:block;font:600 12px/1.3 var(--f-ui);opacity:.85;margin-top:3px;max-width:34ch;white-space:normal}
 /* phones turned sideways: everything shrinks so the map keeps most of the screen */
 @media (orientation:landscape) and (max-height:500px){
-  .top{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;gap:5px;padding-block:4px}
+  .top{gap:5px;padding-block:4px}
   .top .chip{font-size:17px;padding:1px 6px 1px 4px;border-width:2px;box-shadow:0 2px 0 var(--wood-dk)}
   .top .chip img{height:15px}
   .top .chip.era,.top .chip.foe{font-size:17px}
@@ -175,6 +175,7 @@
   <canvas id="game" aria-label="Mapa do reino"></canvas>
 
   <div class="top" id="top">
+   <div class="top-l" id="top-l">
     <div class="chip" title="Madeira"><img src="assets/ic_wood.png" alt=""><span id="r-wood">0</span></div>
     <div class="chip" title="Ouro"><img src="assets/ic_gold.png" alt=""><span id="r-gold">0</span></div>
     <div class="chip" title="Comida"><img src="assets/ic_food.png" alt=""><span id="r-food">0</span></div>
@@ -188,14 +189,26 @@
     <button class="tbtn" id="b-army" type="button" title="Selecionar todo o exército (E)">Exército</button>
  <button class="tbtn bell" id="b-sos" type="button" title="Sino das vilas: pedir ajuda e responder pedidos de socorro" hidden><svg class="bell-ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 1.2c.6 0 1 .4 1 1v.7a4.6 4.6 0 0 1 3.6 4.5v2.9l1.4 1.7v.8H2v-.8l1.4-1.7V7.4A4.6 4.6 0 0 1 7 2.9v-.7c0-.6.4-1 1-1zM6.2 13.4h3.6a1.8 1.8 0 0 1-3.6 0z"/></svg><span id="sos-lbl">Vilas</span><i id="sos-n" hidden>0</i></button>
     <button class="tbtn" id="b-svc" type="button" title="Conselho: pedidos, exército, contratos, estradas, economia e regras (J)">Conselho<b id="svc-n" hidden></b></button>
+   </div>
+   <div class="top-r" id="top-r">
     <button class="tbtn" id="b-speed" type="button" title="Velocidade do jogo (V)">1x</button>
-    <button class="tbtn" id="b-sound" type="button" title="Som (M)">Som</button>
-    <button class="tbtn" id="b-pause" type="button" title="Pausar (P)">Pausar</button>
-    <button class="tbtn" id="b-help" type="button">Ajuda</button>
+    <button class="tbtn tic" id="b-sound" type="button" title="Som e avisos (M)" aria-label="Som e avisos"><svg class="ico on" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 6h3l4-3.5v11L5 10H2z"/><path d="M11 5.2a4 4 0 0 1 0 5.6M12.8 3.4a6.5 6.5 0 0 1 0 9.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><svg class="ico off" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 6h3l4-3.5v11L5 10H2z"/><path d="M11 5.5l4 5m0-5l-4 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span class="tl">Som</span></button>
+    <button class="tbtn tic" id="b-pause" type="button" title="Pausar (P)" aria-label="Pausar"><svg class="ico on" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 2.5h3v11H4zM9 2.5h3v11H9z"/></svg><svg class="ico off" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4.5 2.2l9 5.8-9 5.8z"/></svg><span class="tl">Pausar</span></button>
+    <button class="tbtn tic" id="b-help" type="button" title="Menu e ajuda" aria-label="Menu e ajuda"><svg class="ico on" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="tl">Menu</span></button>
+   </div>
   </div>
+  <div id="watch" hidden>
+    <div class="w-score" id="w-score">
+      <button class="w-side k1" id="w-s1" type="button"><span class="w-name"><i class="w-dot" id="w-d1"></i><b>Azul</b> <small id="w-c1">Computador</small></span><span class="w-stats" id="w-t1"></span><i class="w-hp"><i id="w-h1"></i></i></button>
+      <div class="w-mid"><b id="w-time">0:00</b><small id="w-peace"></small><button class="w-cam" id="w-cam" type="button" title="Câmera automática: segue as batalhas (tecla C)"><span class="lg">Câmera automática</span><span class="sm">Câmera auto</span></button></div>
+      <button class="w-side k2" id="w-s2" type="button"><span class="w-name"><i class="w-dot" id="w-d2"></i><b>Vermelho</b> <small id="w-c2">Computador</small></span><span class="w-stats" id="w-t2"></span><i class="w-hp"><i id="w-h2"></i></i></button>
+    </div>
+    <ol class="w-feed" id="w-feed" aria-live="polite"></ol>
+  </div>
+  <div id="pausecard" hidden><b>Jogo pausado</b><button class="btn" id="b-cont" type="button">Continuar</button></div>
 
-  <div id="sndpop" class="sndpop" hidden role="dialog" aria-label="Som">
-    <b class="sp-h">Som</b>
+  <div id="sndpop" class="sndpop" hidden role="dialog" aria-label="Som e avisos">
+    <b class="sp-h">Som e avisos</b>
     <label class="sw"><input type="checkbox" id="sp-sfx"><span>Efeitos</span></label>
     <label class="sw"><input type="checkbox" id="sp-mus"><span>Trilha sonora</span></label>
     <label class="vol"><span>Volume da música</span><input type="range" id="sp-vol" min="0" max="100" value="50"></label>
@@ -206,6 +219,12 @@
       <label><input type="radio" name="vox" value="off"><i>Desligadas</i></label>
     </div>
     <p id="sp-novoice" class="sp-note" hidden>Este navegador não tem voz em português: os personagens vão murmurar.</p>
+    <div class="vx av" role="radiogroup" aria-label="Avisos na tela"><span>Avisos na tela</span>
+      <label><input type="radio" name="avisos" value="poucos"><i>Poucos</i></label>
+      <label><input type="radio" name="avisos" value="normal"><i>Normais</i></label>
+      <label><input type="radio" name="avisos" value="todos"><i>Todos</i></label>
+    </div>
+    <p class="sp-note">Os avisos que não aparecem ficam no Conselho, em Notícias.</p>
   </div>
   <div id="toasts" aria-live="polite"></div>
   <div id="goals" hidden></div>
@@ -246,18 +265,32 @@
         <label><input type="radio" name="diff" id="d-insano" value="insano"><span>Insano<em>Sem trégua</em></span></label>
       </div>
       <div id="cl-box" hidden>
-        <h4 class="lbl">Quem comanda o Reino Vermelho</h4>
+        <h4 class="lbl">Quem joga</h4>
+        <p class="cl-side k1">Reino Azul</p>
+        <div class="seg" role="radiogroup" aria-label="Quem comanda o Reino Azul">
+          <label><input type="radio" name="blue" value="voce" checked><span>Você<em>Você comanda</em></span></label>
+          <label><input type="radio" name="blue" value="pc"><span>Computador<em>A IA do jogo</em></span></label>
+          <label><input type="radio" name="blue" value="claude"><span>Claude<em>Estratégia de verdade</em></span></label>
+        </div>
+        <p class="cl-side k2">Reino Vermelho</p>
         <div class="seg" role="radiogroup" aria-label="Quem comanda o Reino Vermelho">
           <label><input type="radio" name="foe" value="pc" checked><span>Computador<em>A IA do jogo</em></span></label>
           <label><input type="radio" name="foe" value="claude"><span>Claude<em>Estratégia de verdade</em></span></label>
         </div>
+        <p id="cl-watch" class="cl-watch" hidden><b>Modo observador.</b> As duas máquinas jogam e você assiste: placar, câmera automática e os pensamentos do Claude na tela. Bom para transmitir ao vivo.</p>
         <div id="cl-cfg" class="cl-cfg" hidden>
           <p id="cl-how"></p>
           <div class="cl-key" id="cl-keyrow"><input id="cl-key" type="password" autocomplete="off" spellcheck="false" placeholder="Chave da API da Anthropic (sk-ant-…)" aria-label="Chave da API da Anthropic"><button class="btn alt sm-btn" id="b-cl-test" type="button">Testar</button></div>
-          <div class="seg" role="radiogroup" aria-label="Modelo do Claude">
+          <div id="cl-mb"><small class="cl-ml k1">Claude do Reino Azul</small>
+          <div class="seg" role="radiogroup" aria-label="Modelo do Claude azul">
+            <label><input type="radio" name="clmb" value="esperto" checked><span>Esperto<em>Pensa mais, joga melhor</em></span></label>
+            <label><input type="radio" name="clmb" value="rapido"><span>Rápido<em>Responde na hora, gasta menos</em></span></label>
+          </div></div>
+          <div id="cl-mr"><small class="cl-ml k2">Claude do Reino Vermelho</small>
+          <div class="seg" role="radiogroup" aria-label="Modelo do Claude vermelho">
             <label><input type="radio" name="clm" value="esperto" checked><span>Esperto<em>Pensa mais, joga melhor</em></span></label>
             <label><input type="radio" name="clm" value="rapido"><span>Rápido<em>Responde na hora, gasta menos</em></span></label>
-          </div>
+          </div></div>
           <p id="cl-status" class="cl-status" aria-live="polite"></p>
         </div>
       </div>
@@ -405,7 +438,7 @@
       <h2 id="end-title">Vitória!</h2>
       <p id="end-text"></p>
       <div class="stats" id="end-stats"></div>
-      <details class="howto end-claude" id="end-claude" hidden><summary>O que o Claude pensou <small id="end-claude-n"></small></summary><ol id="end-claude-list"></ol></details>
+      <details class="howto end-claude" id="end-claude" hidden><summary id="end-claude-sum">O que o Claude pensou <small id="end-claude-n"></small></summary><ol id="end-claude-list"></ol></details>
       <div class="row"><button class="btn" id="b-next" type="button" hidden>Próximo capítulo</button><button class="btn" id="b-again" type="button">Jogar de novo</button><button class="btn alt" id="b-menu" type="button">Menu</button></div>
     </div>
   </div>

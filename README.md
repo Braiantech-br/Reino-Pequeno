@@ -23,7 +23,15 @@ Construa a vila, avance pelas cinco eras, negocie com as vilas neutras, contrate
 | **iPhone/iPad em outro site** | [ReinoPequeno-iPhone-iPad.zip](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/downloads/ReinoPequeno-iPhone-iPad.zip) (arquivos do web app) |
 
 Os instaladores ficam na pasta [downloads](downloads/). Depois de instalados, eles se atualizam sozinhos.
+As versões anteriores continuam disponíveis em [downloads/old](downloads/old/).
 Instruções de cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
+
+## Novidades da versão 2.2
+
+- **Modo observador: máquina contra máquina.** Na Batalha Rápida, escolha quem joga cada reino: *Você*, *Computador* ou *Claude* no Azul; *Computador* ou *Claude* no Vermelho. Com uma máquina no Azul, as duas jogam e você assiste, até **Claude contra Claude**, com placar, câmera automática que segue as batalhas e os pensamentos e provocações de cada Claude na tela. Feito para transmitir ao vivo.
+- **Bem menos notificações**, principalmente no celular e no tablet. Em *Som e avisos* você escolhe Poucos, Normais ou Todos; o que não aparece fica no Conselho, em Notícias.
+- **A barra de cima não esconde mais Pausar, Som e Menu:** eles ficam sempre visíveis (ícones nas telas pequenas). Ao voltar para o jogo aparece o cartão *Jogo pausado* com o botão Continuar.
+- No Android, as barras do sistema voltam a se esconder depois de desbloquear a tela.
 
 ## Novidades da versão 2.1
 

@@ -78,7 +78,35 @@ function playSfx(name){
 // ---------------------------------------------------------------- toasts & banner
 const toastBox=$('toasts');
 // a toast with a place on the map can be clicked to jump there (and select the unit or building)
+// ---------------------------------------------------------------- notifications: only what deserves the screen
+// 3 = alert or the answer to something the player just did; 2 = normal news; 1 = routine chatter.
+// What does not make the screen goes to the council's news (Conselho → Notícias).
+const NOTE_LOW=[/^Engenheiro:/,/ pront[oa]!$/,/^Construção concluída/,/ virou [a-zà-ú]+ nível \d/,/rendeu \d+ de ouro/,/ cresceu: agora/,
+  /^Bandidos saíram para saquear o Reino/,/embaixador de .+ (está a caminho|chegou)/,/^Descansad/,/^Casa reformada/,/ subiu para /,/^O Reino Vermelho aprendeu/,
+  /desembarc/,/^Um soldado foi defender/,/foi promovido/,/^Pedido recusado/,/continua na linha de frente/,/prefere seguir lutando/];
+const NOTE_HIGH=[/sob ataque/i,/marchando contra você/,/vêm saquear você/,/apareceu no mapa/,/convertido pelo/,/ caiu!/,/ataca(m)? em \d+ segundos/];
+function noteLevel(msg,kind){
+  if(performance.now()-(ui.inputT||-1e9)<1500)return 3;
+  if(NOTE_LOW.some(r=>r.test(msg)))return 1;
+  if(kind==='bad'||kind==='warn'||NOTE_HIGH.some(r=>r.test(msg)))return 3;
+  return 2;
+}
+function noteMode(){const m=ui.save&&ui.save.avisos;return m==='poucos'||m==='normal'||m==='todos'?m:(matchMedia('(pointer:coarse)').matches||innerWidth<900?'poucos':'normal');}
+function noteRoom(){const sm=Math.min(innerWidth,innerHeight);return innerHeight<500||innerWidth<760?1:sm<900&&matchMedia('(pointer:coarse)').matches?2:3;}
+document.addEventListener('pointerdown',()=>{ui.inputT=performance.now();},true);
+document.addEventListener('keydown',()=>{ui.inputT=performance.now();},true);
 function toast(msg,kind,loc){
+  msg=String(msg);
+  const lvl=noteLevel(msg,kind),need={poucos:3,normal:2,todos:1}[noteMode()],now=performance.now();
+  const seen=ui.noteSeen||(ui.noteSeen=new Map()),burst=(ui.noteBurst||[]).filter(t=>now-t<8000);ui.noteBurst=burst;
+  const repeat=seen.has(msg)&&now-seen.get(msg)<20000;
+  const watch=S&&S.cfg&&S.cfg.watch&&now-(ui.inputT||-1e9)>=1500;   // the observer sees the feed, and the answers to their own taps
+  if(watch||lvl<need||repeat||(lvl<3&&burst.length>=noteRoom()+1)){
+    if(!repeat&&S)cLog(msg,kind==='bad'||kind==='warn'?'bad':kind==='good'?'good':'',loc||null);
+    return;
+  }
+  seen.set(msg,now);burst.push(now);
+  if(seen.size>80)for(const [k,t] of seen)if(now-t>20000)seen.delete(k);
   const el=document.createElement(loc?'button':'div');el.className='toast'+(kind?' '+kind:'')+(loc?' go':'');
   el.textContent=msg;
   if(loc){
@@ -93,8 +121,8 @@ function toast(msg,kind,loc){
       el.remove();
     });
   }
-  toastBox.appendChild(el);while(toastBox.children.length>3)toastBox.firstChild.remove();
-  setTimeout(()=>el.remove(),loc?5500:3800);
+  toastBox.appendChild(el);const room=noteRoom();while(toastBox.children.length>room)toastBox.firstChild.remove();
+  setTimeout(()=>el.remove(),room===1?(loc?4500:3200):(loc?5500:3800));
 }
 let bannerTimer=0;
 function banner(kicker,title,text,foe){
@@ -173,6 +201,12 @@ function showEnd(){
     kick='Defesa do Rei';title=`${S.wavesBeaten} ${S.wavesBeaten===1?'onda':'ondas'}`;
     text=(why==='king'?'O Rei Aldebrando caiu.':'O castelo caiu.')+(ui.newBest?` Novo recorde na dificuldade ${S.diff.name}!`:` Seu recorde na dificuldade ${S.diff.name}: ${best} ondas.`);
     st=[[time,'tempo de jogo'],[S.wavesBeaten,'ondas vencidas'],[best,'recorde'],[A.stats.kills,'inimigos derrotados'],[A.stats.lost,'unidades perdidas'],[ERAS[A.era].roman,'sua era']];
+  }else if(S.cfg&&S.cfg.watch){
+    // observer mode: the winner is whoever still has a castle
+    const wt=win?1:2,lt=win?2:1,Wn=S.teams[wt],Ln=S.teams[lt];
+    kick='Modo observador · fim da batalha';title=`${KNAME[wt]} venceu!`;
+    text=`${watchWho(wt)} derrubou o castelo ${KCOLOR[lt]} (${watchWho(lt)}) em ${time} de jogo, na dificuldade ${S.diff.name}.`;
+    st=[[time,'tempo de jogo'],[`${ERAS[A.era].roman} × ${ERAS[B.era].roman}`,'era azul × vermelha'],[`${A.stats.kills} × ${B.stats.kills}`,'abates azul × vermelho'],[`${A.stats.lost} × ${B.stats.lost}`,'perdas azul × vermelho'],[Wn.stats.wood+Wn.stats.gold+Wn.stats.food,'recursos do vencedor'],[Ln.stats.wood+Ln.stats.gold+Ln.stats.food,'recursos do perdedor']];
   }else{
     kick=win?'O reino está a salvo':'Fim de jogo';title=win?'Vitória!':'O castelo caiu';
     text=win?`O castelo vermelho caiu na dificuldade ${S.diff.name}. A ilha é toda sua.`:'O Reino Vermelho derrubou o seu castelo. Tente avançar de era mais cedo, construir torres perto do ouro e treinar tropas que vencem as deles.';
@@ -213,7 +247,10 @@ function endStory(){
 $('b-st-next').addEventListener('click',()=>{const st=ui.story;if(!st)return;playSfx('click');if(st.i<st.pages.length-1){st.i++;storyPage();}else endStory();});
 $('b-st-skip').addEventListener('click',endStory);
 const talkQ=[];let talkTimer=0;
-function talk(who,text){talkQ.push([who,text]);if(talkQ.length===1)nextTalk();}
+function talk(who,text){
+  if(S&&S.cfg&&S.cfg.watch&&who!=='rubro'&&who!=='gasparcl'){cLog(`${speaker(who).name}: ${text}`);return;}
+  talkQ.push([who,text]);if(talkQ.length===1)nextTalk();
+}
 function nextTalk(){
   const el=$('talk');
   if(!talkQ.length){el.hidden=true;return;}
@@ -354,6 +391,7 @@ function pick(wx,wy){
 function mark(x,y,col){FX.marks.push({x,y,col,t:0});}
 function clearU(u){u.path=null;u.stuck=0;u.work=0;u.detour=null;}
 function command(wx,wy){
+  if(watching())return;
   let units=ownUnits();if(!units.length)return;
   for(const u of units)u.cmdT=S.t;
   {const h=pick(wx,wy),i=inB(tileOf(wx),tileOf(wy))?idx(tileOf(wx),tileOf(wy)):-1;
@@ -1043,12 +1081,21 @@ function hud(){
   renderGoals();renderAsk();
   const idle=S.ents.filter(e=>!e.dead&&e.kind==='pawn'&&e.team===1&&!e.order).length;
   $('b-idle').textContent=`Ociosos (${idle})`;
-  $('b-pause').textContent=ui.paused?'Continuar':'Pausar';
+  topControls();
   $('b-speed').textContent=ui.speed+'x';
   ui.svcT=(ui.svcT||0)+1;if(ui.svcT>=5){ui.svcT=0;renderSvc();sosTick();if(!$('ov-sos').hidden)renderSos();if(councilOpen())renderCouncil();}
   moodChip();
   {const tb=$('top').getBoundingClientRect().bottom+6,ts=$('toasts');if(Math.abs((parseFloat(ts.style.top)||0)-tb)>1)ts.style.top=tb+'px';}
-  $('b-sound').textContent=SND.on||MUS.on?'Som':'Mudo';$('b-sound').classList.toggle('on',!SND.on&&!MUS.on);
+}
+// the fixed controls on the top bar (pause, sound) and the card that brings a paused game back
+function topControls(){
+  const bp=$('b-pause'),pl=ui.paused?'Continuar':'Pausar';
+  bp.classList.toggle('paused',!!ui.paused);if(bp.lastChild.textContent!==pl){bp.lastChild.textContent=pl;bp.title=pl+' (P)';bp.setAttribute('aria-label',pl);}
+  const bs=$('b-sound'),mute=!SND.on&&!MUS.on,sl=mute?'Mudo':'Som';
+  bs.classList.toggle('mute',mute);bs.classList.toggle('on',mute);if(bs.lastChild.textContent!==sl)bs.lastChild.textContent=sl;
+  const tl=$('top-l');tl.classList.toggle('more',tl.scrollWidth>tl.clientWidth+4&&tl.scrollLeft+tl.clientWidth<tl.scrollWidth-4);
+  const ov=[...document.querySelectorAll('.overlay')].some(o=>!o.hidden);
+  $('pausecard').hidden=!(ui.started&&ui.paused&&S&&!S.over&&!ov&&!ui.placing);
 }
 function renderEras(){
   const T=S?S.teams[1]:{era:1};
@@ -1194,7 +1241,8 @@ function resumeMatch(){
   document.querySelector('#c-foe img').src=S.mode==='skirmish'?'assets/ic_enemy.png':'assets/ic_wild.png';
   $('c-foe').title=S.mode==='skirmish'?'Reino Vermelho':'Próximo ataque';
   refreshPanel(true);hud();
-  banner('Partida retomada',MODE_NAME[S.mode]||'',`${fmt(S.t)} de jogo. O jogo está pausado: toque em Continuar quando estiver pronto.`,false);
+  banner('Partida retomada',S.cfg&&S.cfg.watch?'Modo observador':(MODE_NAME[S.mode]||''),`${fmt(S.t)} de jogo. O jogo está pausado: toque em Continuar quando estiver pronto.`,false);
+  watchStart();
   clStart(false);
 }
 ui.save=loadSave();
@@ -1244,13 +1292,21 @@ function showMenu(){
 function startGame(p){
   p=p||{};
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
-  const opts={mode,relief:p.relief,fog:p.fog!=null?p.fog:!!$('opt-fog').checked};
+  const blue=mode==='skirmish'?(p.blue||(['voce','pc','claude'].includes(CLAUDE.cfg.blue)?CLAUDE.cfg.blue:'voce')):'voce',watch=blue!=='voce';
+  const opts={mode,relief:p.relief,fog:watch?false:p.fog!=null?p.fog:!!$('opt-fog').checked};
   if(mode!=='skirmish'){const key=p.hero||radio('hero')||ui.save.hero||'warrior';ui.save.hero=key;writeSave();const h=ui.save.heroes[key]||{};opts.hero={key,kills:h.kills||0,rank:h.rank||0};}
   if(mode==='campaign')opts.chapter=p.chapter||ui.chapter;
   const c=newGame(ui.seed,diff,opts);
   const vsClaude=mode==='skirmish'&&(p.claude!=null?p.claude:CLAUDE.cfg.foe==='claude');
   if(vsClaude)S.cfg=Object.assign({},S.cfg,{claude:true});
-  ui.last={mode,diff,chapter:opts.chapter,hero:opts.hero&&opts.hero.key,fog:opts.fog,claude:vsClaude};COUNCIL.log.length=0;COUNCIL.last='';ui.townTab='com';
+  if(watch){
+    // observer mode: the same AI (or Claude) plays the Blue Kingdom too, with the same help as red
+    S.cfg=Object.assign({},S.cfg,{watch:true,blue,fog:false});
+    aiInit(1);
+    for(const k in S.teams[1].res)S.teams[1].res[k]+=S.diff.start;
+    S.rules=Object.assign({},S.rules||{},{obras:true,estradas:true,socorro:true,renovar:true,medicos:true,batedor:true,armyAuto:true,gold:2000});
+  }
+  ui.last={mode,diff,chapter:opts.chapter,hero:opts.hero&&opts.hero.key,fog:opts.fog,claude:vsClaude,blue};COUNCIL.log.length=0;COUNCIL.last='';ui.townTab='com';
   ui.seed=newSeed();
   audioInit();
   ui.started=true;ui.paused=false;ui.sel=[];ui.placing=null;ui.targeting=null;ui.foeAttacking=false;ui.speed=1;ui.goalsHTML='';ui.goalsMin=VW<760;
@@ -1266,22 +1322,37 @@ function startGame(p){
   }else if(mode==='survival'){
     banner('Defesa do Rei','Proteja o rei',`A primeira onda chega em ${fmt(waveInfo().inT)}. Forje armas e escudos no castelo.`,false);
     setTimeout(()=>talk('king','Eles vêm de todos os lados, onda após onda. Enquanto eu estiver de pé, Pedravale não cai.'),1800);
-  }else banner('Começa a partida',ERAS[1].name,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)} antes do primeiro ataque grande.${S.cfg&&S.cfg.claude?' Quem comanda o Reino Vermelho é o Claude.':''}`,false);
+  }else if(watch)banner('Modo observador',`${watchWho(1)} × ${watchWho(2)}`,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)}. A câmera segue as batalhas sozinha; arraste o mapa para olhar à vontade.`,false);
+  else banner('Começa a partida',ERAS[1].name,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)} antes do primeiro ataque grande.${S.cfg&&S.cfg.claude?' Quem comanda o Reino Vermelho é o Claude.':''}`,false);
+  watchStart();
   clStart(true);
 }
 $('b-idle').addEventListener('click',()=>S&&selectIdle());
 $('b-army').addEventListener('click',()=>S&&selectArmy());
-$('b-pause').addEventListener('click',()=>{ui.paused=!ui.paused;hud();});
+$('b-pause').addEventListener('click',()=>{ui.paused=!ui.paused;ui.awayPaused=false;hud();});
+$('b-cont').addEventListener('click',()=>{ui.paused=false;ui.awayPaused=false;audioInit();hud();});
+$('top-l').addEventListener('scroll',()=>topControls(),{passive:true});
 $('b-speed').addEventListener('click',()=>{ui.speed=ui.speed===1?2:ui.speed===2?3:1;hud();});
 // leaving the app (minimised, another tab, phone home button): pause the match and silence everything
 function appAway(away){
   if(away){
     saveMatch();
-    if(ui.started&&!ui.paused&&!(S&&S.over)){ui.paused=true;ui.awayPaused=true;try{hud();}catch(e){}}
-    voxStop();
-    if(SND.ac&&SND.ac.state==='running'){ui.awaySusp=true;SND.ac.suspend().catch(()=>{});}
-  }else if(ui.awaySusp){ui.awaySusp=false;if(SND.ac)SND.ac.resume().catch(()=>{});}
+    if(ui.started&&!ui.paused&&!(S&&S.over)&&!watching()){ui.paused=true;ui.awayPaused=true;try{hud();}catch(e){}}
+    if(!watching())voxStop();
+    if(SND.ac&&SND.ac.state==='running'&&!watching()){ui.awaySusp=true;SND.ac.suspend().catch(()=>{});}
+  }else{
+    if(ui.awaySusp){ui.awaySusp=false;if(SND.ac)SND.ac.resume().catch(()=>{});}
+    relayout();
+  }
 }
+// back on screen (unlocked phone, rotated, app reopened): measure everything again
+function relayout(){
+  const go=()=>{try{resize();if(S)hud();topControls();}catch(e){}};
+  requestAnimationFrame(go);setTimeout(go,350);setTimeout(go,1200);
+}
+window.addEventListener('pageshow',relayout);window.__relayout=relayout;
+window.addEventListener('orientationchange',relayout);
+window.addEventListener('focus',relayout);
 document.addEventListener('visibilitychange',()=>appAway(document.visibilityState==='hidden'));
 window.__appPause=h=>appAway(!!h);
 // sound settings: effects, music (with volume) and the characters' voices
@@ -1292,6 +1363,7 @@ function sndApply(){
   $('sp-sfx').checked=SND.on;$('sp-mus').checked=MUS.on;$('sp-vol').value=Math.round(MUS.vol*100);$('sp-vol').disabled=!MUS.on;
   for(const r of p.querySelectorAll('input[name="vox"]'))r.checked=r.value===VOX.mode;
   $('sp-novoice').hidden=!(VOX.mode==='voz'&&!VOX.ok);
+  for(const r of p.querySelectorAll('input[name="avisos"]'))r.checked=r.value===noteMode();
 }
 function sndSave(patch){ui.save.snd=Object.assign(ui.save.snd||{},patch);writeSave();sndApply();hud();}
 // the sound panel opens next to its button, always inside the screen
@@ -1307,13 +1379,14 @@ $('b-sound2').addEventListener('click',ev=>{openSnd($('b-sound2'),true);ev.stopP
 $('sp-sfx').addEventListener('change',e=>sndSave({sfx:e.target.checked}));
 $('sp-mus').addEventListener('change',e=>{audioInit();sndSave({mus:e.target.checked});});
 $('sp-vol').addEventListener('input',e=>sndSave({vol:+e.target.value/100}));
+for(const r of document.querySelectorAll('#sndpop input[name="avisos"]'))r.addEventListener('change',e=>{ui.save.avisos=e.target.value;writeSave();});
 for(const r of document.querySelectorAll('#sndpop input[name="vox"]'))r.addEventListener('change',e=>{sndSave({vox:e.target.value});if(e.target.value!=='off'&&e.target.value!=='texto'){audioInit();voxSpeak(e.target.value==='voz'?'Olá! Assim eu falo.':'Olá! Assim eu falo.','pawn',false,3,2);}});
 $('b-help').addEventListener('click',showMenu);
 $('b-start').addEventListener('click',()=>startGame());
 $('b-resume').addEventListener('click',()=>{ui.paused=false;$('ov-start').hidden=true;audioInit();});
 $('b-load').addEventListener('click',resumeMatch);
 window.addEventListener('pagehide',saveMatch);
-$('b-again').addEventListener('click',()=>{const L=ui.last||{};startGame({mode:L.mode,diff:L.diff,chapter:L.chapter,hero:L.hero,fog:L.fog,claude:L.claude});});
+$('b-again').addEventListener('click',()=>{const L=ui.last||{};startGame({mode:L.mode,diff:L.diff,chapter:L.chapter,hero:L.hero,fog:L.fog,claude:L.claude,blue:L.blue});});
 $('b-next').addEventListener('click',()=>{const L=ui.last||{};ui.chapter=Math.min(5,(L.chapter||1)+1);startGame({mode:'campaign',diff:L.diff,chapter:ui.chapter,hero:L.hero,fog:L.fog});});
 $('b-menu').addEventListener('click',showMenu);
 $('c-era').addEventListener('click',()=>{renderEras();$('ov-eras').hidden=false;ui.erasPaused=!ui.paused;ui.paused=true;});
@@ -1418,6 +1491,12 @@ window.addEventListener('keydown',ev=>{
   if(!S||!ui.started)return;
   const sel=liveSel(),single=sel.length===1?sel[0]:null;
   if(ui.confirm){if(k==='escape')closeConfirm(false);else if(k==='enter')closeConfirm(true);return;}
+  if(watching()){
+    if(k==='p'){ui.paused=!ui.paused;hud();}else if(k==='v'){ui.speed=ui.speed===1?2:ui.speed===2?3:1;hud();}
+    else if(k==='m'){const on=!(SND.on||MUS.on);sndSave({sfx:on,mus:on});}else if(k==='c'||k==='h')watchCamToggle();
+    if(['arrowup','arrowdown','arrowleft','arrowright','a','s','d','w'].includes(k)){W.camHold=performance.now()+15000;if(k.startsWith('arrow'))ev.preventDefault();}
+    return;
+  }
   if(k==='escape'){if(councilOpen())$('ov-council').hidden=true;else if(!$('ov-sos').hidden)$('ov-sos').hidden=true;else if(ui.placing||ui.targeting)cancelModes();else select([]);}
   else if((k==='delete'||k==='backspace')&&single&&single.team===1&&DEF[single.kind].building){ev.preventDefault();askDemolish(single);}
   else if(k==='p'){ui.paused=!ui.paused;hud();}
@@ -1463,12 +1542,123 @@ function frame(now){
   ui.musT=(ui.musT||0)-rdt;if(ui.musT<=0){ui.musT=.5;try{musWatch();}catch(e){}}
   voxChatter(rdt);
   panKeys(rdt);
+  if(S&&ui.started&&!S.over&&watching())watchCam(rdt);
   if(!ui.paused)updFx(rdt);
   render();
   if(ui.started&&!ui.paused&&S&&!S.over&&S.t-(ui.savedT||0)>40)saveMatch();
-  hudT-=rdt;if(hudT<=0&&S){hudT=.2;hud();refreshPanel(false);drawMini();ui.sel=ui.sel.filter(id=>{const e=byId.get(id);return e&&!e.dead;});}
+  hudT-=rdt;if(hudT<=0&&S){hudT=.2;hud();refreshPanel(false);drawMini();ui.sel=ui.sel.filter(id=>{const e=byId.get(id);return e&&!e.dead;});if(watching())watchTick();}
   requestAnimationFrame(frame);
 }
+
+// ================================================================ observer mode: machine against machine
+// Both kingdoms are played by the computer or by Claude. The screen becomes a broadcast: a scoreboard, a feed with
+// what each Claude thinks and the big moments of the war, and a camera that goes after the action on its own.
+const W={feed:[],camAuto:true,camHold:0,camT:0,goal:null,eras:{},atk:{},hp:{},own:{},ctrs:new Set(),cast:0,lastT:-1};
+const KSHORT={1:'Azul',2:'Vermelho'};
+function watchWho(team){
+  const cl=team===1?S.cfg.blue==='claude':!!S.cfg.claude,C=CLAUDE.side[team];
+  if(!cl)return 'Computador';
+  return C.on&&C.stopped?'Computador (Claude fora)':`Claude ${clModel(team).name}`;
+}
+const pctHp=team=>{const c=castleOf(team);return c?Math.round(c.hp/c.maxhp*100):0;};
+function watchStart(){
+  const on=watching();$('app').classList.toggle('watch',on);$('watch').hidden=!on;
+  if(!on)return;
+  W.feed.length=0;$('w-feed').innerHTML='';W.camAuto=true;W.camHold=0;W.camT=0;W.goal=null;W.cast=0;W.lastT=-1;
+  for(const t of [1,2]){W.eras[t]=S.teams[t].era;W.atk[t]=false;W.hp[t]=pctHp(t);}
+  W.own={};for(const T of S.towns||[])W.own[T.i]=T.owner||0;
+  W.ctrs=new Set(ctrList().filter(c=>c.state==='active').map(c=>c.id));
+  $('w-cam').classList.toggle('on',W.camAuto);
+  watchScore();watchLayout();
+}
+function watchLayout(){
+  const tr=$('top-r').getBoundingClientRect(),app=$('app'),upright=innerWidth<=760&&innerHeight>innerWidth;
+  // upright phones: the scoreboard gets its own full-width row under the controls
+  app.style.setProperty('--wright',(upright?14:Math.max(16,innerWidth-tr.left+10))+'px');
+  app.style.setProperty('--wtop',(upright?tr.bottom+6:Math.max(8,tr.top))+'px');
+  const sc=$('w-score').getBoundingClientRect();
+  app.style.setProperty('--wfeed',Math.round(Math.max(sc.bottom,tr.bottom)+8)+'px');
+}
+function watchScore(){
+  if(!S||!watching())return;
+  const mm=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+  for(const t of [1,2]){
+    const T=S.teams[t];let army=0,pawns=0;
+    for(const e of S.ents){if(e.dead||e.team!==t)continue;const D=DEF[e.kind];if(!D.unit)continue;if(e.kind==='pawn')pawns++;else if(D.mil)army++;}
+    const txt=`Era ${ERAS[T.era].roman}${T.research?'→'+ERAS[T.research.era].roman:''} · ${army}<span class="lg"> tropas</span><span class="sm">⚔</span> · ${pawns}<span class="lg"> aldeões</span><span class="sm">👷</span> · ${T.stats.kills}<span class="lg"> abates</span><span class="sm">☠</span>`;
+    if($('w-t'+t).innerHTML!==txt)$('w-t'+t).innerHTML=txt;
+    $('w-c'+t).textContent=watchWho(t);
+    $('w-h'+t).style.width=pctHp(t)+'%';
+    $('w-d'+t).dataset.st=clState(t)||'pc';
+  }
+  $('w-time').textContent=mm(S.t);
+  $('w-peace').textContent=S.t<S.diff.peace?`trégua ${mm(S.diff.peace-S.t)}`:'';
+}
+// one entry on the live feed: a Claude thought (with its orders), a taunt, or a big moment of the war
+function watchFeed(team,kind,d){
+  if(!S)return;
+  const mm=`${Math.floor(S.t/60)}:${String(Math.floor(S.t%60)).padStart(2,'0')}`;
+  let body='',tag='';
+  if(kind==='thought'){
+    tag='Claude pensa';
+    const ord={atacar:'atacar',esperar:'esperar',recuar:'recuar',saquear:'saquear'}[d.order];
+    const bits=[d.strategy&&`estratégia: ${esc(d.strategy)}`,ord&&`ordem: ${ord}${d.target?' → '+esc(d.target):''}`,d.build&&d.build.length&&`construir: ${d.build.map(k=>DEF[k]?DEF[k].name.toLowerCase():k).join(', ')}`].filter(Boolean);
+    body=`<p>${esc(d.thought||'Plano novo.')}</p>${bits.length?`<small>${bits.join(' · ')}</small>`:''}`;
+  }else if(kind==='taunt'){tag=KENG[team];body=`<q>${esc(d)}</q>`;}
+  else{tag='';body=`<p>${esc(d)}</p>`;}
+  W.feed.unshift({team,kind,html:`<li class="w-e k${team} ${kind}"><header><i></i><b>${KSHORT[team]||''}</b>${tag?` · ${tag}`:''}<time>${mm}</time></header>${body}</li>`});
+  const max=innerHeight<520||innerWidth<760?2:innerHeight<800?4:5;W.feed.length=Math.min(W.feed.length,max);
+  $('w-feed').innerHTML=W.feed.map(f=>f.html).join('');
+}
+// the narrator: watches the war and puts its big moments on the feed (and gives the camera somewhere to look)
+function watchTick(){
+  watchScore();watchLayout();
+  if(S.t-W.lastT<1)return;W.lastT=S.t;
+  for(const t of [1,2]){
+    const K=KNAME[t],F=KNAME[t===1?2:1],era=S.teams[t].era;
+    if(era>W.eras[t]){W.eras[t]=era;watchFeed(t,'event',`O ${K} chegou à ${ERAS[era].name}.`);}
+    const A=t===1?S.ai1:S.ai,atk=!!(A&&A.attacking);
+    if(atk&&!W.atk[t]){const tg=byId.get(A.target);watchFeed(t,'event',`O exército ${KCOLOR[t]} marcha contra ${tg&&tg.kind==='castle'?'o castelo':'a base do'} ${F.replace('Reino ','')}!`);
+      const mine=S.ents.filter(e=>!e.dead&&e.team===t&&DEF[e.kind].mil&&DEF[e.kind].unit);if(mine.length){let x=0,y=0;for(const e of mine){x+=e.x;y+=e.y;}W.goal={x:x/mine.length,y:y/mine.length,z:1.15};W.camT=6;}}
+    if(!atk&&W.atk[t]&&A&&S.t-A.retreatT<3)watchFeed(t,'event',`O exército ${KCOLOR[t]} recua para casa.`);
+    W.atk[t]=atk;
+    const hp=pctHp(t);for(const mark of [75,50,25])if(W.hp[t]>mark&&hp<=mark){watchFeed(t,'event',`O castelo ${KCOLOR[t]} está com ${mark}% de vida!`);const c=castleOf(t);if(c){W.goal={x:c.x,y:c.y-30,z:1.2};W.camT=6;}}
+    W.hp[t]=hp;
+  }
+  for(const T of S.towns||[]){const o=T.owner||0;if(o!==W.own[T.i]){if(o)watchFeed(o,'event',`${T.name} virou vassala do ${KNAME[o]}.`);else if(W.own[T.i])watchFeed(W.own[T.i],'event',`${T.name} se libertou do ${KNAME[W.own[T.i]]}.`);W.own[T.i]=o;}}
+  for(const c of ctrList())if(c.state==='active'&&!W.ctrs.has(c.id)&&(c.team===1||c.team===2)){W.ctrs.add(c.id);const T=S.towns[c.town];watchFeed(c.team,'event',`O ${KNAME[c.team]} fechou contrato com ${T?T.name:'uma vila'}: ${(CTR[c.kind]&&CTR[c.kind].name||c.kind).toLowerCase()}.`);}
+}
+// the automatic camera: goes after the biggest fight, then the armies on the march, then the two kingdoms
+function watchHot(){
+  const cell=320,B=new Map();
+  for(const e of S.ents){if(e.dead||!(e.team===1||e.team===2))continue;const D=DEF[e.kind];if(!D.unit||!D.mil)continue;
+    const k=Math.floor(e.x/cell)+','+Math.floor(e.y/cell);let b=B.get(k);if(!b){b={1:0,2:0,x:0,y:0,n:0};B.set(k,b);}b[e.team]++;b.x+=e.x;b.y+=e.y;b.n++;}
+  let best=null,bs=0;
+  for(const [k,b] of B){const [cx,cy]=k.split(',').map(Number);let a=b[1],r=b[2],x=b.x,y=b.y,n=b.n;
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const o=B.get((cx+dx)+','+(cy+dy));if(o){a+=o[1];r+=o[2];x+=o.x;y+=o.y;n+=o.n;}}
+    const sc=Math.min(a,r)*3+(a+r)*.25;if(Math.min(a,r)>=2&&sc>bs){bs=sc;best={x:x/n,y:y/n,z:a+r>30?1.05:1.3};}}
+  if(best)return best;
+  // an army on the march: its biggest group away from home
+  for(const t of [2,1]){const A=t===1?S.ai1:S.ai;if(!A||!A.attacking)continue;const home=castleOf(t);let g=null,gn=0;
+    for(const [k,b] of B){if(!b[t])continue;const x=b.x/b.n,y=b.y/b.n;if(home&&hyp(x-home.x,y-home.y)<600)continue;if(b[t]>gn){gn=b[t];g={x,y,z:1.15};}}
+    if(g&&gn>=3)return g;}
+  W.cast=(W.cast+1)%6;const c=castleOf(W.cast<3?1:2);return c?{x:c.x,y:c.y+40,z:1.0}:null;
+}
+function watchCam(dt){
+  if(!W.camAuto||performance.now()<W.camHold)return;
+  W.camT-=dt*Math.max(1,ui.speed*.7);
+  if(W.camT<=0||!W.goal){W.camT=4.5;W.goal=watchHot()||W.goal;}
+  if(!W.goal)return;
+  const g=W.goal,cx=cam.x+VW/(2*cam.z),cy=cam.y+VH/(2*cam.z),k=Math.min(1,dt*1.4),zz=(VW<700?.82:1)*g.z;
+  cam.z+=(zz-cam.z)*Math.min(1,dt*.9);
+  centerOn(cx+(g.x-cx)*k,cy+(g.y-cy)*k);
+}
+function watchCamToggle(){W.camAuto=!W.camAuto;W.camHold=0;W.camT=0;$('w-cam').classList.toggle('on',W.camAuto);toast(W.camAuto?'Câmera automática ligada.':'Câmera livre: arraste o mapa para olhar.');}
+$('w-cam').addEventListener('click',watchCamToggle);
+for(const t of [1,2])$('w-s'+t).addEventListener('click',()=>{if(CLAUDE.side[t].on)clWake(t);const c=castleOf(t);if(c){centerOn(c.x,c.y);W.camHold=performance.now()+12000;}});
+// looking around by hand pauses the automatic camera for a while
+for(const id of ['game','mini'])$(id).addEventListener('pointerdown',()=>{if(watching())W.camHold=performance.now()+15000;},true);
+$('game').addEventListener('wheel',()=>{if(watching())W.camHold=performance.now()+15000;},{passive:true,capture:true});
 window.addEventListener('resize',resize);
 function boot(data){
   resize();try{voxInit();}catch(e){}sndApply();

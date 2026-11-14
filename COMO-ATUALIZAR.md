@@ -43,7 +43,7 @@ Em 1 ou 2 minutos o site já abre a versão nova, e os jogos instalados passam a
 
 ### b) Trocar os instaladores (opcional)
 
-Os instaladores ficam na pasta `downloads/`, com nomes fixos (`ReinoPequeno-Windows.zip`, `-Mac.zip`, `-Linux.zip`, `-Android.apk`, `-iPhone-iPad.zip`), então os links do README nunca mudam. Só precisa trocar quando quiser que quem baixa pela primeira vez já receba a versão nova; quem já instalou se atualiza pelo botão. Para trocar: abra https://github.com/Braiantech-br/Reino-Pequeno/upload/main/downloads, arraste os arquivos novos com esses mesmos nomes e faça *Commit changes*.
+Os instaladores ficam na pasta `downloads/`, com nomes fixos (`ReinoPequeno-Windows.zip`, `-Mac.zip`, `-Linux.zip`, `-Android.apk`, `-iPhone-iPad.zip`), então os links do README nunca mudam. Só precisa trocar quando quiser que quem baixa pela primeira vez já receba a versão nova; quem já instalou se atualiza pelo botão. Para trocar: abra https://github.com/Braiantech-br/Reino-Pequeno/upload/main/downloads, arraste os arquivos novos com esses mesmos nomes e faça *Commit changes*. Antes, se quiser guardar a versão que estava lá, envie os arquivos antigos para `downloads/old/<versão>/` (por exemplo `downloads/old/2.2/`).
 
 ### c) Publicar também como Release (opcional)
 
@@ -89,7 +89,7 @@ O Release é uma página com a lista de versões e os arquivos de cada uma.
    ```
    python codigo/pacotes/empacotar.py 2.1
    ```
-   Isso cria a pasta `dist/` com todos os downloads e já coloca o site, o `LEIA-ME.txt` e a pasta `atualizacao/` na raiz do repositório. Com `--downloads` no fim, troca também os instaladores da pasta `downloads/`.
+   Isso cria a pasta `dist/` com todos os downloads e já coloca o site, o `LEIA-ME.txt` e a pasta `atualizacao/` na raiz do repositório. Com `--downloads` no fim, troca também os instaladores da pasta `downloads/`, e os que estavam lá vão sozinhos para `downloads/old/<versão>/` (nenhuma versão antiga se perde).
    - O `.exe` do Windows só é montado onde existe o compilador *mingw*, e o APK só onde existem as ferramentas de Android e a chave (`RP_KEYSTORE` e `RP_KEYSTORE_PASS`). Se não existirem, o empacotador pula esses dois e avisa. Tudo bem: os instalados se atualizam pelo botão.
 3. Envie:
    ```
