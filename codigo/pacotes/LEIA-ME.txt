@@ -692,6 +692,34 @@ vozes embutidas, e o mesmo botão de atualização.
   pontes pagam 8% da carga; as vilas não gostam.
 
 ------------------------------------------------------------------------------
+ 6.23 O CLAUDE COMANDA O REINO VERMELHO (Batalha Rápida)
+------------------------------------------------------------------------------
+  Na tela inicial, em "Quem comanda o Reino Vermelho", escolha Claude.
+  A cada minuto de jogo o Claude, a inteligência artificial da Anthropic,
+  recebe um relatório da guerra (recursos, tropas dos dois lados, vilas,
+  contratos, perdas) e decide a estratégia do Vermelho: economia, quando
+  avançar de era, que tropas treinar, o que construir, quando e onde atacar
+  (castelo, torres, fazendas, quartéis ou uma vila), saques, contratos com
+  as vilas, espionagem e impostos. Os generais e o Mestre Rubro executam.
+  O Mestre Rubro provoca você com frases do Claude, e no fim da partida a
+  tela final mostra tudo o que o Claude pensou, ordem por ordem.
+
+  Como o jogo fala com o Claude:
+    No link do jogo no claude.ai ... usa a sua conta do Claude. Na primeira
+                                     ordem aparece um pedido de permissão.
+    Versões baixadas e site ........ precisa de uma chave da API da
+                                     Anthropic (console.anthropic.com). Cole
+                                     a chave no menu e toque em Testar. A
+                                     chave fica só no aparelho e vai direto
+                                     para a Anthropic; cada ordem é cobrada
+                                     na sua conta da API.
+  Modelos: Esperto (pensa mais, joga melhor) ou Rápido (responde na hora e
+  gasta menos). Uma partida de 30 minutos tem umas 30 ordens.
+  Sem internet, sem resposta ou no limite de uso, o computador assume o
+  Vermelho na hora e o selo "Claude" na barra de cima fica cinza: toque nele
+  para chamar o Claude de volta.
+
+------------------------------------------------------------------------------
  6.22 O CONSELHO
 ------------------------------------------------------------------------------
   O botão Conselho (tecla J) reúne tudo:

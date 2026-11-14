@@ -1,0 +1,5 @@
+Novo: o Claude pode comandar o Reino Vermelho na Batalha Rápida. Escolha "Claude" em "Quem comanda o Reino Vermelho".
+A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos.
+O Mestre Rubro provoca você com frases do Claude, e no fim da partida você lê tudo o que ele pensou.
+No link do claude.ai o Claude usa a sua conta; nas versões baixadas e no site, a sua chave da API da Anthropic.
+Modelos Esperto e Rápido. Se o Claude ficar sem resposta, o computador assume o Vermelho e você pode chamá-lo de volta.

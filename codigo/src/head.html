@@ -181,6 +181,7 @@
     <div class="chip" title="População"><img src="assets/ic_pawn.png" alt=""><span id="r-pop">0/0</span></div>
     <button class="chip era" id="c-era" type="button" title="Ver as eras"><img src="assets/ic_monk.png" alt=""><span id="r-era">Era I</span><i id="r-era-bar"></i></button>
     <button class="chip foe" id="c-foe" type="button" title="Reino Vermelho"><img src="assets/ic_enemy.png" alt=""><span id="r-foe">Era I</span><i id="r-foe-bar"></i></button>
+    <button class="chip claude" id="c-claude" type="button" hidden><i class="cl-dot"></i><span id="cl-chip">Claude no comando</span></button>
     <button class="chip mood" id="c-pop" type="button" title="Humor do povo e impostos"><span class="face" id="r-face">☺</span><span id="r-mood">60</span><i id="r-mood-bar"></i></button>
     <div class="spacer"></div>
     <button class="tbtn" id="b-idle" type="button" title="Selecionar peão ocioso (.)">Ociosos</button>
@@ -243,6 +244,22 @@
         <label><input type="radio" name="diff" id="d-normal" value="normal"><span>Normal<em>Inimigo sem pressa</em></span></label>
         <label><input type="radio" name="diff" id="d-dificil" value="dificil" checked><span>Difícil<em>Ataques mais fortes</em></span></label>
         <label><input type="radio" name="diff" id="d-insano" value="insano"><span>Insano<em>Sem trégua</em></span></label>
+      </div>
+      <div id="cl-box" hidden>
+        <h4 class="lbl">Quem comanda o Reino Vermelho</h4>
+        <div class="seg" role="radiogroup" aria-label="Quem comanda o Reino Vermelho">
+          <label><input type="radio" name="foe" value="pc" checked><span>Computador<em>A IA do jogo</em></span></label>
+          <label><input type="radio" name="foe" value="claude"><span>Claude<em>Estratégia de verdade</em></span></label>
+        </div>
+        <div id="cl-cfg" class="cl-cfg" hidden>
+          <p id="cl-how"></p>
+          <div class="cl-key" id="cl-keyrow"><input id="cl-key" type="password" autocomplete="off" spellcheck="false" placeholder="Chave da API da Anthropic (sk-ant-…)" aria-label="Chave da API da Anthropic"><button class="btn alt sm-btn" id="b-cl-test" type="button">Testar</button></div>
+          <div class="seg" role="radiogroup" aria-label="Modelo do Claude">
+            <label><input type="radio" name="clm" value="esperto" checked><span>Esperto<em>Pensa mais, joga melhor</em></span></label>
+            <label><input type="radio" name="clm" value="rapido"><span>Rápido<em>Responde na hora, gasta menos</em></span></label>
+          </div>
+          <p id="cl-status" class="cl-status" aria-live="polite"></p>
+        </div>
       </div>
       <label class="sw opt-fog" id="opt-fog-box"><input type="checkbox" id="opt-fog"><span><b>Névoa de guerra</b> · só se vê o que as suas tropas, prédios e vilas aliadas enxergam. Batedores revelam o mapa.</span></label>
       <h4 class="lbl">Mapa</h4>
@@ -388,6 +405,7 @@
       <h2 id="end-title">Vitória!</h2>
       <p id="end-text"></p>
       <div class="stats" id="end-stats"></div>
+      <details class="howto end-claude" id="end-claude" hidden><summary>O que o Claude pensou <small id="end-claude-n"></small></summary><ol id="end-claude-list"></ol></details>
       <div class="row"><button class="btn" id="b-next" type="button" hidden>Próximo capítulo</button><button class="btn" id="b-again" type="button">Jogar de novo</button><button class="btn alt" id="b-menu" type="button">Menu</button></div>
     </div>
   </div>

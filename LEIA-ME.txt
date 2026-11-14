@@ -1,5 +1,5 @@
 ﻿==============================================================================
-  REINO PEQUENO  ·  versão 2.0  ·  21 de outubro de 2026
+  REINO PEQUENO  ·  versão 2.1  ·  14 de novembro de 2026
   Estratégia medieval em tempo real  ·  Braian Tech
 ==============================================================================
 
@@ -29,7 +29,7 @@ fica guardado só no aparelho. A internet só é usada quando VOCÊ toca em
 ==============================================================================
 
   Cada sistema tem o seu arquivo para baixar (nos Releases, o nome traz o
-  número da versão, como ReinoPequeno-2.0-Windows.zip):
+  número da versão, como ReinoPequeno-2.1-Windows.zip):
 
   ReinoPequeno-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
   ReinoPequeno-Mac.zip .......... Reino Pequeno.app
@@ -692,6 +692,34 @@ vozes embutidas, e o mesmo botão de atualização.
   pontes pagam 8% da carga; as vilas não gostam.
 
 ------------------------------------------------------------------------------
+ 6.23 O CLAUDE COMANDA O REINO VERMELHO (Batalha Rápida)
+------------------------------------------------------------------------------
+  Na tela inicial, em "Quem comanda o Reino Vermelho", escolha Claude.
+  A cada minuto de jogo o Claude, a inteligência artificial da Anthropic,
+  recebe um relatório da guerra (recursos, tropas dos dois lados, vilas,
+  contratos, perdas) e decide a estratégia do Vermelho: economia, quando
+  avançar de era, que tropas treinar, o que construir, quando e onde atacar
+  (castelo, torres, fazendas, quartéis ou uma vila), saques, contratos com
+  as vilas, espionagem e impostos. Os generais e o Mestre Rubro executam.
+  O Mestre Rubro provoca você com frases do Claude, e no fim da partida a
+  tela final mostra tudo o que o Claude pensou, ordem por ordem.
+
+  Como o jogo fala com o Claude:
+    No link do jogo no claude.ai ... usa a sua conta do Claude. Na primeira
+                                     ordem aparece um pedido de permissão.
+    Versões baixadas e site ........ precisa de uma chave da API da
+                                     Anthropic (console.anthropic.com). Cole
+                                     a chave no menu e toque em Testar. A
+                                     chave fica só no aparelho e vai direto
+                                     para a Anthropic; cada ordem é cobrada
+                                     na sua conta da API.
+  Modelos: Esperto (pensa mais, joga melhor) ou Rápido (responde na hora e
+  gasta menos). Uma partida de 30 minutos tem umas 30 ordens.
+  Sem internet, sem resposta ou no limite de uso, o computador assume o
+  Vermelho na hora e o selo "Claude" na barra de cima fica cinza: toque nele
+  para chamar o Claude de volta.
+
+------------------------------------------------------------------------------
  6.22 O CONSELHO
 ------------------------------------------------------------------------------
   O botão Conselho (tecla J) reúne tudo:
@@ -785,19 +813,12 @@ vozes embutidas, e o mesmo botão de atualização.
 
   Código-fonte e versões: https://github.com/Braiantech-br/Reino-Pequeno
 
-  Versão 2.0 (21 de outubro de 2026)
-    - Contratos com as vilas: mercenários por 5, 10 ou 15 minutos ou até a morte, herói da vila, guarnição, proteção, aliança juramentada e rota fixa.
-    - Um mensageiro leva cada proposta a pé; a vila aceita, recusa ou pede mais. Renovar sai 10% mais barato.
-    - Honra: quem cumpre contratos paga menos; quem quebra, saqueia ou ataca vilas paga mais e é recusado.
-    - Cada vila tem tropas de elite e um herói próprios.
-    - Exército com hierarquia: o de maior patente comanda, empates vão a voto, grupos com chefes e subchefes.
-    - Comandos de patente: Parede de escudos, Avante!, Segurar a linha e Grito de guerra.
-    - Ordens ao general: defender, atacar pelo flanco, recuar, patrulhar ou deixar livre.
-    - Batedores estudam o terreno e o general propõe um plano de defesa e de ataque, obra por obra, com o motivo.
-    - Névoa de guerra opcional.
-    - Economia interna: impostos, humor do povo, feira com fama, soldo, caravanas e pedágio.
-    - Conquista de vilas, vassalos, revoltas e leilão; o Reino Vermelho faz tudo isso também, com o Mestre Rubro.
-    - Conselho: um lugar só para pedidos, exército, contratos, estradas, economia e regras.
+  Versão 2.1 (14 de novembro de 2026)
+    - Novo: o Claude pode comandar o Reino Vermelho na Batalha Rápida. Escolha "Claude" em "Quem comanda o Reino Vermelho".
+    - A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos.
+    - O Mestre Rubro provoca você com frases do Claude, e no fim da partida você lê tudo o que ele pensou.
+    - No link do claude.ai o Claude usa a sua conta; nas versões baixadas e no site, a sua chave da API da Anthropic.
+    - Modelos Esperto e Rápido. Se o Claude ficar sem resposta, o computador assume o Vermelho e você pode chamá-lo de volta.
 
   Versão 1.15 (outubro de 2026)
     - Sino das vilas: pedir e dar socorro, favores entre vilas e reino.

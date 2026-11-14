@@ -19,6 +19,11 @@ Construa a vila, avance pelas cinco eras, negocie com as vilas neutras, contrate
 Os instaladores ficam na pasta [downloads](downloads/). Depois de instalados, eles se atualizam sozinhos.
 Instruções de cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
 
+## Novidades da versão 2.1
+
+- **O Claude comanda o Reino Vermelho.** Na Batalha Rápida, escolha "Claude" em *Quem comanda o Reino Vermelho*. A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos. O Mestre Rubro provoca você com as frases dele, e no fim da partida você lê tudo o que ele pensou.
+- No link do jogo no claude.ai o Claude usa a sua conta do Claude. Nas versões baixadas e no site, use a sua chave da API da Anthropic (fica só no aparelho).
+
 ## Novidades da versão 2.0
 
 - **Contratos com as vilas:** mercenários por 5, 10 ou 15 minutos ou até a morte, herói da vila, guarnição, proteção, aliança juramentada e rota fixa. Um mensageiro leva cada proposta a pé; a vila aceita, recusa ou pede mais.

@@ -1,1 +1,1 @@
-Instaladores da versão 2.0. Depois de instalados, eles se atualizam sozinhos pelo botão "Procurar atualização".
+Instaladores da versão 2.1. Depois de instalados, eles se atualizam sozinhos pelo botão "Procurar atualização".

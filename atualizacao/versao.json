@@ -1,22 +1,15 @@
 {
- "ver": 200,
- "name": "2.0",
- "date": "2026-10-21",
+ "ver": 210,
+ "name": "2.1",
+ "date": "2026-11-14",
  "file": "jogo.html",
- "bytes": 3484262,
- "sha256": "e36eb78bce565b507dcdfc8771cee6153fd10847e9a6e14f8937df8bfcd90557",
+ "bytes": 3513385,
+ "sha256": "5cbaf9c332752ea9199c09d5a5b2c39e874218d6d8995629ba7d160192d7be35",
  "notas": [
-  "Contratos com as vilas: mercenários por 5, 10 ou 15 minutos ou até a morte, herói da vila, guarnição, proteção, aliança juramentada e rota fixa.",
-  "Um mensageiro leva cada proposta a pé; a vila aceita, recusa ou pede mais. Renovar sai 10% mais barato.",
-  "Honra: quem cumpre contratos paga menos; quem quebra, saqueia ou ataca vilas paga mais e é recusado.",
-  "Cada vila tem tropas de elite e um herói próprios.",
-  "Exército com hierarquia: o de maior patente comanda, empates vão a voto, grupos com chefes e subchefes.",
-  "Comandos de patente: Parede de escudos, Avante!, Segurar a linha e Grito de guerra.",
-  "Ordens ao general: defender, atacar pelo flanco, recuar, patrulhar ou deixar livre.",
-  "Batedores estudam o terreno e o general propõe um plano de defesa e de ataque, obra por obra, com o motivo.",
-  "Névoa de guerra opcional.",
-  "Economia interna: impostos, humor do povo, feira com fama, soldo, caravanas e pedágio.",
-  "Conquista de vilas, vassalos, revoltas e leilão; o Reino Vermelho faz tudo isso também, com o Mestre Rubro.",
-  "Conselho: um lugar só para pedidos, exército, contratos, estradas, economia e regras."
+  "Novo: o Claude pode comandar o Reino Vermelho na Batalha Rápida. Escolha \"Claude\" em \"Quem comanda o Reino Vermelho\".",
+  "A cada minuto o Claude lê um relatório da guerra e decide a estratégia: economia, eras, tropas, construções, ataques, saques, cercos a vilas, contratos e impostos.",
+  "O Mestre Rubro provoca você com frases do Claude, e no fim da partida você lê tudo o que ele pensou.",
+  "No link do claude.ai o Claude usa a sua conta; nas versões baixadas e no site, a sua chave da API da Anthropic.",
+  "Modelos Esperto e Rápido. Se o Claude ficar sem resposta, o computador assume o Vermelho e você pode chamá-lo de volta."
  ]
 }

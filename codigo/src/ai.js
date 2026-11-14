@@ -62,7 +62,9 @@ function aiUpdate(dt){
 }
 // ---------------------------------------------------------------- diplomacy: the Red Kingdom hires, protects, swears, outbids, conquers
 function aiDiplo(I){
-  const A=S.ai;if(!S.towns||!S.towns.length||S.t<(A.dipNext||200))return;A.dipNext=S.t+22;
+  const A=S.ai;
+  if(clDiplo(I))return;
+  if(!S.towns||!S.towns.length||S.t<(A.dipNext||200))return;A.dipNext=S.t+22;
   if(svcList().list.some(m=>m.team===2&&m.type==='contract'&&m.state==='run'))return;
   const gold=I.res.gold,mine=ctrList().filter(c=>c.team===2&&c.state==='active'),c=I.castle;
   const ok=S.towns.filter(T=>!townFoe(T.i,2)&&(!T.owner||T.owner===2));
@@ -99,7 +101,8 @@ function aiGoal(I){
   const next=I.era+1,E=ERAS[next];if(!E||I.T.research)return null;
   if(S.t<S.diff.eraMin[next]-E.time)return null;
   const need=[0,9,15,21,26][I.era]-(S.diff.key==='insano'?2:0);
-  if(I.pawns.length<need)return null;
+  const cl=clPlan();if(cl&&cl.era==='esperar'&&I.threats.length<3)return null;
+  if(I.pawns.length<need-(cl&&cl.era==='agora'?4:0))return null;
   if(!eraReqMet(2,next))return null;
   return {era:next,cost:E.cost};
 }
@@ -135,6 +138,7 @@ function aiDefense(I){
 function aiWeights(I){
   const base=[null,{food:.5,wood:.42,gold:.08},{food:.42,wood:.33,gold:.25},{food:.38,wood:.27,gold:.35},{food:.36,wood:.28,gold:.36},{food:.36,wood:.28,gold:.36}][I.era];
   const w={...base};
+  const cl=clPlan();if(cl&&cl.eco){for(const k in w)w[k]=w[k]*.4+(cl.eco[k]||0)*.6;}
   if(I.goal)for(const k in I.goal.cost){const short=Math.max(0,I.goal.cost[k]-I.res[k]);w[k]+=short/1500;}
   for(const k in w)if(I.res[k]>1500)w[k]*=.4;
   let s=0;for(const k in w)s+=w[k];for(const k in w)w[k]/=s;
@@ -154,7 +158,7 @@ function aiAssign(p,res,I){
 }
 function aiEconomy(I,step){
   const A=S.ai,c=I.castle,T=I.T;
-  const target=[0,12,19,25,30,34][I.era]+S.diff.pawnBonus;
+  const cl=clPlan(),target=[0,12,19,25,30,34][I.era]+S.diff.pawnBonus+(cl?cl.pawns:0);
   if(!T.research&&c.queue.length<2&&I.pawns.length+c.queue.length<target&&I.pop<I.cap)trainAt(c,'pawn');
   // farms take over once the sheep near home run low
   let sheepHome=0;for(const e of S.ents)if(!e.dead&&DEF[e.kind].critter&&hyp(e.x-c.x,e.y-c.y)<10*TS)sheepHome++;
@@ -243,6 +247,7 @@ function aiPlan(I){
   if(e>=3){p.push(['monastery',1]);p.push(['tower',2]);if(hard)p.push(['barracks',2]);}
   if(e>=4){p.push(['archery',2]);p.push(['tower',3]);if(ins)p.push(['barracks',3]);}
   if(e>=5){if(hard)p.push(['monastery',2]);p.push(['tower',4]);}
+  const cl=clPlan();if(cl&&cl.build.length){const extra=[];for(const k of cl.build){const have=p.filter(q=>q[0]===k).reduce((m,q)=>Math.max(m,q[1]),0);extra.push([k,Math.max(have,0)+1]);}return extra.concat(p);}
   return p;
 }
 function aiBuildings(I,step){
@@ -311,8 +316,10 @@ function aiTrain(I){
         else if(I.era>=4&&I.army.length>=9&&cnt('catapult')<(S.diff.key==='normal'?1:2))k='catapult';
         else if(S.diff.harass&&I.era<=2&&cnt('scout')<1)k='scout';
         else k=unlocked(2,'lancer')&&score('lancer')>score('warrior')?'lancer':'warrior';
+        const ck=clPick(I,'barracks',cnt);if(ck)k=ck;
       }
-      else if(kind==='archery')k=I.era>=4&&Math.random()<.55?'royal':'archer';
+      else if(kind==='archery')k=clPick(I,'archery',cnt)||(I.era>=4&&Math.random()<.55?'royal':'archer');
+      else if(clPick(I,'monastery',cnt))k=clPick(I,'monastery',cnt);
       else if(I.monks.length+b.queue.length<S.diff.monks+(I.era>=4?1:0))k='monk';
       else if(I.era>=4&&cnt('wizard')<2)k='wizard';
       else if(I.era>=4&&cnt('paladin')<(S.diff.key==='normal'?2:4))k='paladin';
@@ -354,6 +361,7 @@ function aiArmy(I){
   const A=S.ai;
   if(A.siegeTown!=null){const T=S.towns&&S.towns[A.siegeTown];if(!T||!T.siege||T.siege.team!==2){A.siegeTown=null;}else if(!A.defending){for(const u of I.army){if(!u.order||u.order.type==='move'&&!u.order.amove){u.order={type:'move',x:T.x+(Math.random()-.5)*60,y:T.y+(Math.random()-.5)*40,amove:true};u.path=null;}}return;}}
   if(A.defending||!I.rally)return;
+  if(clArmy(I))return;
   const raidIds=new Set(A.raid?A.raid.ids:[]);
   const main=I.army.filter(u=>!raidIds.has(u.id));
   // raid party: come home when it is spent
@@ -371,14 +379,14 @@ function aiArmy(I){
     }
   }
   // early harassment of the player's workers
-  const peace=S.t<S.diff.peace;
-  if(S.diff.harass&&!peace&&!A.raid&&!A.attacking&&I.era>=2&&A.harassEra<I.era&&main.length>=5&&S.t>A.retreatT+40){
+  const peace=S.t<S.diff.peace,cl=clPlan(),clRaid=cl&&cl.order==='saquear'&&!cl.raidDone;
+  if((S.diff.harass||clRaid)&&!peace&&!A.raid&&!A.attacking&&(clRaid||I.era>=2&&A.harassEra<I.era)&&main.length>=(clRaid?3:5)&&S.t>A.retreatT+(clRaid?10:40)){
     const tgt=aiRaidTarget(I);
     if(tgt){
       const party=main.filter(u=>u.kind!=='lancer').sort((a,b)=>DEF[b.kind].speed-DEF[a.kind].speed).slice(0,S.diff.key==='insano'?5:4);
       if(party.length>=3){
         for(const u of party){u.order={type:'move',x:tgt.x,y:tgt.y,amove:true,raid:true};u.path=null;}
-        A.raid={ids:party.map(u=>u.id),t:S.t};A.harassEra=I.era;
+        A.raid={ids:party.map(u=>u.id),t:S.t};A.harassEra=I.era;if(clRaid)cl.raidDone=true;
         return;
       }
     }
@@ -404,11 +412,14 @@ function aiArmy(I){
       }
     }
   }
-  const thr=S.diff.attackBase+I.era*2;
-  const ready=main.length>=thr||(main.length>=6&&S.t-A.lastAttack>220)||(I.pop>=I.cap-1&&I.cap>=60&&main.length>=8);
+  let thr=S.diff.attackBase+I.era*2;
+  if(cl&&cl.min)thr=cl.min;
+  let ready=main.length>=thr||(main.length>=6&&S.t-A.lastAttack>220)||(I.pop>=I.cap-1&&I.cap>=60&&main.length>=8);
+  if(cl&&cl.order==='esperar')ready=I.pop>=I.cap-1&&I.cap>=80&&main.length>=thr;
+  if(cl&&cl.order==='atacar'&&main.length>=Math.min(thr,6))ready=true;
   if(!A.attacking&&ready&&!peace&&S.t>A.retreatT+30){
     A.creep=null;
-    const tgt=aiAttackTarget(I,I.castle,main.length>=thr*1.6);
+    const tgt=clTarget(I)||aiAttackTarget(I,I.castle,main.length>=thr*1.6);
     if(tgt){A.attacking=true;A.lastAttack=S.t;A.waves++;A.target=tgt.id;A.big=main.length>=thr*1.6;}
   }
   if(!A.attacking)return;
@@ -420,7 +431,7 @@ function aiArmy(I){
     A.target=tgt.id;
   }
   const c=centerOf(tgt);
-  const fl=main.length>=10?armyFlank(2,main,c):null;
+  const fl=main.length>=10&&!(cl&&cl.flank===false)||cl&&cl.flank&&main.length>=6?armyFlank(2,main,c):null;
   if(fl&&!A.flankSaid){A.flankSaid=S.t;HOOK.army('flank',2,byId.get(fl.q.lead),{});}
   for(const u of main.concat(I.monks)){
     const o=u.order;
@@ -437,10 +448,119 @@ function aiArmy(I){
     const foes=[];forNear(mid.x,mid.y,340,e=>{if(!e.dead&&e.team&&e.team!==2&&DEF[e.kind].mil)foes.push(e);});
     for(const b of I.foeBlds)if(DEF[b.kind].dmg&&distRect(mid.x,mid.y,rectOf(b))<260)foes.push(b);
     const mine=strength(near),theirs=strength(foes);
-    if(main.length<=2||(theirs>0&&mine<theirs*.5)){
+    if(main.length<=2||(theirs>0&&mine<theirs*(cl&&cl.order==='atacar'?.35:.5))){
       A.attacking=false;A.retreatT=S.t;A.flankSaid=0;for(const u of main)u.flankDone=false;
       for(const u of main.concat(I.monks)){u.order={type:'move',x:I.rally.x+(Math.random()-.5)*80,y:I.rally.y+(Math.random()-.5)*60};u.path=null;}
     }
   }
 }
 
+
+// ================================================================ Claude commands the Red Kingdom
+// Claude sends a plan every minute or so (the strategy); the AI above keeps doing the hands-on work
+// (gathering, houses, farms, repairs, defending the town) and follows the plan where it says something.
+const CL_UNITS={barracks:['warrior','lancer','scout','ram','catapult'],archery:['archer','royal'],monastery:['monk','paladin','wizard']};
+const CL_BUILD=['house','farm','barracks','archery','tower','monastery','market','tavern','wall','gate'];
+const CL_CTR=['merc','mercLife','hero','garrison','protect','loyalty','route','liberate'];
+function clPlan(){const A=S.ai;return A&&A.cl&&S.t<A.cl.until?A.cl:null;}
+function clNum(v,a,b,d){v=Number(v);return isFinite(v)?clamp(v,a,b):d;}
+function clTown(name){if(!S.towns||!name)return null;const n=String(name).toLowerCase().replace(/^vila[:\s]*/,'').trim();return S.towns.find(T=>T.name.toLowerCase()===n)||S.towns.find(T=>T.name.toLowerCase().startsWith(n.slice(0,4)))||null;}
+// read Claude's answer, keep only what the rules allow, and make it the plan for the next minutes
+function clApply(o){
+  if(!S||!S.ai||!o||typeof o!=='object')return null;
+  const A=S.ai,old=A.cl||{};
+  const p={t:S.t,until:S.t+150,pawns:0,build:[],mix:null,eco:null,era:'normal',order:'normal',target:null,min:0,flank:null,ctr:null,spy:false,tax:null,taunt:'',thought:'',strategy:''};
+  p.thought=String(o.pensamento||o.thought||'').slice(0,240);
+  p.strategy=String(o.estrategia||'').slice(0,20);
+  if(o.economia&&typeof o.economia==='object'){const e={food:clNum(o.economia.comida,0,1,0),wood:clNum(o.economia.madeira,0,1,0),gold:clNum(o.economia.ouro,0,1,0)};const s=e.food+e.wood+e.gold;if(s>0.05){for(const k in e)e[k]/=s;p.eco=e;}}
+  p.pawns=Math.round(clNum(o.aldeoes,-6,8,0));
+  if(['agora','esperar','normal'].includes(o.era))p.era=o.era;
+  if(Array.isArray(o.construir))p.build=o.construir.map(String).filter(k=>CL_BUILD.includes(k)).slice(0,3);
+  if(o.treinar&&typeof o.treinar==='object'){const m={};for(const k in o.treinar){const v=clNum(o.treinar[k],0,20,0);if(v>0&&DEF[k]&&DEF[k].unit&&DEF[k].mil)m[k]=v;}if(Object.keys(m).length)p.mix=m;}
+  const ex=o.exercito||{};
+  if(['atacar','esperar','recuar','saquear','normal'].includes(ex.ordem))p.order=ex.ordem;
+  if(ex.alvo)p.target=String(ex.alvo).slice(0,40);
+  p.min=Math.round(clNum(ex.minimo,0,80,0));
+  if(typeof ex.flanco==='boolean')p.flank=ex.flanco;
+  const c=o.contrato;
+  if(c&&typeof c==='object'&&CL_CTR.includes(c.tipo)){const T=clTown(c.vila);if(T)p.ctr={kind:c.tipo,town:T.i,min:[5,10,15].includes(+c.minutos)?+c.minutos:10};}
+  p.spy=!!o.espionar;
+  if(o.impostos!=null)p.tax=Math.round(clNum(o.impostos,0,4,2));
+  p.taunt=String(o.provocacao||'').replace(/\s+/g,' ').trim().slice(0,140);
+  if(p.tax!=null&&p.tax!==econOf(2).tax)econSetTax(2,p.tax);
+  if(p.spy&&!(S.intel&&S.intel[2]&&S.intel[2].sweep))p.spyResult=startSweep(2,'spy');
+  if(p.order==='recuar'){const I=aiScan();A.attacking=false;A.retreatT=S.t;A.raid=null;if(I.rally)for(const u of I.army.concat(I.monks)){u.order={type:'move',x:I.rally.x+(Math.random()-.5)*80,y:I.rally.y+(Math.random()-.5)*60};u.path=null;}}
+  if(p.order==='atacar'&&old.order!=='atacar')A.target=null;
+  A.cl=p;
+  (A.clLog=A.clLog||[]).push({t:S.t,thought:p.thought,strategy:p.strategy,order:p.order,target:p.target,taunt:p.taunt});
+  if(A.clLog.length>80)A.clLog.shift();
+  return p;
+}
+// which unit a building trains, following Claude's mix
+function clPick(I,kind,cnt){
+  const p=clPlan();if(!p||!p.mix)return null;
+  const opts=CL_UNITS[kind].filter(k=>p.mix[k]&&unlocked(2,k));if(!opts.length)return null;
+  const tot=opts.reduce((s,k)=>s+p.mix[k],0)||1,have=opts.reduce((s,k)=>s+cnt(k),0)+1;
+  let best=null,bd=-1e9;
+  for(const k of opts){const d=p.mix[k]/tot-cnt(k)/have;if(d>bd){bd=d;best=k;}}
+  if(best==='ram'&&cnt('ram')>=3||best==='catapult'&&cnt('catapult')>=3)return null;
+  return best;
+}
+// the target Claude named: the castle, towers, the economy, the barracks or a town
+function clTarget(I){
+  const p=clPlan();if(!p||!p.target)return null;
+  const t=p.target.toLowerCase(),from=I.castle;
+  const near=list=>{let b=null,bd=1e9;for(const e of list){if(e.dead)continue;const d=hyp(e.x-from.x,e.y-from.y);if(d<bd){bd=d;b=e;}}return b;};
+  if(t.startsWith('castelo'))return castleOf(1);
+  if(t.startsWith('torre'))return near(I.foeBlds.filter(b=>b.kind==='tower'))||castleOf(1);
+  if(t.startsWith('econ')||t.startsWith('fazenda'))return near(I.foeBlds.filter(b=>b.kind==='farm'||b.kind==='house'||b.kind==='market'));
+  if(t.startsWith('quartel')||t.startsWith('militar'))return near(I.foeBlds.filter(b=>['barracks','archery','monastery'].includes(b.kind)));
+  return null;
+}
+// army orders that the AI above does not have: march on a town
+function clArmy(I){
+  const p=clPlan();if(!p||!p.target||p.order!=='atacar')return false;
+  const t=p.target.toLowerCase();if(!t.startsWith('vila'))return false;
+  const T=clTown(t);if(!T||T.owner===2)return false;
+  if(!T.siege&&!p.siegeAsked){p.siegeAsked=true;if(startConquest(2,T.i)!=='ok')return false;S.ai.siegeTown=T.i;}
+  return false;   // the siege branch of aiArmy now leads the army there
+}
+// one contract per plan, sent with the AI's own messenger
+function clDiplo(I){
+  const p=clPlan();if(!p||!p.ctr||p.ctrSent||!S.towns)return false;
+  p.ctrSent=true;
+  const r=proposeContract(2,p.ctr.kind,p.ctr.town,{min:p.ctr.min});
+  p.ctrResult=r;return r==='ok';
+}
+// the situation report Claude reads before each order
+function clReport(){
+  const I=aiScan(),T2=S.teams[2],T1=S.teams[1],A=S.ai||{},E=econOf(2);
+  const cnt=list=>{const o={};for(const u of list){o[u.kind]=(o[u.kind]||0)+1;}return o;};
+  const bl={};for(const k in I.blds)bl[k]=I.blds[k].filter(b=>b.built).length;
+  const fb={};for(const b of I.foeBlds)if(b.built)fb[b.kind]=(fb[b.kind]||0)+1;
+  const round=n=>n<5?n:Math.round(n/5)*5;
+  const fm={};for(const u of I.foeArmy)fm[u.kind]=(fm[u.kind]||0)+1;for(const k in fm)fm[k]=round(fm[k]);
+  const c2=castleOf(2),c1=castleOf(1);
+  const pct=e=>e?Math.round(e.hp/e.maxhp*100)+'%':'destruído';
+  const mm=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
+  const r={
+    tempo:mm(S.t),dificuldade:S.diff.name,
+    tregua:S.t<S.diff.peace?`até ${mm(S.diff.peace)} (antes disso o exército não ataca o castelo azul)`:'acabou',
+    voce:{era:T2.era,tropas_disponiveis:Object.keys(DEF).filter(k=>DEF[k].unit&&DEF[k].mil&&DEF[k].cost&&!DEF[k].elite&&!DEF[k].thero&&unlocked(2,k)),pesquisando_era:!!T2.research,recursos:{comida:Math.round(I.res.food),madeira:Math.round(I.res.wood),ouro:Math.round(I.res.gold)},
+      populacao:`${I.pop}/${I.cap}`,aldeoes:I.pawns.length,exercito:cnt(I.army.concat(I.monks)),total_exercito:I.army.length+I.monks.length,
+      predios:bl,castelo:pct(c2),honra:Math.round(honorOf(2)),impostos:TAX[E.tax].n,humor_do_povo:Math.round(E.pop),
+      inimigos_dentro_da_base:I.threats.length,atacando_agora:!!A.attacking,mortes:T2.stats.lost,abates:T2.stats.kills},
+    jogador_azul:{era:T1.era,exercito_aprox:round(I.foeArmy.length),composicao_aprox:fm,predios:fb,castelo:pct(c1),honra:Math.round(honorOf(1)),aldeoes_aprox:round(I.foePawns.length)},
+    vilas:(S.towns||[]).map(T=>({nome:T.name,nivel:T.lvl||1,amizade_com_voce:friendOf(T,2),amizade_com_azul:friendOf(T,1),dona:T.owner?teamName(T.owner):null,jurada_a:loyalTo(T)?teamName(loyalTo(T)):null,sob_ataque:!!T.siege})),
+    seus_contratos:ctrList().filter(c=>c.state==='active'&&c.team===2).map(c=>({tipo:c.kind,vila:S.towns[c.town].name})),
+    contratos_do_azul:ctrList().filter(c=>c.state==='active'&&c.team===1).map(c=>({tipo:c.kind,vila:S.towns[c.town].name})),
+  };
+  const sp=S.intel&&S.intel[2]&&S.intel[2].spy;if(sp)r.espionagem={torres_do_azul:sp.towers,lado_mais_fraco:sp.weak};
+  const last=A.cl;if(last){r.sua_ordem_anterior={estrategia:last.strategy,exercito:last.order,alvo:last.target,contrato:last.ctr?`${last.ctr.kind} com ${S.towns[last.ctr.town].name}: ${{ok:'mensageiro enviado',rep:'recusado, falta amizade',cost:'faltou ouro',dup:'já estava em vigor',busy:'já havia um mensageiro a caminho',hostile:'a vila está em guerra com você',sworn:'a vila é jurada ao azul'}[last.ctrResult]||last.ctrResult||'na fila'}`:null,espionagem:last.spy?({ok:'batedor enviado',noscout:'sem batedor livre (treine um scout)'}[last.spyResult]||last.spyResult||'já em andamento'):null};}
+  // what changed since the last report
+  const prev=A.clPrev||{lost:0,kills:0,blds:0,fblds:0};
+  const nb=Object.values(bl).reduce((a,b)=>a+b,0),nf=Object.values(fb).reduce((a,b)=>a+b,0);
+  r.desde_o_ultimo_relatorio={unidades_perdidas:T2.stats.lost-prev.lost,inimigos_derrotados:T2.stats.kills-prev.kills,predios_seus:nb-prev.blds,predios_do_azul:nf-prev.fblds};
+  A.clPrev={lost:T2.stats.lost,kills:T2.stats.kills,blds:nb,fblds:nf};
+  return r;
+}
