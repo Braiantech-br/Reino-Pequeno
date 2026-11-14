@@ -1,5 +1,5 @@
 // Records the trailer: node rec.js <out-dir> [every=1] [from=0] [to=end] [w=1920] [h=1080]
-// CENAS=scenes-2.0.js picks another script (default: the newest trailer, scenes-2.1.js)
+// CENAS=scenes-2.0.js picks another script (default: the newest trailer, scenes-2.2.js)
 const {chromium}=require(process.env.PLAYWRIGHT||'playwright');
 const fs=require('fs'),path=require('path');
 const [OUT,EVERY='1',FROM='0',TO='',W='1920',H='1080']=process.argv.slice(2);
@@ -12,7 +12,7 @@ const [OUT,EVERY='1',FROM='0',TO='',W='1920',H='1080']=process.argv.slice(2);
   await p.goto('http://localhost:8765/preview.html');
   await p.waitForTimeout(1500);
   await p.evaluate(()=>document.fonts.ready);
-  await p.addScriptTag({path:path.join(__dirname,process.env.CENAS||'scenes-2.1.js')});
+  await p.addScriptTag({path:path.join(__dirname,process.env.CENAS||'scenes-2.2.js')});
   const info=await p.evaluate(()=>TR.prep(4242));
   console.log('prep',JSON.stringify(info));
   const total=await p.evaluate(()=>TR.TOTAL),end=TO?+TO:total;
