@@ -5,7 +5,7 @@ S = f'{R}/src'
 import sys; sys.path.insert(0, f'{R}/pacotes')
 import imagens; imagens.ensure_assets()      # the sprites come out of the published game when codigo/assets/ is missing
 ORDER = ['core.js', 'ai.js', 'modes.js', 'life.js', 'trade.js', 'towns.js', 'diplo.js', 'army.js', 'scout.js', 'econ.js', 'tactics.js',
-         'view.js', 'forge.js', 'music.js', 'voice.js', 'claude.js', 'council.js', 'ui.js']
+         'view.js', 'forge.js', 'music.js', 'voice.js', 'claude.js', 'council.js', 'ui.js', 'tutorial.js']
 head = open(f'{S}/head.html', encoding='utf-8').read().replace('/*BASECSS*/', open(f'{S}/base.css', encoding='utf-8').read())
 meta = json.load(open(f'{R}/meta.json'))
 js = '\n'.join(open(f'{S}/{f}', encoding='utf-8').read() for f in ORDER if os.path.exists(f'{S}/{f}'))

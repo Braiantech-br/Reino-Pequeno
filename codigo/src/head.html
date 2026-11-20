@@ -75,6 +75,20 @@
 .heroes input:checked+span{background:#ffe9a8;border-color:#b07d16;box-shadow:0 3px 0 #7a5410}
 .fj-open{margin-top:8px;display:inline-flex;flex-direction:column;align-items:flex-start}.fj-open small{font:400 12px var(--f-ui);opacity:.85}
 #ov-forja{z-index:9}
+#tut{position:absolute;z-index:5;left:50%;top:calc(env(safe-area-inset-top,0px) + 200px);transform:translateX(-50%);width:min(520px,calc(100% - 32px));background:#fff6dd;border:3px solid var(--wood);border-radius:14px;box-shadow:0 4px 0 var(--wood-dk);padding:10px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+#tut small{grid-column:1/-1;font:600 11px var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--wood)}#tut p{margin:0;font-size:15px;line-height:1.35}#tut .btn{font-size:17px;padding:5px 10px}
+#tut-arrow{position:absolute;left:0;top:0;z-index:4;pointer-events:none;margin:-34px 0 0 -14px;font-size:30px;color:#ffd84a;text-shadow:0 2px 0 #6b4a10,0 0 8px rgba(0,0,0,.4);animation:tutbob .7s ease-in-out infinite alternate}
+@keyframes tutbob{from{margin-top:-40px}to{margin-top:-30px}}
+.tut-glow{outline:4px solid #ffd84a!important;outline-offset:2px;animation:tutglow 1s ease-in-out infinite alternate}@keyframes tutglow{from{box-shadow:0 0 0 0 rgba(255,216,74,.9)}to{box-shadow:0 0 14px 4px rgba(255,216,74,.9)}}
+#b-tut.first{background:var(--gold,#e9b434);border-color:#8a6412;color:#3a2610}
+@media (max-width:760px),(max-height:560px){#tut{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 132px)}#tut p{font-size:13px}}
+#ov-saves{z-index:9}.sheet.saves{max-width:620px}
+.sv-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sv-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;border:3px solid var(--wood);border-radius:12px;background:#fff6dd}
+.sv-row b{font:400 24px/1 var(--f-display)}.sv-row small{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px}
+.sv-row .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.sv-row .btn{font-size:18px;padding:5px 12px}
+.sv-row.empty{opacity:.75}
+@media (max-width:560px){.sv-row{grid-template-columns:1fr}.sv-row .btns{justify-content:flex-start}}
 .sheet.forja{max-width:860px}
 .fj-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-top:10px;align-items:start}
 .fj-stage canvas{width:100%;max-width:300px;aspect-ratio:1;border:3px solid var(--wood);border-radius:12px;image-rendering:pixelated;display:block}
@@ -242,6 +256,8 @@
     <p class="sp-note">Os avisos que não aparecem ficam no Conselho, em Notícias.</p>
   </div>
   <div id="toasts" aria-live="polite"></div>
+  <div id="tut" hidden role="status" aria-live="polite"><small id="tut-n">Tutorial</small><p id="tut-t"></p><button class="btn alt sm-btn" id="tut-skip" type="button">Pular tutorial</button></div>
+  <div id="tut-arrow" hidden aria-hidden="true">▼</div>
   <div id="goals" hidden></div>
   <div id="ask" hidden role="dialog" aria-label="Pedido de autorização"><img id="ak-av" src="assets/av05.png" alt=""><div><b id="ak-who">Mestre Gaspar pede autorização</b><p id="ak-text"></p><p class="ak-cost" id="ak-cost"></p><div class="ak-row"><button class="btn sm-btn" id="b-ak-yes" type="button">Autorizar</button><button class="btn alt sm-btn" id="b-ak-no" type="button">Agora não</button></div></div></div>
   <div id="report" hidden role="dialog" aria-label="Relatório de serviço"><img id="rp-av" src="assets/av01.png" alt=""><div><b id="rp-who"></b><small id="rp-title"></small><ul id="rp-lines"></ul><div class="ak-row"><button class="btn sm-btn" id="b-rp-ok" type="button">Entendido</button><button class="btn alt sm-btn" id="b-rp-see" type="button">Ver no mapa</button></div></div></div>
@@ -254,6 +270,15 @@
     <div class="card mini"><canvas id="mini" width="192" height="128" aria-label="Minimapa"></canvas></div>
   </div>
 
+  <div class="overlay" id="ov-saves" hidden>
+    <div class="sheet saves" role="dialog" aria-label="Partidas salvas">
+      <div class="kicker" id="sv-kick">Partidas salvas</div>
+      <h2 id="sv-title">Partidas salvas</h2>
+      <p id="sv-lead">A partida em andamento também é salva sozinha a cada 40 segundos (Automática).</p>
+      <div id="sv-list" class="sv-list"></div>
+      <div class="row"><button class="btn alt" id="sv-close" type="button">Fechar</button></div>
+    </div>
+  </div>
   <div class="overlay" id="ov-forja" hidden>
     <div class="sheet wide forja" role="dialog" aria-label="Forja de Heróis">
       <div class="kicker">Crie um herói só seu</div>
@@ -343,8 +368,11 @@
       </div>
       <div class="row">
         <button class="btn" id="b-start" type="button">Começar</button>
+        <button class="btn alt" id="b-tut" type="button">Aprender a jogar<small>tutorial de 5 minutos</small></button>
         <button class="btn alt" id="b-resume" type="button" hidden>Continuar</button>
         <button class="btn alt" id="b-load" type="button" hidden>Continuar partida salva<small id="load-info"></small></button>
+        <button class="btn alt" id="b-save" type="button" hidden>Salvar partida</button>
+        <button class="btn alt" id="b-saves" type="button" hidden>Partidas salvas<small id="saves-info"></small></button>
         <button class="btn alt" id="b-eras" type="button">Ver as eras</button>
         <button class="btn alt" id="b-sound2" type="button" title="Trilha sonora e falas">♪ Som</button>
         <button class="btn alt" id="b-upd" type="button" hidden title="Baixar a versão mais nova do jogo">⟳ Procurar atualização<small id="upd-info"></small></button>

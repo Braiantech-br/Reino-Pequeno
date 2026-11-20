@@ -317,13 +317,14 @@ function spawnWave(w){
   HOOK.wave(w,spot);
 }
 function waveReady(w){
-  if(w.spawned)return false;
+  if(w.spawned||S.tut&&!S.tut.done)return false;
   if(w.after){const d=S.goalsDone[w.after];return d!=null&&S.t>=d+(w.delay||15);}
-  return S.t>=w.t*({normal:1.15,dificil:1,insano:.9}[S.diff.key]||1);
+  return S.t-(S.tutShift||0)>=w.t*({normal:1.15,dificil:1,insano:.9}[S.diff.key]||1);
 }
 function waveDueIn(w){
+  if(S.tut&&!S.tut.done)return null;
   if(w.after){const d=S.goalsDone[w.after];return d==null?null:d+(w.delay||15)-S.t;}
-  return w.t*({normal:1.15,dificil:1,insano:.9}[S.diff.key]||1)-S.t;
+  return w.t*({normal:1.15,dificil:1,insano:.9}[S.diff.key]||1)-(S.t-(S.tutShift||0));
 }
 // Defesa do Rei: endless waves that grow; every fifth wave brings a boss
 const BOSSES=[['crow',3],['violet',3],['captain',2],['duke',2]];

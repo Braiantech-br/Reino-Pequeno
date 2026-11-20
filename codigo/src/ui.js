@@ -1162,6 +1162,40 @@ function saveMatch(){
   }catch(e){ui.savedT=S.t;}
 }
 function clearMatch(){try{localStorage.removeItem(MATCH_KEY);localStorage.removeItem(MATCH_INFO);}catch(e){}}
+// ---------------------------------------------------------------- save slots: the automatic one plus three of the player's
+const SLOTS=['auto',1,2,3];
+const slotKey=n=>n==='auto'?MATCH_KEY:'reinoPequeno.slot.'+n,slotInfoKey=n=>n==='auto'?MATCH_INFO:'reinoPequeno.slot.'+n+'.info';
+function slotInfo(n){try{const i=JSON.parse(localStorage.getItem(slotInfoKey(n))||'null');return i&&localStorage.getItem(slotKey(n))?i:null;}catch(e){return null;}}
+function slotText(i){if(!i)return '';const d=new Date(i.when),hm=`${d.getDate()}/${d.getMonth()+1} às ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return `${i.watch?'Modo observador':MODE_NAME[i.mode]||'Partida'}${i.mode==='campaign'&&i.chapter?' · capítulo '+i.chapter:''} · ${i.diff||''} · ${fmt(i.t)} de jogo · ${hm}`;}
+function saveSlot(n){
+  if(!S||!ui.started||S.over)return false;
+  try{
+    localStorage.setItem(slotKey(n),JSON.stringify({v:1,cam:{x:cam.x,y:cam.y,z:cam.z},last:ui.last||null,S},matchOut));
+    localStorage.setItem(slotInfoKey(n),JSON.stringify({mode:S.mode,chapter:S.chapter||0,diff:S.diff&&S.diff.name,t:S.t,when:Date.now(),watch:!!(S.cfg&&S.cfg.watch)}));
+    return true;
+  }catch(e){toast('Não há espaço para salvar aqui. Apague uma partida antiga e tente de novo.','warn');return false;}
+}
+function delSlot(n){try{localStorage.removeItem(slotKey(n));localStorage.removeItem(slotInfoKey(n));}catch(e){}}
+function openSaves(saving){
+  ui.svSave=!!saving;
+  $('sv-title').textContent=saving?'Salvar partida':'Partidas salvas';
+  $('sv-kick').textContent=saving?`${fmt(S?S.t:0)} de jogo`:'Continue de onde parou';
+  $('sv-lead').textContent=saving?'Escolha um espaço. Se ele já tiver uma partida, ela é trocada por esta.':'A partida em andamento também é salva sozinha a cada 40 segundos (Automática).';
+  $('sv-list').innerHTML=SLOTS.map(n=>{const i=slotInfo(n),nm=n==='auto'?'Automática':`Espaço ${n}`;
+    const b=[];if(i&&!saving)b.push(`<button class="btn" type="button" data-sv="load:${n}">Continuar</button>`);
+    if(saving&&n!=='auto')b.push(`<button class="btn" type="button" data-sv="save:${n}">Salvar aqui</button>`);
+    if(i)b.push(`<button class="btn alt" type="button" data-sv="del:${n}">Apagar</button>`);
+    return `<div class="sv-row${i?'':' empty'}"><div><b>${nm}</b><small>${i?slotText(i):'Vazio'}</small></div><div class="btns">${b.join('')}</div></div>`;}).join('');
+  $('ov-saves').hidden=false;
+}
+$('sv-list').addEventListener('click',ev=>{
+  const b=ev.target.closest('button[data-sv]');if(!b)return;const[a,v]=b.dataset.sv.split(':'),n=v==='auto'?'auto':+v;
+  if(a==='load'){$('ov-saves').hidden=true;resumeMatch(n);}
+  else if(a==='save'){if(saveSlot(n)){toast(`Partida salva no espaço ${n}.`,'good');$('ov-saves').hidden=true;loadBtn();}}
+  else if(a==='del'){if(b.dataset.ok){delSlot(n);openSaves(ui.svSave);loadBtn();}else{b.dataset.ok='1';b.textContent='Apagar mesmo?';b.classList.add('danger');}}
+});
+$('sv-close').addEventListener('click',()=>{$('ov-saves').hidden=true;});
 function savedMatchInfo(){
   try{const i=JSON.parse(localStorage.getItem(MATCH_INFO)||'null');if(!i||!localStorage.getItem(MATCH_KEY))return null;
     const d=new Date(i.when),hm=`${d.getDate()}/${d.getMonth()+1} às ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
@@ -1250,10 +1284,12 @@ $('b-upd').addEventListener('click',()=>{audioInit();if(UPD.next)updDlg(`Versão
 $('b-upd-go').addEventListener('click',applyUpdate);
 $('b-upd-close').addEventListener('click',()=>{$('ov-upd').hidden=true;});
 $('b-upd-reset').addEventListener('click',()=>{updDlg('Voltando à versão original...','',{busy:true});dropVersion().then(()=>{try{localStorage.removeItem('rp.try');}catch(e){}setTimeout(restartGame,500);});});
-function loadBtn(){const inf=savedMatchInfo();$('b-load').hidden=!inf||!!(ui.started&&S&&!S.over);$('load-info').textContent=inf||'';}
-function resumeMatch(){
-  let d=null;try{d=JSON.parse(localStorage.getItem(MATCH_KEY)||'null',matchIn);}catch(e){d=null;}
-  if(!d||!d.S){clearMatch();toast('Não consegui abrir a partida salva.');renderMenu();return;}
+function loadBtn(){const inf=savedMatchInfo(),live=!!(ui.started&&S&&!S.over);$('b-load').hidden=!inf||live;$('load-info').textContent=inf||'';
+  const n=SLOTS.filter(k=>k!=='auto'&&slotInfo(k)).length;$('b-saves').hidden=!n&&!inf;$('saves-info').textContent=n?`${n} ${n===1?'espaço usado':'espaços usados'}`:'';$('b-save').hidden=!live;}
+function resumeMatch(n){
+  n=n||'auto';let d=null;try{d=JSON.parse(localStorage.getItem(slotKey(n))||'null',matchIn);}catch(e){d=null;}
+  if(!d||!d.S){delSlot(n);toast('Não consegui abrir a partida salva.');renderMenu();return;}
+  fjSync();
   S=d.S;afterLoad();
   if(d.cam)Object.assign(cam,d.cam);clampCam();
   ui.last=d.last||{mode:S.mode,diff:S.diff&&S.diff.key,chapter:S.chapter};
@@ -1264,6 +1300,7 @@ function resumeMatch(){
   document.querySelector('#c-foe img').src=S.mode==='skirmish'?'assets/ic_enemy.png':'assets/ic_wild.png';
   $('c-foe').title=S.mode==='skirmish'?'Reino Vermelho':'Próximo ataque';
   refreshPanel(true);hud();
+  if(S.tut&&!S.tut.done)tutShow();else{$('tut').hidden=true;$('tut-arrow').hidden=true;}
   banner('Partida retomada',S.cfg&&S.cfg.watch?'Modo observador':(MODE_NAME[S.mode]||''),`${fmt(S.t)} de jogo. O jogo está pausado: toque em Continuar quando estiver pronto.`,false);
   watchStart();
   clStart(false);
@@ -1275,7 +1312,7 @@ ui.seed=newSeed();
 const radio=n=>{const r=document.querySelector(`input[name="${n}"]:checked`);return r?r.value:null;};
 function renderMenu(){
   const mode=radio('mode')||'campaign';
-  fjSync();
+  fjSync();$('b-tut').classList.toggle('first',!ui.save.tutDone);
   const sk=mode==='skirmish';
   $('hero-box').hidden=sk&&radio('blue')&&radio('blue')!=='voce';
   $('chap-box').hidden=mode!=='campaign';
@@ -1311,12 +1348,14 @@ $('b-reroll').addEventListener('click',()=>{ui.seed=newSeed();drawPreview();play
   if(!ui.started){const c=newGame(ui.seed,'dificil');centerOn(c.x+30,c.y-10);}});
 function showMenu(){
   ui.paused=true;$('ov-end').hidden=true;
+  $('b-tut').classList.toggle('first',!ui.save.tutDone);
   $('b-resume').hidden=!(ui.started&&S&&!S.over);
   loadBtn();
   renderMenu();$('ov-start').hidden=false;
 }
 function startGame(p){
   p=p||{};
+  $('tut').hidden=true;$('tut-arrow').hidden=true;tutGlow(null);
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
   const blue=mode==='skirmish'?(p.blue||(['voce','pc','claude'].includes(CLAUDE.cfg.blue)?CLAUDE.cfg.blue:'voce')):'voce',watch=blue!=='voce';
   const opts={mode,relief:p.relief,fog:watch?false:p.fog!=null?p.fog:!!$('opt-fog').checked};
@@ -1413,7 +1452,9 @@ for(const r of document.querySelectorAll('#sndpop input[name="vox"]'))r.addEvent
 $('b-help').addEventListener('click',showMenu);
 $('b-start').addEventListener('click',()=>startGame());
 $('b-resume').addEventListener('click',()=>{ui.paused=false;$('ov-start').hidden=true;audioInit();});
-$('b-load').addEventListener('click',resumeMatch);
+$('b-load').addEventListener('click',()=>resumeMatch('auto'));
+$('b-save').addEventListener('click',()=>openSaves(true));
+$('b-saves').addEventListener('click',()=>openSaves(false));
 window.addEventListener('pagehide',saveMatch);
 $('b-again').addEventListener('click',()=>{const L=ui.last||{};startGame({mode:L.mode,diff:L.diff,chapter:L.chapter,hero:L.hero,fog:L.fog,claude:L.claude,blue:L.blue});});
 $('b-next').addEventListener('click',()=>{const L=ui.last||{};ui.chapter=Math.min(5,(L.chapter||1)+1);startGame({mode:'campaign',diff:L.diff,chapter:ui.chapter,hero:L.hero,fog:L.fog});});
@@ -1566,6 +1607,7 @@ function frame(now){
     while(acc>=STEP&&n<10){update(STEP);acc-=STEP;n++;}
     if(n>=10)acc=0;
     clTick();
+    if(S.tut&&!S.tut.done)tutTick();
   }
   ui.alarmT-=rdt;
   ui.musT=(ui.musT||0)-rdt;if(ui.musT<=0){ui.musT=.5;try{musWatch();}catch(e){}}
