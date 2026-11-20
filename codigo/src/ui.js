@@ -46,7 +46,7 @@ function wololo(t){
 function playSfx(name){
   const ac=SND.ac;if(!ac||!SND.on||ac.state!=='running')return;
   const now=ac.currentTime;
-  const gap={boom:.08,wololo:.9,alarm:3,ram:.25,catapult:.3,fireball:.2,bell:1.2}[name]||.15;
+  const gap={summon:1.2,boom:.08,wololo:.9,alarm:3,ram:.25,catapult:.3,fireball:.2,bell:1.2}[name]||.15;
   if(SND.last[name]&&now-SND.last[name]<gap)return;SND.last[name]=now;
   try{
     switch(name){
@@ -59,6 +59,7 @@ function playSfx(name){
       case 'build':tone('sine',660,660,now,.25,.2);tone('sine',990,990,now+.1,.35,.18);break;
       case 'train':tone('square',520,700,now,.09,.06);break;
       case 'bolt':noise(now,.35,.4,'highpass',1800);tone('sine',90,40,now,.4,.4);break;
+      case 'summon':tone('sawtooth',180,90,now,.5,.06);tone('sine',110,55,now+.1,.6,.18);noise(now,.4,.12,'bandpass',420);break;
       case 'meteor':tone('sawtooth',320,80,now,.7,.07);break;
       case 'boom':noise(now,.45,.28,'lowpass',600);tone('sine',70,35,now,.35,.3);break;
       case 'win':[523,659,784,1047,784,1047].forEach((f,i)=>tone('triangle',f,f,now+i*.14,.35,.25));break;
@@ -83,7 +84,7 @@ const toastBox=$('toasts');
 // What does not make the screen goes to the council's news (Conselho → Notícias).
 const NOTE_LOW=[/^Engenheiro:/,/ pront[oa]!$/,/^Construção concluída/,/ virou [a-zà-ú]+ nível \d/,/rendeu \d+ de ouro/,/ cresceu: agora/,
   /^Bandidos saíram para saquear o Reino/,/embaixador de .+ (está a caminho|chegou)/,/^Descansad/,/^Casa reformada/,/ subiu para /,/^O Reino Vermelho aprendeu/,
-  /desembarc/,/^Um soldado foi defender/,/foi promovido/,/^Pedido recusado/,/continua na linha de frente/,/prefere seguir lutando/];
+  /desembarc/,/: deu certo \(/,/o general mudou de plano/,/tirou os aldeões do caminho/,/^Um soldado foi defender/,/foi promovido/,/^Pedido recusado/,/continua na linha de frente/,/prefere seguir lutando/];
 const NOTE_HIGH=[/sob ataque/i,/marchando contra você/,/vêm saquear você/,/apareceu no mapa/,/convertido pelo/,/ caiu!/,/ataca(m)? em \d+ segundos/];
 function noteLevel(msg,kind){
   if(performance.now()-(ui.inputT||-1e9)<1500)return 3;
@@ -147,6 +148,28 @@ HOOK.fear=u=>{if(u.team===1&&AT-(ui.fearT||-99)>7){ui.fearT=AT;voxSay(u,'fear',2
 function taunt(team,x,y){let b=null,bd=1e9;for(const e of S.ents){if(e.dead||e.team!==team||!DEF[e.kind].unit||!DEF[e.kind].mil)continue;const d=hyp(e.x-x,e.y-y);if(d<bd){bd=d;b=e;}}if(b&&bd<500)voxSay(b,'taunt',2,true);}
 HOOK.wild=(x,y,n)=>{toast(`Um bando de ${n} saqueadores apareceu no mapa!`,'warn',{x,y});FX.pings.push({x,y,t:0,col:'#c78bff'});playSfx('wild');ui.lastAlarm={x,y};};
 HOOK.loaded=()=>{buildTerrain();buildMiniBase();ui.actKey='';};
+// the war councils: what the masters and the generals decided
+const WAR_LEAD={1:'O general azul',2:'Mestre Rubro'};
+HOOK.war=(team,ev,pl,W,why)=>{
+  if(!S)return;
+  const watch=S.cfg&&S.cfg.watch,P=pl&&WAR_PLANS[pl.type],K=team===1?'Azul':'Vermelho';
+  if(ev==='evac'){if(team===1&&!watch)toast('Mestre Gaspar tirou os aldeões do caminho dos saqueadores.');else if(watch)watchFeed(team,'event',`${team===1?'Mestre Gaspar':'Mestre Rubro'} esconde os aldeões dos saqueadores.`);return;}
+  if(!P)return;
+  if(watch){
+    if(ev==='start')watchFeed(team,'event',`Conselho ${K}: ${P.name} (${P.hist}). ${W.lastN?W.lastN.toLocaleString('pt-BR')+' futuros pesados.':''}`);
+    else if(ev==='strike')watchFeed(team,'event',`${P.name}: o reino ${K.toLowerCase()} ataca agora!`);
+    else if(ev==='done'||ev==='fail')watchFeed(team,'event',`${P.name} ${ev==='done'?'deu certo':'falhou'} (${why||''}).`);
+    return;
+  }
+  if(team===1){
+    const g=byId.get(armyOf(1).gen);
+    if(ev==='start'){if(g)sqSay(g,P.name+'!');toast(`Plano do general: ${P.name}. ${P.hist[0].toUpperCase()+P.hist.slice(1)}.`,'good',g);}
+    else if(ev==='done')toast(`${P.name}: deu certo (${why}).`,'good');
+    else if(ev==='fail')toast(`${P.name}: o general mudou de plano (${why}).`);
+  }else if(ev==='strike'&&['emboscada','fingida','pinca','martelo','diversao'].includes(pl.type)){
+    toast(pl.type==='emboscada'?'Emboscada! Tropas vermelhas estavam escondidas na mata.':pl.type==='fingida'?'Cuidado: a fuga vermelha era uma armadilha!':pl.type==='diversao'?'O ataque vermelho era uma distração: o exército principal vem pelo outro lado!':`O Reino Vermelho fecha o cerco: ${P.name.toLowerCase()}!`,'bad');
+  }
+};
 HOOK.sfx=(name,x,y,team,other)=>{
   const on=x>cam.x-80&&x<cam.x+VW/cam.z+80&&y>cam.y-80&&y<cam.y+VH/cam.z+80;
   if(name==='train'||name==='build'){if(team===1)playSfx(name);return;}
@@ -234,7 +257,7 @@ function showStory(pages,kicker,title,done){
 function storyPage(){
   const st=ui.story,p=st.pages[st.i],sp=speaker(p[0]);
   $('st-kicker').textContent=st.kicker;$('st-title').textContent=st.title;
-  $('st-av').src=`assets/${sp.av}.png`;$('st-who').textContent=sp.name;$('st-text').textContent=heroText(p[1]);
+  $('st-av').src=avURL(sp.av);$('st-who').textContent=sp.name;$('st-text').textContent=heroText(p[1]);
   $('st-pg').textContent=`${st.i+1} de ${st.pages.length}`;
   $('b-st-next').textContent=st.i<st.pages.length-1?'Continuar':'Pronto';
   $('b-st-skip').hidden=st.i>=st.pages.length-1;
@@ -255,7 +278,7 @@ function nextTalk(){
   const el=$('talk');
   if(!talkQ.length){el.hidden=true;return;}
   const [who,text]=talkQ[0],sp=speaker(who);
-  $('tk-av').src=`assets/${sp.av}.png`;$('tk-who').textContent=sp.name;$('tk-text').textContent=heroText(text);
+  $('tk-av').src=avURL(sp.av);$('tk-who').textContent=sp.name;$('tk-text').textContent=heroText(text);
   el.classList.toggle('foe',FOES.includes(who));
   el.style.bottom=($('panel').offsetHeight+10)+'px';
   el.hidden=false;el.style.animation='none';void el.offsetWidth;el.style.animation='';
@@ -281,7 +304,7 @@ function renderAsk(){
   const el=$('ask');const q=S&&S.ask;
   if(!q||!ui.started){el.hidden=true;ui.askId=null;return;}
   if(ui.askId===q.t)return;ui.askId=q.t;
-  $('ak-text').textContent=q.text;$('ak-who').textContent=q.who||'Mestre Gaspar pede autorização';$('ak-av').src=`assets/${q.av||'av05'}.png`;
+  $('ak-text').textContent=q.text;$('ak-who').textContent=q.who||'Mestre Gaspar pede autorização';$('ak-av').src=avURL(q.av||'av05');
   if(q.loc)FX.pings.push({x:q.loc.x,y:q.loc.y,t:0,col:'#ffe066'});
   $('ak-cost').innerHTML=q.cost?'Custo: '+Object.entries(q.cost).map(([k,v])=>`${RES_IMG[k]}${v}`).join(' '):'';
   el.style.bottom=($('panel').offsetHeight+10)+'px';
@@ -707,7 +730,7 @@ function refreshPanel(force){
     h=`<img class="por" alt="" src="${iconFor('castle',1)}"><div class="txt"><h3>${ERAS[T.era].name}</h3><p>${ui.placing?'Escolha onde construir.':'Selecione peões para coletar e construir. No castelo você avança de era.'}</p></div>`;
   }else if(sel.length===1){
     const e=sel[0];
-    const av=e.hero&&HEROES[S.heroKey]?`assets/${HEROES[S.heroKey].av}.png`:CHAR[e.kind]?`assets/${CHAR[e.kind].av}.png`:null;
+    const av=e.hero&&HEROES[S.heroKey]?avURL(HEROES[S.heroKey].av):CHAR[e.kind]?avURL(CHAR[e.kind].av):null;
     h=`<img class="por" alt="" src="${av||iconFor(e.kind,e.team||1)}"><div class="txt"><h3>${unitName(e)}</h3>`+
       (e.maxhp&&e.kind!=='town'?`<div class="hp"><i style="width:${Math.max(0,e.hp/e.maxhp*100)}%"></i></div>`:'')+
       `<p>${e.hero?'Herói · ':''}${statusOf(e)}${e.maxhp&&e.kind!=='town'?` · ${Math.ceil(e.hp)}/${e.maxhp} PV`:''}${rankText(e)}${squadText(e)}${e.ctr?' · <b>contratado</b>':''}</p></div>`;
@@ -1015,7 +1038,7 @@ const reportQ=[];
 function showReport(){
   const el=$('report'),r=reportQ[0];
   if(!r){el.hidden=true;return;}
-  $('rp-av').src=`assets/${r.av}.png`;$('rp-who').textContent=r.who+' traz um relatório';$('rp-title').textContent=r.title+(r.ok?' · cumprido':' · fracassou');
+  $('rp-av').src=avURL(r.av);$('rp-who').textContent=r.who+' traz um relatório';$('rp-title').textContent=r.title+(r.ok?' · cumprido':' · fracassou');
   $('rp-lines').innerHTML=r.lines.map(l=>`<li>${l.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</li>`).join('');
   el.classList.toggle('bad',!r.ok);$('b-rp-see').hidden=!r.loc;
   el.style.top=($('top').getBoundingClientRect().bottom+8)+'px';
@@ -1252,12 +1275,14 @@ ui.seed=newSeed();
 const radio=n=>{const r=document.querySelector(`input[name="${n}"]:checked`);return r?r.value:null;};
 function renderMenu(){
   const mode=radio('mode')||'campaign';
-  $('hero-box').hidden=mode==='skirmish';
+  fjSync();
+  const sk=mode==='skirmish';
+  $('hero-box').hidden=sk&&radio('blue')&&radio('blue')!=='voce';
   $('chap-box').hidden=mode!=='campaign';
-  const cur=radio('hero')||ui.save.hero||'warrior';
-  $('hero-list').innerHTML=Object.entries(HEROES).map(([k,H])=>{
+  let cur=radio('hero')||(sk?ui.save.heroSk||'nenhum':ui.save.hero)||'warrior';if(!HEROES[cur]&&!(sk&&cur==='nenhum'))cur='warrior';
+  $('hero-list').innerHTML=(sk?`<label><input type="radio" name="hero" value="nenhum"${cur==='nenhum'?' checked':''}><span><img alt="" src="assets/ic_fort.png"><b>Sem herói</b><small>Batalha clássica</small><em class="rk">O Reino Vermelho também não tem herói.</em></span></label>`:'')+Object.entries(HEROES).map(([k,H])=>{
     const h=ui.save.heroes[k],rk=h&&(h.kills||h.rank)?`${RANKS[h.rank||0].n}, ${h.kills||0} abates`:H.desc;
-    return `<label><input type="radio" name="hero" value="${k}"${k===cur?' checked':''}><span><img alt="" src="assets/${H.av}.png"><b>${H.name}</b><small>${H.role}</small><em class="rk">${rk}</em></span></label>`;
+    return `<label><input type="radio" name="hero" value="${k}"${k===cur?' checked':''}><span><img alt="" src="${avURL(H.av)}"><b>${H.name}</b><small>${H.role}</small><em class="rk">${rk}</em></span></label>`;
   }).join('');
   const un=ui.save.unlocked||1;
   $('chap-list').innerHTML=CHAPTERS.slice(1).map(C=>`<button type="button" data-ch="${C.n}" class="${C.n===ui.chapter?'on':''}${C.n<un?' done':''}"${C.n>un?' disabled title="Termine o capítulo anterior"':''}><b>${C.n}. ${C.title}</b>${C.n>un?'Bloqueado':C.place}</button>`).join('');
@@ -1279,7 +1304,8 @@ function drawPreview(){
 }
 document.querySelectorAll('input[name="mode"]').forEach(r=>r.addEventListener('change',renderMenu));
 
-$('hero-list').addEventListener('change',()=>{ui.save.hero=radio('hero');writeSave();});
+$('hero-list').addEventListener('change',()=>{const v=radio('hero');if((radio('mode')||'campaign')==='skirmish')ui.save.heroSk=v;else ui.save.hero=v;writeSave();});
+document.querySelectorAll('input[name="blue"]').forEach(r=>r.addEventListener('change',renderMenu));
 $('chap-list').addEventListener('click',ev=>{const b=ev.target.closest('[data-ch]');if(!b||b.disabled)return;ui.chapter=+b.dataset.ch;renderMenu();});
 $('b-reroll').addEventListener('click',()=>{ui.seed=newSeed();drawPreview();playSfx('click');
   if(!ui.started){const c=newGame(ui.seed,'dificil');centerOn(c.x+30,c.y-10);}});
@@ -1294,9 +1320,12 @@ function startGame(p){
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
   const blue=mode==='skirmish'?(p.blue||(['voce','pc','claude'].includes(CLAUDE.cfg.blue)?CLAUDE.cfg.blue:'voce')):'voce',watch=blue!=='voce';
   const opts={mode,relief:p.relief,fog:watch?false:p.fog!=null?p.fog:!!$('opt-fog').checked};
-  if(mode!=='skirmish'){const key=p.hero||radio('hero')||ui.save.hero||'warrior';ui.save.hero=key;writeSave();const h=ui.save.heroes[key]||{};opts.hero={key,kills:h.kills||0,rank:h.rank||0};}
+  fjSync();
+  if(mode!=='skirmish'){let key=p.hero||radio('hero')||ui.save.hero||'warrior';if(!HEROES[key])key='warrior';ui.save.hero=key;writeSave();const h=ui.save.heroes[key]||{};opts.hero={key,kills:h.kills||0,rank:h.rank||0};}
+  else if(!watch){const key=p.hero||radio('hero')||ui.save.heroSk||'nenhum';ui.save.heroSk=key;writeSave();if(HEROES[key]){const h=ui.save.heroes[key]||{};opts.skHero={key,kills:h.kills||0,rank:h.rank||0};}}
   if(mode==='campaign')opts.chapter=p.chapter||ui.chapter;
   const c=newGame(ui.seed,diff,opts);
+  if(opts.skHero)spawnHero(opts.skHero.key,opts.skHero.kills,opts.skHero.rank);
   const vsClaude=mode==='skirmish'&&(p.claude!=null?p.claude:CLAUDE.cfg.foe==='claude');
   if(vsClaude)S.cfg=Object.assign({},S.cfg,{claude:true});
   if(watch){
@@ -1678,6 +1707,8 @@ function boot(data){
     for(const k in iconCache)delete iconCache[k];
     if(S){buildTerrain();buildMiniBase();}
     ui.actKey='';refreshPanel(true);
+    for(const k in AVF)if(!AVF[k])delete AVF[k];
+    if(!$('ov-start').hidden)renderMenu();
   });
   refreshPanel(true);hud();
   requestAnimationFrame(t=>{last=t;frame(t);});
@@ -1689,4 +1720,5 @@ window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTi
   CLAUDE,clApply,clReport,clPrompt,watchStart,watchFeed,watchScore,WATCH:W,aiInit,withTeam,
   walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
+  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,
   setAT(v){AT=v;}};

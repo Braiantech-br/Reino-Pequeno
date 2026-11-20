@@ -3,7 +3,7 @@ const TS=32;let MW=96, MH=64, N=MW*MH;
 // Batalha Rápida plays on a bigger island (twice the area and more); the story chapters keep the classic size
 const mapSizeFor=mode=>mode==='skirmish'?[136,92]:[96,64];
 const WATER=0, GRASS=1, SAND=2, TREE=3, STUMP=4, ROAD=5, PIT=6;
-const HOOK={council(){},honor(){},ctr(){},town(){},army(){},scout(){},econ(){},sos(){},townGrow(){},envoy(){},report(){},ambush(){},svc(){},trained(){},fear(){},village(){},terrain(){},skill(){},tired(){},rested(){},renovated(){},ask(){},raid(){},wildNews(){},engineer(){},diplo(){},built(){},toast(){},sfx(){},tile(){},loaded(){},era(){},over(){},alarm(){},idle(){},rank(){},wild(){},talk(){},goal(){},item(){},wave(){},waveDone(){}};
+const HOOK={war(){},council(){},honor(){},ctr(){},town(){},army(){},scout(){},econ(){},sos(){},townGrow(){},envoy(){},report(){},ambush(){},svc(){},trained(){},fear(){},village(){},terrain(){},skill(){},tired(){},rested(){},renovated(){},ask(){},raid(){},wildNews(){},engineer(){},diplo(){},built(){},toast(){},sfx(){},tile(){},loaded(){},era(){},over(){},alarm(){},idle(){},rank(){},wild(){},talk(){},goal(){},item(){},wave(){},waveDone(){}};
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const hyp=Math.hypot;
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -97,6 +97,19 @@ const DEF={
   crow:   {name:'Corvo Negro',unit:true,mil:true,wild:true,boss:true,noConvert:true,look:{skin:'k',base:'warrior',s:1.3},hp:950,speed:52,r:12,dmg:22,range:20,cd:1.0,sight:220,regen:2,bounty:{gold:200,food:100}},
   violet: {name:'Capitã Violeta',unit:true,mil:true,wild:true,boss:true,noConvert:true,look:{skin:'p',base:'lancer',s:1.25},hp:850,speed:54,r:12,dmg:22,range:32,cd:1.3,sight:220,bounty:{gold:180,food:80}},
   hideout:{name:'Fortaleza dos bandidos',building:true,wild:true,w:3,h:3,hp:1300,look:{skin:'k',base:'barracks'},drop:true,bounty:{gold:280,food:160}},
+  // creatures of the Forja (their sheets are rebuilt in the device from the Tiny Swords ones, see forge.js)
+  skel:   {name:'Esqueleto',unit:true,mil:true,wild:true,noConvert:true,undead:true,look:{f:'esqueleto',base:'warrior'},hp:115,speed:54,r:9,dmg:11,range:18,cd:1.05,sight:200,bounty:{gold:5}},
+  skelA:  {name:'Esqueleto arqueiro',unit:true,mil:true,wild:true,ranged:true,noConvert:true,undead:true,look:{f:'esqarq',base:'archer'},hp:65,speed:56,r:8,dmg:9,range:150,cd:1.4,sight:220,bounty:{gold:6}},
+  orc:    {name:'Orc brutamontes',unit:true,mil:true,wild:true,look:{f:'orc',base:'pawn',s:1.35,atk:'axe'},hp:230,speed:52,r:11,dmg:18,range:22,cd:1.3,sight:200,cleave:28,bounty:{gold:14,food:6}},
+  necro:  {name:'Morvana, a Necromante',unit:true,mil:true,wild:true,boss:true,ranged:true,noConvert:true,undead:true,look:{f:'necro',base:'monk',s:1.35},hp:1150,speed:48,r:12,dmg:17,range:170,cd:1.6,sight:250,proj:'fire',splash:30,drain:.4,summon:{kind:'skel',alt:'skelA',n:2,cd:15,max:8},regen:2,bounty:{gold:260,food:80}},
+  giant:  {name:'Gorm, o Gigante de Pedra',unit:true,mil:true,wild:true,boss:true,noConvert:true,look:{f:'gigante',base:'warrior',s:1.85},hp:2600,speed:38,r:17,dmg:40,range:32,cd:1.9,sight:230,cleave:48,stun:.8,wallx:4,regen:3,bounty:{gold:320,food:120}},
+  // heroes of the Forja (Campanha and Defesa do Rei)
+  hchama: {name:'Cavaleiro em Chamas',unit:true,mil:true,noConvert:true,look:{f:'chama',base:'warrior'},hp:130,speed:58,r:10,dmg:13,range:20,cd:1.0,sight:215,cleave:34},
+  hrunico:{name:'Cavaleiro Rúnico',unit:true,mil:true,noConvert:true,look:{f:'runico',base:'warrior'},hp:145,speed:56,r:10,dmg:12,range:20,cd:1.0,sight:215,stun:.6},
+  hdruida:{name:'Druida do Bosque',unit:true,mil:true,ranged:true,noConvert:true,aura:true,look:{f:'druida',base:'monk',s:1.1},hp:75,speed:52,r:9,dmg:9,range:160,cd:1.3,sight:245,chill:1.6},
+  hsombra:{name:'Caçadora das Sombras',unit:true,mil:true,ranged:true,noConvert:true,look:{f:'sombra',base:'archer'},hp:70,speed:68,r:8,dmg:10,range:200,cd:1.15,sight:260,volley:2},
+  hgelo:  {name:'Lanceira de Gelo',unit:true,mil:true,noConvert:true,look:{f:'gelo',base:'lancer'},hp:160,speed:55,r:10,dmg:15,range:32,cd:1.35,sight:215,chill:2},
+  hanjo:  {name:'Guardiã Celeste',unit:true,mil:true,noConvert:true,aura:true,look:{f:'anjo',base:'lancer'},hp:165,speed:55,r:10,dmg:14,range:32,cd:1.35,sight:220,regen:3},
 };
 const baseKind=k=>DEF[k]&&DEF[k].look?DEF[k].look.base:k;
 // veterancy, Command & Conquer style: a new rank every 3 enemy soldiers defeated; from the third rank on, wounds heal by themselves
@@ -232,6 +245,19 @@ function spawnUnit(kind,team,x,y,extra){
   if(D.boss||D.king)e.face=team===1?1:-1;
   if(D.holy){e.faith=1;e.boltCd=0;e.meteorCd=0;}
   return addEnt(Object.assign(e,extra||{}));
+}
+// a summoner (the Necromancer) raises the dead around it while there are foes in sight
+function summonTick(u,M,dt){
+  u.sumT=(u.sumT==null?M.cd*.5:u.sumT)-dt;if(u.sumT>0)return;
+  u.sumT=M.cd;
+  let foe=false;forNear(u.x,u.y,DEF[u.kind].sight,e=>{if(!foe&&!e.dead&&e.team&&e.team!==u.team&&e.team<3&&DEF[e.kind].unit)foe=true;});
+  if(!foe)return;
+  u.raised=(u.raised||[]).filter(id=>alive(byId.get(id)));
+  for(let k=0;k<M.n&&u.raised.length<M.max;k++){
+    const a=Math.random()*Math.PI*2,x=u.x+Math.cos(a)*34,y=u.y+Math.sin(a)*24;if(!walkPt(x,y))continue;
+    const s=spawnUnit(M.alt&&Math.random()<.35?M.alt:M.kind,u.team,x,y,{summoned:u.id});u.raised.push(s.id);
+    HOOK.sfx('summon',x,y,u.team);
+  }
 }
 function spawnFixed(kind,team,tx,ty,extra){
   const D=DEF[kind];
@@ -1110,6 +1136,7 @@ function update(dt){
   engineerBrain(dt);
   villageMind(dt);
   if(!S.over&&S.ai)aiUpdate(dt);
+  if(!S.over)warUpdate(dt);
   if(!S.over)modeUpdate(dt);
 }
 
@@ -1156,6 +1183,7 @@ function updUnit(u,dt){
     else if(rk>=6)u.hp=Math.min(u.maxhp,u.hp+u.maxhp*.012*rf*.4*dt);
   }
   if(D.feed){u.feedT=(u.feedT||0)-dt;if(u.feedT<=0){u.feedT=4;forNear(u.x,u.y,120,e=>{if(e.dead||e.team!==u.team||!DEF[e.kind].mil||!healable(e)||hyp(e.x-u.x,e.y-u.y)>120)return;e.supT=Math.max(e.supT||0,S.t+6);});}}
+  if(D.summon)summonTick(u,D.summon,dt);
   if(u.stunT>0){u.stunT-=dt;u.moving=false;return;}
   if(!walkPt(u.x,u.y)){const w=nearestWalk(clamp(tileOf(u.x),0,MW-1),clamp(tileOf(u.y),0,MH-1));if(w){u.x=w[0]*TS+16;u.y=w[1]*TS+16;u.path=null;}}
   if(u.kind==='pawn'||u.kind==='engineer'||u.kind==='bpawn')pawnSafety(u,dt);
@@ -1334,6 +1362,8 @@ function doAttack(u,dt){
       if(D.cleave&&!tb)forNear(t.x,t.y,D.cleave+10,e=>{if(e===t||e.dead||!e.team||e.team===u.team||!DEF[e.kind].unit||hyp(e.x-t.x,e.y-t.y)>D.cleave)return;damage(e,dmg*.55,u);});
       if(D.volley&&!tb){let k=D.volley-1;forNear(u.x,u.y,D.range,e=>{if(k<=0||e===t||e.dead||!e.team||e.team===u.team||!DEF[e.kind].unit||hyp(e.x-u.x,e.y-u.y)>D.range)return;k--;shoot(u,e,dmg*.7,u);});}
       if(D.stun&&!tb&&DEF[t.kind].unit&&!DEF[t.kind].boss)t.stunT=Math.max(t.stunT||0,D.stun);
+      if(D.chill&&!tb&&DEF[t.kind].unit&&!DEF[t.kind].boss)t.slowT=Math.max(t.slowT||0,D.chill);
+      if(D.drain&&u.hp<u.maxhp)u.hp=Math.min(u.maxhp,u.hp+dmg*D.drain);
       if(D.siege)HOOK.sfx('ram',t.x,t.y,u.team);
 
     }

@@ -130,7 +130,7 @@ function voxKey(e){
   if(LINES[k])return k;const b=baseKind(k);return LINES[b]?b:'warrior';
 }
 function voxFem(e,key){
-  if(e&&e.hero&&HEROES[S.heroKey]&&/Dona|Dama|Ruiva|Capitã/.test(HEROES[S.heroKey].name))return true;
+  if(e&&e.hero&&HEROES[S.heroKey]&&(HEROES[S.heroKey].fem||/Dona|Dama|Ruiva|Capitã/.test(HEROES[S.heroKey].name)))return true;
   const P=VPROF[key];if(P&&P[3])return true;
   if(key==='pawn')return hash((e?e.id:1)*7+3)<.5;
   return false;

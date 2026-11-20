@@ -40,7 +40,7 @@ function spr(key,frame,x,y,o){
 }
 const pre=t=>t===2?'r_':t===3?'k_':'b_';
 // a look with v keeps the team colours and swaps the metal or the hair (see the generated sprite sheets)
-function skin(e){const L=DEF[e.kind].look;return L?(L.v?(e.team===2?'r':e.team===3?'k':'b')+L.v+'_':L.skin==='b'?pre(e.team):L.skin+'_'):pre(e.team);}
+function skin(e){const L=DEF[e.kind].look;return L?(L.f?fgPre(L.f,e.team):L.v?(e.team===2?'r':e.team===3?'k':'b')+L.v+'_':L.skin==='b'?pre(e.team):L.skin+'_'):pre(e.team);}
 const UNIT_ANCHOR={merchant:[99,136,1],pawn:[96,136,1],warrior:[96,137,1],archer:[94,136,1],lancer:[150,198,.85],monk:[96,134,1]};
 function unitAnim(e){
   const k=baseKind(e.kind),p=skin(e);
@@ -76,6 +76,8 @@ function drawUnit(e){
     const col=D.holy?(era>=5?'rgba(255,214,90,.45)':'rgba(140,200,255,.4)'):(era>=5?'rgba(255,214,90,.35)':'rgba(255,255,255,.18)');
     ell(0,0,D.r+6+Math.sin(AT*4+e.id)*1.5,(D.r+6)*.42,col);
   }
+  const FL=D.look&&D.look.f&&FGR[D.look.f];
+  if(FL)fgBack(e,FL,sc);
   shadow(0,0,D.r+2,3.4);
   // a converted creature keeps its looks, so mark whose side it is on now
   if((D.look&&D.look.skin||D.envoy)&&e.team!==3)ell(0,0,D.r+5,(D.r+5)*.42,null,TEAMC[e.team],2.5);
@@ -85,8 +87,9 @@ function drawUnit(e){
   const frame=fps?Math.floor(AT*fps+e.id*1.7):Math.min(m[2]-1,Math.floor((1-Math.max(0,e.atkT)/.45)*m[2]));
   if(e.hitT>0)ctx.filter='brightness(1.9)';
   if(e.stunT>0)ctx.filter='saturate(.2) brightness(1.3)';
-  spr(key,frame,0,0,{ax:an[0],ay:an[1],s:sc,flip:(e.face||1)<0});
+  spr(key,frame,0,0,{ax:an[0],ay:an[1],s:sc,flip:(e.face||1)<0,alpha:FL&&FL.alpha});
   ctx.filter='none';
+  if(FL)fgFront(e,FL,sc);
   if(e.trader&&!e.moving)drawStallFront(e,sc);
   if(e.stunT>0)for(let i=0;i<3;i++){const a=AT*6+i*2.1;circ(Math.cos(a)*9,-44+Math.sin(a)*3,2.2,'#ffe066');}
   if(e.kind==='pawn'&&e.team===1){
@@ -108,7 +111,7 @@ function drawUnit(e){
     rr(-14,-72,28,4,2,'rgba(30,20,20,.6)');rr(-14,-72,28*q,4,2,'#ffd84a');
   }
   if(e.kind==='wizard'&&Math.sin(AT*3+e.id)>.3){const a=AT*5+e.id,fx=(e.face||1)*10;circ(fx+Math.cos(a)*3,-30*sc+Math.sin(a)*3,1.8,'#ffb347');circ(fx-Math.cos(a)*3,-30*sc-Math.sin(a)*3,1.3,'#ffe28a');}
-  if(e.healT>0){const fk=(e.kind==='wizard'||D.look&&D.look.v?pre(e.team):skin(e))+'monk_fx';spr(fk,Math.floor(AT*14+e.id),0,4,{s:.7,alpha:.85});}
+  if(e.healT>0){const fk=(e.kind==='wizard'||D.look&&(D.look.v||D.look.f)?pre(e.team):skin(e))+'monk_fx';spr(fk,Math.floor(AT*14+e.id),0,4,{s:.7,alpha:.85});}
   if(D.king||D.boss&&!D.wild&&e.kind!=='captain')drawCrown(0,-44*sc-(baseKind(e.kind)==='lancer'?10:0)+Math.sin(AT*2)*1,1,D.king?'#ffd84a':'#ff8a6a');
 }
 // a cart of the delivery services: the driver pulls it, the load shows what it carries
@@ -891,7 +894,7 @@ function iconFor(kind,team){
   const c=document.createElement('canvas');c.width=c.height=96;const prev=ctx;ctx=c.getContext('2d');
   const D=DEF[kind];
   let skey=null;
-  if(D.look)skey=D.look.v?(team===2?'r':'b')+D.look.v+'_'+D.look.base+'_idle':D.look.skin?(D.look.skin==='b'&&team===2?'r':D.look.skin)+'_'+D.look.base+(D.building?'':'_idle'):'m_idle';
+  if(D.look)skey=D.look.f?fgPre(D.look.f,team||1)+D.look.base+'_idle':D.look.v?(team===2?'r':'b')+D.look.v+'_'+D.look.base+'_idle':D.look.skin?(D.look.skin==='b'&&team===2?'r':D.look.skin)+'_'+D.look.base+(D.building?'':'_idle'):'m_idle';
   else if(D.mech)skey=null;
   else if(D.naval||kind==='dock'||kind==='bridge'||D.cart)skey=null;
   else if(kind==='town')skey='y_house3';

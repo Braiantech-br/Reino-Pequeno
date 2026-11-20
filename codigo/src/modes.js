@@ -29,6 +29,12 @@ const HEROES={
   paladin:{kind:'paladin',name:'Dama Celeste',av:'av26',role:'Paladina',desc:'Armadura prateada: cura quem luta ao lado dela e ninguém a converte.'},
   wizard: {kind:'wizard',name:'Mestre Alvar',av:'av27',role:'Mago',desc:'Bolas de fogo que explodem em área. Frágil de perto.'},
   scout:  {kind:'scout',name:'Ruiva',av:'av28',role:'Batedora',desc:'A mais rápida do reino. Caça peões e mercadores e enxerga longe.'},
+  chama:  {kind:'hchama',name:'Sir Brasa',av:'Fchama',role:'Cavaleiro em Chamas',desc:'A espada em chamas acerta todos à frente dele.'},
+  runico: {kind:'hrunico',name:'Sir Varik',av:'Frunico',role:'Cavaleiro Rúnico',desc:'Runas de raio: cada golpe atordoa o inimigo.'},
+  druida: {kind:'hdruida',name:'Mãe Raiz',av:'Fdruida',role:'Druida',desc:'Cura quem está perto e prende os inimigos com raízes (ficam lentos).',fem:true},
+  sombra: {kind:'hsombra',name:'Nyx',av:'Fsombra',role:'Caçadora das Sombras',desc:'A arqueira mais rápida: duas flechas por disparo.',fem:true},
+  gelo:   {kind:'hgelo',name:'Isa',av:'Fgelo',role:'Lanceira de Gelo',desc:'A lança congela: quem ela acerta fica lento.',fem:true},
+  anjo:   {kind:'hanjo',name:'Serafina',av:'Fanjo',role:'Guardiã Celeste',desc:'Aura de luz que cura quem luta ao lado dela.',fem:true},
 };
 const CHAPTERS=[null,
 {n:1,title:'Cinzas na Aldeia',place:'Aldeia de Pedravale',

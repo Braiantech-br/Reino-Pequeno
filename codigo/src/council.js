@@ -15,7 +15,7 @@ function councilBadge(){
   const b=$('svc-n');const v=n||run;b.hidden=!v;b.textContent=v;b.classList.toggle('ask',!!n);
 }
 const fmtLeft=s=>s===Infinity?'sem prazo':fmtT(s);
-function avImg(k){return `<img alt="" src="assets/${k||'av05'}.png">`;}
+function avImg(k){return `<img alt="" src="${avURL(k||'av05')}">`;}
 // ---------------------------------------------------------------- Mensagens
 function cMsg(){
   const qs=[S.ask,...(S.asks||[])].filter(Boolean);
@@ -40,6 +40,9 @@ function cArmy(){
   let h=`<h3 class="c-h">${alive(g)?`${(g.rank||0)>=3?'General':'Chefe eleito'}: ${esc(rankedName(g))}`:'Sem general'} <small>${U.length} soldados · ${A.sq.length} ${A.sq.length===1?'grupo':'grupos'}</small></h3>`;
   h+=`<p class="meta">Quem tem a maior patente comanda o exército; entre iguais, a tropa vota. Cada patente a partir de Soldado comanda um grupo (Soldado 3, Cabo 4, Sargento 6, Tenente 8 + 1 subchefe, Capitão 12 + 2, Major 16 + 3, Comandante todos). Quanto maior a patente, mais vida, força e regeneração.</p>`;
   h+=`<div class="c-ord">${Object.entries(ARMY_ORD).map(([k,n])=>`<button class="btn ${A.ord.type===k?'':'alt'} sm-btn" type="button" data-c="ord:${k}">${n}</button>`).join('')}</div>`;
+  {const W=S.war&&S.war[1],pl=W&&W.plan;
+   h+=A.ord.type==='plano'?`<div class="c-war"><b>Conselho de Guerra</b> · ${pl?`plano atual: <b>${WAR_PLANS[pl.type].name}</b> <small>(${WAR_PLANS[pl.type].hist})</small>`:'o general estuda o mapa'}<br><small>${W?W.evals.toLocaleString('pt-BR'):0} planos avaliados nesta partida${W&&W.hist.length?` · últimos: ${W.hist.slice(0,3).map(x=>WAR_PLANS[x.type].name+(x.ok==null?'':x.ok?' ✓':' ✗')).join(', ')}`:''}</small></div>`
+     :'<p class="meta">Com <b>Plano do general</b>, o general pesa milhares de planos (emboscada na mata, pinça, martelo e bigorna, retirada fingida, guerrilha, sabotagem, ataque de diversão, caçar o comandante) e comanda as tropas sozinho.</p>';}
   if(!A.sq.length)h+='<p class="meta">Ainda não há grupos: o exército precisa de pelo menos 4 soldados. Treine tropas no quartel, na arquearia e no mosteiro.</p>';
   const kids=p=>A.sq.filter(q=>q.par===p);
   const walk=(q,d)=>sqLine(q,d)+kids(q.id).map(k=>walk(k,d+1)).join('');

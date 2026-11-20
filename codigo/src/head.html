@@ -73,6 +73,21 @@
 .heroes small{font-size:11px;color:var(--ink-soft);line-height:1.2}
 .heroes .rk{grid-column:1/-1;font-size:11px;line-height:1.25;color:var(--ink-soft)}
 .heroes input:checked+span{background:#ffe9a8;border-color:#b07d16;box-shadow:0 3px 0 #7a5410}
+.fj-open{margin-top:8px;display:inline-flex;flex-direction:column;align-items:flex-start}.fj-open small{font:400 12px var(--f-ui);opacity:.85}
+#ov-forja{z-index:9}
+.sheet.forja{max-width:860px}
+.fj-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;margin-top:10px;align-items:start}
+.fj-stage canvas{width:100%;max-width:300px;aspect-ratio:1;border:3px solid var(--wood);border-radius:12px;image-rendering:pixelated;display:block}
+.fj-team{display:flex;gap:6px;margin-top:6px}.fj-team button,.fj-chips button{font:600 13px var(--f-ui);padding:5px 9px;border:2px solid var(--wood);border-radius:9px;background:#fff6dd;color:var(--ink);cursor:pointer}
+.fj-team button[aria-pressed="true"],.fj-chips button[aria-pressed="true"]{background:#ffe08a;border-color:#b07d16;box-shadow:inset 0 -2px 0 #b07d16}
+.fj-perk{font-size:13px!important;line-height:1.4!important;margin:8px 0 0!important}
+.fj-opts{display:flex;flex-direction:column;gap:9px;max-height:min(62vh,520px);overflow:auto;padding-right:4px}
+.fj-row{display:grid;grid-template-columns:118px 1fr;gap:8px;align-items:center}.fj-row>b{font:600 13px var(--f-ui);color:var(--wood)}
+.fj-row input{font:600 15px var(--f-ui);padding:6px 9px;border:2px solid var(--wood);border-radius:9px;background:#fffaf0;min-width:0}
+.fj-chips{display:flex;flex-wrap:wrap;gap:5px}
+.fj-chips.sw button.swc{width:28px;height:28px;padding:0;border-radius:50%;font-size:12px;line-height:1}
+.fj-chips.sw button.swc[aria-pressed="true"]{outline:3px solid #b07d16;outline-offset:1px}
+@media (max-width:760px){.fj-grid{grid-template-columns:1fr}.fj-stage{display:grid;grid-template-columns:150px 1fr;gap:8px;align-items:start}.fj-stage canvas{max-width:150px}.fj-team{flex-direction:column}.fj-perk{grid-column:1/-1}.fj-row{grid-template-columns:1fr}.fj-opts{max-height:none}}
 .chapters{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .chapters button{font:600 13px var(--f-ui);padding:6px 10px;border:3px solid var(--wood);border-radius:10px;background:#fff6dd;box-shadow:0 3px 0 var(--wood-dk);cursor:pointer;color:var(--ink);text-align:left}
 .chapters button b{display:block;font:400 19px/1 var(--f-display);color:var(--wood)}
@@ -239,6 +254,21 @@
     <div class="card mini"><canvas id="mini" width="192" height="128" aria-label="Minimapa"></canvas></div>
   </div>
 
+  <div class="overlay" id="ov-forja" hidden>
+    <div class="sheet wide forja" role="dialog" aria-label="Forja de Heróis">
+      <div class="kicker">Crie um herói só seu</div>
+      <h2>Forja de Heróis</h2>
+      <div class="fj-grid">
+        <div class="fj-stage">
+          <canvas id="fj-cv" width="300" height="300" aria-label="Prévia do herói"></canvas>
+          <div class="fj-team"><button type="button" id="fj-t1" aria-pressed="true">Reino Azul</button><button type="button" id="fj-t2" aria-pressed="false">Reino Vermelho</button></div>
+          <p id="fj-perk" class="fj-perk"></p>
+        </div>
+        <div class="fj-opts" id="fj-opts"></div>
+      </div>
+      <div class="row"><button class="btn" id="fj-save" type="button">Salvar herói</button><button class="btn alt" id="fj-rand" type="button">Sortear</button><button class="btn alt" id="fj-close" type="button">Fechar</button></div>
+    </div>
+  </div>
   <div class="overlay" id="ov-start">
     <div class="sheet wide">
       <div class="kicker">Estratégia em tempo real</div>
@@ -253,6 +283,7 @@
       <div id="hero-box">
         <h4 class="lbl">Seu herói</h4>
         <div class="heroes" id="hero-list" role="radiogroup" aria-label="Herói"></div>
+        <button class="btn alt sm-btn fj-open" id="b-forja" type="button">⚒ Forja de Heróis<small>crie um herói só seu</small></button>
       </div>
       <div id="chap-box">
         <h4 class="lbl">Capítulo</h4>
@@ -277,6 +308,12 @@
           <label><input type="radio" name="foe" value="pc" checked><span>Computador<em>A IA do jogo</em></span></label>
           <label><input type="radio" name="foe" value="claude"><span>Claude<em>Estratégia de verdade</em></span></label>
         </div>
+        <div id="cl-aidebox"><p class="cl-side k1">Claude no seu reino</p>
+        <div class="seg" role="radiogroup" aria-label="Claude no seu reino">
+          <label><input type="radio" name="aide" value="off" checked><span>Desligado<em>Só você decide</em></span></label>
+          <label><input type="radio" name="aide" value="conselho"><span>Conselheiro<em>Dicas durante a partida</em></span></label>
+          <label><input type="radio" name="aide" value="generais"><span>Comanda os generais<em>Táticas do exército e o Mestre Gaspar</em></span></label>
+        </div></div>
         <p id="cl-watch" class="cl-watch" hidden><b>Modo observador.</b> As duas máquinas jogam e você assiste: placar, câmera automática e os pensamentos do Claude na tela. Bom para transmitir ao vivo.</p>
         <div id="cl-cfg" class="cl-cfg" hidden>
           <p id="cl-how"></p>

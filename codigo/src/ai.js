@@ -373,6 +373,9 @@ function aiArmy(I){
   if(A.siegeTown!=null){const T=S.towns&&S.towns[A.siegeTown];if(!T||!T.siege||T.siege.team!==ME){A.siegeTown=null;}else if(!A.defending){for(const u of I.army){if(!u.order||u.order.type==='move'&&!u.order.amove){u.order={type:'move',x:T.x+(Math.random()-.5)*60,y:T.y+(Math.random()-.5)*40,amove:true};u.path=null;}}return;}}
   if(A.defending||!I.rally)return;
   if(clArmy(I))return;
+  // the war council (tactics.js) leads the army when it has a plan; the AI below handles the rest
+  const wr=warArmy(I);if(wr==='all')return;
+  if(wr==='some'){I.army=I.army.filter(u=>!u.war);}
   const raidIds=new Set(A.raid?A.raid.ids:[]);
   const main=I.army.filter(u=>!raidIds.has(u.id));
   // raid party: come home when it is spent
@@ -492,6 +495,7 @@ function clApply(o){
   const ex=o.exercito||{};
   if(['atacar','esperar','recuar','saquear','normal'].includes(ex.ordem))p.order=ex.ordem;
   if(ex.alvo)p.target=String(ex.alvo).slice(0,40);
+  if(ex.tatica&&WAR_PLANS[ex.tatica])p.tatica=ex.tatica;
   p.min=Math.round(clNum(ex.minimo,0,80,0));
   if(typeof ex.flanco==='boolean')p.flank=ex.flanco;
   const c=o.contrato;
@@ -501,6 +505,7 @@ function clApply(o){
   p.taunt=String(o.provocacao||'').replace(/\s+/g,' ').trim().slice(0,140);
   if(p.tax!=null&&p.tax!==econOf(ME).tax)econSetTax(ME,p.tax);
   if(p.spy&&!(S.intel&&S.intel[ME]&&S.intel[ME].sweep))p.spyResult=startSweep(ME,'spy');
+  if(p.order==='recuar'||p.tatica&&warOf(ME).plan&&warOf(ME).plan.type!==p.tatica){const W=warOf(ME);if(W.plan)warEnd(W,false,'ordem do Claude');W.next=S.t;}
   if(p.order==='recuar'){const I=aiScan();A.attacking=false;A.retreatT=S.t;A.raid=null;if(I.rally)for(const u of I.army.concat(I.monks)){u.order={type:'move',x:I.rally.x+(Math.random()-.5)*80,y:I.rally.y+(Math.random()-.5)*60};u.path=null;}}
   if(p.order==='atacar'&&old.order!=='atacar')A.target=null;
   A.cl=p;
@@ -567,6 +572,7 @@ function clReport(){
     seus_contratos:ctrList().filter(c=>c.state==='active'&&c.team===ME).map(c=>({tipo:c.kind,vila:S.towns[c.town].name})),
     contratos_do_inimigo:ctrList().filter(c=>c.state==='active'&&c.team===FO).map(c=>({tipo:c.kind,vila:S.towns[c.town].name})),
   };
+  const wn=warNow(ME);if(wn){const W=warOf(ME);r.conselho_de_guerra=Object.assign(wn,{melhores_opcoes_agora:(W.lastC||[]).map(c=>c.type)});}
   const sp=S.intel&&S.intel[ME]&&S.intel[ME].spy;if(sp)r.espionagem={torres_do_inimigo:sp.towers,lado_mais_fraco:sp.weak};
   const last=A.cl;if(last){r.sua_ordem_anterior={estrategia:last.strategy,exercito:last.order,alvo:last.target,contrato:last.ctr?`${last.ctr.kind} com ${S.towns[last.ctr.town].name}: ${{ok:'mensageiro enviado',rep:'recusado, falta amizade',cost:'faltou ouro',dup:'já estava em vigor',busy:'já havia um mensageiro a caminho',hostile:'a vila está em guerra com você',sworn:'a vila é jurada ao inimigo'}[last.ctrResult]||last.ctrResult||'na fila'}`:null,espionagem:last.spy?({ok:'batedor enviado',noscout:'sem batedor livre (treine um scout)'}[last.spyResult]||last.spyResult||'já em andamento'):null};}
   // what changed since the last report

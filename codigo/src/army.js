@@ -11,7 +11,7 @@ const CMD={
   linha:  {name:'Segurar a linha',rank:6,dur:12,cd:60,glyph:'⛨',desc:'Por 12 segundos, o grupo recebe 15% menos dano e não perde o moral.'},
   grito:  {name:'Grito de guerra',rank:7,dur:10,cd:70,glyph:'✷',desc:'Cura 20% da vida de todo o exército em volta e dá +20% de dano por 10 segundos.'},
 };
-const ARMY_ORD={free:'Livre (você comanda)',defend:'Defender a base',attack:'Atacar o inimigo',retreat:'Recuar para o castelo',patrol:'Patrulhar as vilas aliadas'};
+const ARMY_ORD={plano:'Plano do general (táticas automáticas)',free:'Livre (você comanda)',defend:'Defender a base',attack:'Atacar o inimigo',retreat:'Recuar para o castelo',patrol:'Patrulhar as vilas aliadas'};
 function armyOf(team){S.armies=S.armies||{};return S.armies[team]||(S.armies[team]={sq:[],n:0,gen:0,ord:{type:'free'},orgT:0,taskT:0,helpT:0,asked:{}});}
 function sqOf(u){if(!u||!u.sq||!S.armies)return null;const A=S.armies[u.team];if(!A)return null;for(const q of A.sq)if(q.id===u.sq)return q;return null;}
 function sqLeads(u){const q=sqOf(u);return !!q&&q.lead===u.id;}
@@ -209,7 +209,7 @@ function sqGo(q,p,amove,face){
   });
 }
 function armyTask(team){
-  const A=armyOf(team),o=A.ord,c=castleOf(team);if(!c||o.type==='free'||!A.sq.length)return;
+  const A=armyOf(team),o=A.ord,c=castleOf(team);if(!c||o.type==='free'||o.type==='plano'||!A.sq.length)return;
   const foeT=team===1?2:1,foe=castleOf(foeT);
   const live=A.sq.filter(q=>alive(byId.get(q.lead)));
   const ua=underAttack(team);

@@ -5,14 +5,48 @@
 // Two ways to reach Claude: inside claude.ai the page asks Claude on the player's own account (artifact `sample`);
 // anywhere else (downloaded game, site) the player's own Anthropic API key, kept only in this browser.
 function clSide(){return {on:false,busy:false,next:0,lastReal:-1e9,calls:0,fails:0,stopped:'',ctl:null,prevArmy:0,gid:0};}
-const CLAUDE={sample:null,cfg:{blue:'voce',foe:'pc',model:'esperto',modelBlue:'esperto',key:''},side:{1:clSide(),2:clSide()}};
+const CLAUDE={sample:null,cfg:{blue:'voce',foe:'pc',model:'esperto',modelBlue:'esperto',key:'',aide:'off'},side:{1:clSide(),2:clSide()}};
 const CL_MODELS={rapido:{api:'claude-haiku-5-5',tier:'quick',name:'Rápido'},esperto:{api:'claude-sonnet-5-5',tier:'default',name:'Esperto'}};
 const CL_EVERY=60,CL_MIN_REAL=25000;
 const KNAME={1:'Reino Azul',2:'Reino Vermelho'},KCOLOR={1:'azul',2:'vermelho'},KENG={1:'Mestre Gaspar',2:'Mestre Rubro'},KVOICE={1:'gasparcl',2:'rubro'};
 function clLoadCfg(){try{const c=JSON.parse(localStorage.getItem('rp.claude')||'{}');Object.assign(CLAUDE.cfg,c);}catch(e){}}
 function clSaveCfg(){try{localStorage.setItem('rp.claude',JSON.stringify(CLAUDE.cfg));}catch(e){}}
 function clVia(){return CLAUDE.sample?'conta':CLAUDE.cfg.key?'chave':'';}
-function clWants(team){if(!S||S.mode!=='skirmish'||!S.cfg)return false;return team===2?!!S.cfg.claude:!!(S.cfg.watch&&S.cfg.blue==='claude');}
+function clWants(team){if(!S||S.mode!=='skirmish'||!S.cfg)return false;return team===2?!!S.cfg.claude:!!(S.cfg.watch&&S.cfg.blue==='claude'||clAide());}
+// Claude in the player's own kingdom: an adviser, or the one who leads the generals and Mestre Gaspar
+function clAide(){return S&&S.cfg&&!S.cfg.watch&&S.mode==='skirmish'&&['conselho','generais'].includes(CLAUDE.cfg.aide)?CLAUDE.cfg.aide:'';}
+function clAideRules(){
+  const g=clAide()==='generais';
+  return `Você é o Claude, conselheiro de guerra do Reino Azul em Reino Pequeno, um jogo de estratégia medieval em tempo real (estilo Age of Empires). Quem joga o Reino Azul é uma pessoa: ela cuida da economia e das construções. ${g?'Você comanda os generais do exército dela (o Conselho de Guerra) e orienta o Mestre Gaspar, o engenheiro.':'Você só aconselha: dicas curtas, práticas e animadas.'}
+O inimigo é o Reino Vermelho (o computador, com o Mestre Rubro). Unidades: guerreiro vence arqueiro, arqueiro vence lanceiro, lanceiro vence guerreiro; monges curam e convertem; torres no alto são fortes; muralhas e fossos seguram ataques.
+${g?`O Conselho de Guerra pesa milhares de planos sozinho; você escolhe a direção. Táticas: assalto, pinca (cerco pelos dois lados), martelo (infantaria segura de frente, a tropa rápida bate por trás), emboscada (esconder o exército na mata no caminho do inimigo), fingida (retirada fingida até a armadilha), guerrilha (bater nos aldeões e sumir), sabotagem (fazendas, mercado, carroças, o engenheiro), diversao (atacar um lado e entrar pelo outro), decapitar (caçar o general ou o herói) e defesa.
+Responda só com JSON: {"pensamento":"leitura da situação, até 200 caracteres","ordem":"normal","tatica":"","evacuar":true,"dicas":["dica curta para o jogador"]}
+ordem = atacar, esperar, saquear ou normal. tatica = uma das táticas ou vazio para o Conselho escolher. evacuar = o Mestre Gaspar tira os aldeões do caminho dos saqueadores. dicas = até 2 dicas para o jogador (economia, prédios, tropas), até 120 caracteres cada.`
+:`Responda só com JSON: {"pensamento":"leitura da situação, até 200 caracteres","dicas":["dica 1","dica 2","dica 3"]}
+dicas = de 1 a 3 dicas para o jogador agora (o que construir, treinar, onde atacar, como se defender), até 120 caracteres cada, em português, diretas.`}
+No relatório, "voce" é o Reino Azul (o jogador) e "inimigo" é o Reino Vermelho.
+RELATÓRIO`;
+}
+function clAideApply(o){
+  if(!o||typeof o!=='object')return null;
+  const mode=clAide(),W=warOf(1);
+  const p={t:S.t,thought:String(o.pensamento||'').replace(/\s+/g,' ').trim().slice(0,240),tips:(Array.isArray(o.dicas)?o.dicas:[]).map(x=>String(x).replace(/\s+/g,' ').trim().slice(0,140)).filter(Boolean).slice(0,3)};
+  if(mode==='generais'){
+    const ord=['atacar','esperar','saquear','normal'].includes(o.ordem)?o.ordem:'normal';
+    W.cl={order:ord==='normal'?'':ord,tatica:WAR_PLANS[o.tatica]?o.tatica:'',until:S.t+150};
+    if(armyOf(1).ord.type!=='plano')armyOrder(1,'plano');
+    if(W.plan&&W.cl.tatica&&W.plan.type!==W.cl.tatica)withTeam(1,()=>warEnd(W,false,'ordem do Claude'));
+    W.next=S.t;
+    if(typeof o.evacuar==='boolean'){S.rules=S.rules||{};S.rules.evacuar=o.evacuar;}
+    p.order=ord;p.tatica=W.cl.tatica;
+  }
+  (CLAUDE.aideLog=CLAUDE.aideLog||[]).push(p);if(CLAUDE.aideLog.length>60)CLAUDE.aideLog.shift();
+  const head=mode==='generais'?(p.tatica?`Plano: ${WAR_PLANS[p.tatica].name}. `:p.order&&p.order!=='normal'?`Ordem: ${p.order}. `:''):'';
+  cLog(`Claude (conselheiro): ${p.thought}`,'good');
+  for(const t of p.tips)cLog(`Dica do Claude: ${t}`,'good');
+  const say=(head+(p.tips[0]||p.thought)).slice(0,220);if(say)talk('gasparcl',say);
+  return p;
+}
 function clModel(team){return CL_MODELS[team===1?CLAUDE.cfg.modelBlue:CLAUDE.cfg.model]||CL_MODELS.esperto;}
 function clAnyOn(){return CLAUDE.side[1].on||CLAUDE.side[2].on;}
 // the rules Claude reads, written for the kingdom it commands
@@ -35,8 +69,8 @@ REGRAS
 
 RESPOSTA
 Responda só com um objeto JSON neste formato, sem nenhum texto fora dele:
-{"pensamento":"leitura da situação e plano, até 200 caracteres","estrategia":"economia","economia":{"comida":0.4,"madeira":0.3,"ouro":0.3},"aldeoes":0,"era":"normal","construir":["tower"],"treinar":{"warrior":3,"archer":2},"exercito":{"ordem":"normal","alvo":"castelo","minimo":12,"flanco":true},"contrato":null,"espionar":false,"impostos":2,"provocacao":""}
-Campos: estrategia = economia, rush, defesa, tecnologia, cerco ou diplomacia. economia = pesos dos aldeões em cada recurso. aldeoes = ajuste na meta de aldeões, de -6 a 8. era = agora, esperar ou normal. construir = até 3 prédios prioritários. treinar = pesos da mistura de tropas (só tropas da sua era ou abaixo). exercito.ordem = atacar, esperar, recuar, saquear (atacar aldeões) ou normal; alvo = castelo, torres, economia, quartel ou vila:<nome>; minimo = tamanho do exército para partir; flanco = mandar um grupo pelo lado. contrato = {"tipo":"merc","vila":"<nome>","minutos":10} ou null (só com vilas que gostam de você e se houver ouro). espionar = mandar o batedor ver a base inimiga. impostos = 0 a 4. provocacao = uma frase curta e divertida do ${eng} para ${who}, em português, sem palavrão nem ofensa pessoal; deixe vazio em metade das ordens.
+{"pensamento":"leitura da situação e plano, até 200 caracteres","estrategia":"economia","economia":{"comida":0.4,"madeira":0.3,"ouro":0.3},"aldeoes":0,"era":"normal","construir":["tower"],"treinar":{"warrior":3,"archer":2},"exercito":{"ordem":"normal","alvo":"castelo","minimo":12,"flanco":true,"tatica":""},"contrato":null,"espionar":false,"impostos":2,"provocacao":""}
+Campos: estrategia = economia, rush, defesa, tecnologia, cerco ou diplomacia. economia = pesos dos aldeões em cada recurso. aldeoes = ajuste na meta de aldeões, de -6 a 8. era = agora, esperar ou normal. construir = até 3 prédios prioritários. treinar = pesos da mistura de tropas (só tropas da sua era ou abaixo). exercito.ordem = atacar, esperar, recuar, saquear (atacar aldeões) ou normal; alvo = castelo, torres, economia, quartel ou vila:<nome>; minimo = tamanho do exército para partir; flanco = mandar um grupo pelo lado. tatica = o plano que o seu Conselho de Guerra (o mestre e os generais) deve executar, ou vazio para ele escolher sozinho depois de pesar milhares de planos: assalto, pinca (cerco pelos dois lados), martelo (infantaria segura de frente e a tropa rápida bate por trás), emboscada (esconder o exército na mata no caminho do inimigo), fingida (retirada fingida para puxar o inimigo até a armadilha), guerrilha (bater nos aldeões e sumir), sabotagem (fazendas, mercado, carroças, o engenheiro), diversao (atacar um lado e entrar pelo outro), decapitar (caçar o general ou o herói) ou defesa. contrato = {"tipo":"merc","vila":"<nome>","minutos":10} ou null (só com vilas que gostam de você e se houver ouro). espionar = mandar o batedor ver a base inimiga. impostos = 0 a 4. provocacao = uma frase curta e divertida do ${eng} para ${who}, em português, sem palavrão nem ofensa pessoal; deixe vazio em metade das ordens.
 Dicas: treine o que vence a maioria das tropas inimigas; ataque quando estiver claramente mais forte e recue se estiver perdendo feio; avance de era quando a economia aguentar; contrate mercenários de uma vila amiga antes de um ataque grande; não fique parado com recursos sobrando.
 
 RELATÓRIO`;
@@ -73,9 +107,10 @@ function clTurn(team,why){
   const C=CLAUDE.side[team];
   if(!C.on||C.busy||C.stopped||!S||S.over)return;
   C.busy=true;C.lastReal=performance.now();clChip();
-  const prompt=clPrompt(team),gameId=C.gid,K=KNAME[team];
+  const aide=team===1&&clAide(),prompt=aide?clAideRules()+'\n'+JSON.stringify(withTeam(1,()=>clReport())):clPrompt(team),gameId=C.gid,K=KNAME[team];
   clAsk(prompt,team).then(o=>{
     C.busy=false;if(!S||C.gid!==gameId||!C.on)return;
+    if(aide){const q=clAideApply(o);if(!q){C.fails++;C.next=S.t+CL_EVERY;clChip();return;}C.calls++;C.fails=0;C.next=S.t+(aide==='conselho'?90:60);clChip();return;}
     const p=withTeam(team,()=>clApply(o));
     if(!p){C.fails++;C.next=S.t+CL_EVERY;clChip();return;}
     C.calls++;C.fails=0;C.next=S.t+(p.order==='atacar'?45:CL_EVERY);
@@ -147,7 +182,7 @@ function clStart(fresh){
   // the first call comes from the player's click (it may ask for permission); with two Claudes the second waits a bit
   for(const team of [2,1]){
     const C=CLAUDE.side[team];if(!C.on)continue;
-    cLog(`O Claude comanda o ${KNAME[team]} (${clModel(team).name}).`,team===2?'bad':'good');
+    cLog(team===1&&clAide()?(clAide()==='generais'?`O Claude comanda os seus generais e o Mestre Gaspar (${clModel(1).name}).`:`O Claude é o seu conselheiro (${clModel(1).name}).`):`O Claude comanda o ${KNAME[team]} (${clModel(team).name}).`,team===2?'bad':'good');
     if(!first){first=team;clTurn(team,'inicio');}
     else C.lastReal=performance.now()-CL_MIN_REAL+12000;
   }
@@ -162,10 +197,11 @@ function clMenu(){
   document.querySelector(`input[name=blue][value=${blue}]`).checked=true;
   document.querySelector(`input[name=clm][value=${c.model}]`).checked=true;
   document.querySelector(`input[name=clmb][value=${c.modelBlue||'esperto'}]`).checked=true;
-  const any=red==='claude'||blue==='claude',two=red==='claude'&&blue==='claude';
+  const any=red==='claude'||blue==='claude'||blue==='voce'&&['conselho','generais'].includes(c.aide),two=red==='claude'&&(blue==='claude'||blue==='voce'&&['conselho','generais'].includes(c.aide));
   $('cl-watch').hidden=blue==='voce';
+  const aide=['off','conselho','generais'].includes(c.aide)?c.aide:'off';document.querySelector(`input[name=aide][value=${aide}]`).checked=true;$('cl-aidebox').hidden=blue!=='voce';
   $('cl-cfg').hidden=!any;
-  $('cl-mb').hidden=blue!=='claude';$('cl-mr').hidden=red!=='claude';
+  $('cl-mb').hidden=!(blue==='claude'||blue==='voce'&&['conselho','generais'].includes(c.aide));$('cl-mr').hidden=red!=='claude';
   $('cl-keyrow').hidden=!!CLAUDE.sample;
   if($('cl-key')!==document.activeElement)$('cl-key').value=c.key||'';
   const n=two?'São duas ordens por minuto de jogo (uma de cada Claude): uma partida de 30 minutos são umas 60 ordens.':'Uma partida de 30 minutos são umas 30 ordens.';
@@ -183,6 +219,7 @@ function clBind(){
   document.querySelectorAll('input[name=foe]').forEach(r=>r.addEventListener('change',()=>{CLAUDE.cfg.foe=r.value;clSaveCfg();clMenu();}));
   document.querySelectorAll('input[name=blue]').forEach(r=>r.addEventListener('change',()=>{CLAUDE.cfg.blue=r.value;clSaveCfg();clMenu();}));
   document.querySelectorAll('input[name=clm]').forEach(r=>r.addEventListener('change',()=>{CLAUDE.cfg.model=r.value;clSaveCfg();}));
+  document.querySelectorAll('input[name=aide]').forEach(r=>r.addEventListener('change',()=>{CLAUDE.cfg.aide=r.value;clSaveCfg();clMenu();}));
   document.querySelectorAll('input[name=clmb]').forEach(r=>r.addEventListener('change',()=>{CLAUDE.cfg.modelBlue=r.value;clSaveCfg();}));
   document.querySelectorAll('input[name=mode]').forEach(r=>r.addEventListener('change',clMenu));
   $('cl-key').addEventListener('change',()=>{CLAUDE.cfg.key=$('cl-key').value.trim();clSaveCfg();$('cl-status').textContent=CLAUDE.cfg.key?'Chave guardada neste aparelho.':'';});
