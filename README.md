@@ -4,13 +4,13 @@ Estratégia medieval em tempo real, no estilo Age of Empires, Stronghold e Warcr
 
 Construa a vila, avance pelas cinco eras, negocie com as vilas neutras, contrate mercenários e heróis, monte o exército com generais e derrube o castelo do Reino Vermelho. Roda no navegador, no computador e no celular, inclusive sem internet.
 
-## Trailer da 2.2: Claude × Claude
+## Vídeo da atualização 2.3
 
-[![Trailer do Reino Pequeno 2.2 (clique para assistir)](trailer/previa-2.2.gif)](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.2-Trailer.mp4)
+[![Vídeo da atualização 2.3 do Reino Pequeno (clique para assistir)](trailer/previa-2.3.gif)](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.3-Atualizacao.mp4)
 
-▶ [Assistir no navegador](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.2-Trailer.mp4) · [Baixar o trailer (horizontal, 1080p)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.2-Trailer.mp4) · [Baixar a versão vertical (Reels, Shorts, TikTok, Status)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.2-Trailer-vertical.mp4)
+▶ [Assistir no navegador](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.3-Atualizacao.mp4) · [Baixar o vídeo (horizontal, 1080p)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.3-Atualizacao.mp4) · [Baixar a versão vertical (TikTok, Reels, Shorts, Status)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.3-Atualizacao-vertical.mp4)
 
-Os trailers anteriores estão na pasta [trailer/old](trailer/old/).
+Os trailers anteriores (2.1 e 2.2: Claude × Claude) estão na pasta [trailer/old](trailer/old/).
 
 ## Jogar
 

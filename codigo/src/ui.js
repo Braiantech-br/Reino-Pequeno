@@ -1772,5 +1772,5 @@ window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTi
   CLAUDE,clApply,clReport,clPrompt,watchStart,watchFeed,watchScore,WATCH:W,aiInit,withTeam,
   walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
-  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},get NET(){return NET},netSend,lvReel,lvRecTick,lvRecStop,lvVoteStart,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
+  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},get NET(){return NET},netSend,lvReel,lvRecTick,lvRecStop,lvVoteStart,lvVoteDraw,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
   setAT(v){AT=v;}};

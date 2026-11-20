@@ -5,6 +5,7 @@ Os vídeos prontos ficam na pasta [`trailer/`](../../trailer/), na raiz do repos
 
 | Trailer | Roteiro | Trilha |
 |---|---|---|
+| 2.3 — vídeo da atualização: Forja, Conselho de Guerra, dois jogadores, lives (48 s) | `scenes-2.3.js` | `audio-2.3.py` |
 | 2.2 — Claude × Claude, modo observador (53 s) | `scenes-2.2.js` | `audio-2.2.py` |
 | 2.1 — o Claude comanda o Reino Vermelho (53 s) | `scenes-2.1.js` | `audio-2.1.py` |
 | 2.0 — contratos, exército e conquista (61 s) | `scenes-2.0.js` | `audio-2.0.py` |
@@ -14,7 +15,7 @@ Os vídeos prontos ficam na pasta [`trailer/`](../../trailer/), na raiz do repos
 3. Sirva a pasta `codigo/`: `cd codigo && python -m http.server 8765`.
 4. Instale o Playwright (`npm i playwright` e `npx playwright install chromium`).
 5. Grave os quadros: `node codigo/trailer/rec.js quadros` (para o vertical: `node codigo/trailer/rec.js quadros_v 1 0 "" 1080 1920`).
-   Para um trailer antigo: `CENAS=scenes-2.1.js node codigo/trailer/rec.js quadros`.
+   Por padrão grava o roteiro 2.2; para outro: `CENAS=scenes-2.3.js node codigo/trailer/rec.js quadros`.
 6. Gere a trilha: `python codigo/trailer/audio-2.2.py trilha.wav` (precisa do numpy e do scipy).
 7. Junte tudo com o ffmpeg: `codigo/trailer/assemble.sh quadros ReinoPequeno-2.2-Trailer.mp4 trilha.wav 29`.
 
