@@ -1610,7 +1610,8 @@ const STEP=1/30;
 let last=performance.now(),hudT=0,acc=0;
 function frame(now){
   const rdt=Math.min(.1,(now-last)/1000);last=now;AT+=rdt;
-  if(S&&ui.started&&!ui.paused&&!S.over){
+  if(NET.on)netTick(rdt);
+  if(S&&ui.started&&!ui.paused&&!S.over&&!netGuest()){
     acc+=rdt*ui.speed;let n=0;
     while(acc>=STEP&&n<10){update(STEP);acc-=STEP;n++;}
     if(n>=10)acc=0;
@@ -1771,5 +1772,5 @@ window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTi
   CLAUDE,clApply,clReport,clPrompt,watchStart,watchFeed,watchScore,WATCH:W,aiInit,withTeam,
   walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
-  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},lvReel,lvRecTick,lvRecStop,lvVoteStart,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
+  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},get NET(){return NET},netSend,lvReel,lvRecTick,lvRecStop,lvVoteStart,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
   setAT(v){AT=v;}};

@@ -113,7 +113,7 @@ async function edUncode(code){
     let inf={};try{inf=JSON.parse(localStorage.getItem(MAP_PRE+id+'.info')||'{}');}catch(e){}
     if(a==='play'&&raw)edPlayData(raw);
     else if(a==='edit'&&raw)edEdit(raw,id,inf.name);
-    else if(a==='share'&&raw){el('mp-code').value='Gerando o código…';const code=await edCode(JSON.stringify({name:inf.name||'Mapa',data:raw}));el('mp-code').value=code;el('mp-code').select();try{navigator.clipboard&&navigator.clipboard.writeText(code);toast('Código do mapa copiado. Mande para um amigo colar em Meus mapas.','good');}catch(e){}}
+    else if(a==='share'&&raw){el('mp-code').value='Gerando o código…';const code=await edCode(JSON.stringify({name:inf.name||'Mapa',data:raw}));el('mp-code').value=code;el('mp-code').select();try{navigator.clipboard&&navigator.clipboard.writeText(code).catch(()=>{});toast('Código do mapa copiado. Mande para um amigo colar em Meus mapas.','good');}catch(e){}}
     else if(a==='del'){if(b.dataset.ok){localStorage.removeItem(MAP_PRE+id);localStorage.removeItem(MAP_PRE+id+'.info');edMaps();}else{b.dataset.ok='1';b.textContent='Apagar mesmo?';b.classList.add('danger');}}
   });
   el('mp-import').addEventListener('click',async()=>{
