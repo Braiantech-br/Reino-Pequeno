@@ -28,6 +28,11 @@ Os instaladores ficam na pasta [downloads](downloads/). Depois de instalado, o j
 As versões anteriores continuam disponíveis em [downloads/old](downloads/old/).
 Instruções para cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
 
+## Novidades da versão 2.3.1
+
+- **Dois jogadores:** o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos, ordens do exército e batedores.
+- **Votação do público mais simples:** *Chat da Twitch* (o jogo conta os votos sozinho), *Outro chat* (TikTok, YouTube, Instagram: você marca os votos tocando na opção) ou *Sorteio*. Tem botão para testar e intervalo de 2, 3 ou 5 minutos.
+
 ## Novidades da versão 2.3
 
 - **Forja de Heróis:** monte um herói só seu (classe, cores, pluma de fogo ou de gelo, olhos que brilham, coroa ou chifres, aura e poder) e leve-o para a batalha.

@@ -1,5 +1,5 @@
 ﻿==============================================================================
-  REINO PEQUENO  ·  versão 2.3  ·  20 de novembro de 2026
+  REINO PEQUENO  ·  versão 2.3.1  ·  20 de novembro de 2026
   Estratégia medieval em tempo real  ·  Braian Tech
 ==============================================================================
 
@@ -29,7 +29,7 @@ fica guardado apenas no aparelho. A internet só é usada quando VOCÊ toca em
 ==============================================================================
 
   Cada sistema tem o seu próprio arquivo para baixar (nos Releases, o nome
-  traz o número da versão, como em ReinoPequeno-2.3-Windows.zip):
+  traz o número da versão, como em ReinoPequeno-2.3.1-Windows.zip):
 
   ReinoPequeno-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
   ReinoPequeno-Mac.zip .......... Reino Pequeno.app
@@ -874,17 +874,26 @@ e vozes embutidas, e o mesmo botão de atualização.
   código para o amigo (pelo WhatsApp, por exemplo); o amigo cola o convite,
   toca em "Entrar" e manda de volta o código de resposta; o anfitrião cola a
   resposta e a partida começa. O anfitrião comanda o Reino Azul e o amigo, o
-  Vermelho (na tela do amigo, o reino dele aparece em azul). A conexão é
-  direta entre os aparelhos, sem servidor do jogo: funciona melhor no mesmo
-  Wi-Fi; pela internet, depende da rede de cada um. Se o amigo sair, o
-  computador assume o Reino Vermelho.
+  Vermelho (na tela do amigo, o reino dele aparece em azul). Os dois usam o
+  Conselho inteiro: contratos, diplomacia, conquista, economia e exército.
+  A conexão é direta entre os aparelhos, sem servidor do jogo: funciona
+  melhor no mesmo Wi-Fi; pela internet, depende da rede de cada um. Se o
+  amigo sair, o computador assume o Reino Vermelho.
 
  6.30 TRANSMISSÃO AO VIVO (Som e avisos)
-  Votação do público: de tempos em tempos aparecem três eventos (chuva de
-  fogo, mercenários, ouro, bênção, bandidos, mortos-vivos, o Gigante de Pedra,
-  tempestade). Os espectadores votam com !1, !2 ou !3 no chat da Twitch (o
-  jogo só lê o chat, sem login), ou você aperta 1, 2 e 3 para os votos de
-  qualquer outro chat. O mais votado acontece na hora.
+  Votação do público (escolha o modo em Som e avisos):
+    Chat da Twitch ...... escreva o nome do seu canal. De tempos em tempos
+                          (2, 3 ou 5 minutos) aparecem três eventos na tela;
+                          quem assiste digita !1, !2 ou !3 no chat e o jogo
+                          conta sozinho (só lê o chat, sem login). Depois de
+                          30 segundos, o mais votado acontece.
+    Outro chat .......... para TikTok, YouTube, Instagram ou qualquer outro:
+                          quem assiste comenta 1, 2 ou 3, e você marca os
+                          votos tocando na opção ou nas teclas 1, 2 e 3.
+    Sorteio ............. sem chat: o jogo mostra três eventos e sorteia um.
+  Os eventos: chuva de fogo, mercenários, ouro, bênção (cura o exército),
+  bandidos, mortos-vivos, o Gigante de Pedra e tempestade. Sem votos, o jogo
+  sorteia. "Testar a votação agora" mostra uma votação na hora.
   Locutor: narra as batalhas em voz alta, com as falas do jogo ou do Claude.
   Gravar melhores momentos: as batalhas são gravadas da tela enquanto
   acontecem; no fim da partida, toque em "Vídeo horizontal" ou "Vídeo
@@ -995,16 +1004,10 @@ e vozes embutidas, e o mesmo botão de atualização.
 
   Código-fonte e versões: https://github.com/Braiantech-br/Reino-Pequeno
 
-  Versão 2.3 (20 de novembro de 2026)
-    - Forja de Heróis: monte um herói só seu (classe, cores, pluma, olhos que brilham, coroa ou chifres, aura e poder) e leve-o para a batalha.
-    - Personagens novos feitos a partir da arte original: seis heróis (Sir Brasa, Sir Varik, Mãe Raiz, Nyx, Isa e Serafina), esqueletos, orcs, Morvana, a Necromante, e Gorm, o Gigante de Pedra.
-    - Conselho de Guerra: o Mestre Rubro e os generais pesam milhares de planos por decisão (mais de um milhão por partida) e usam táticas da história: emboscada na mata, pinça, martelo e bigorna, retirada fingida, guerrilha, sabotagem, diversão e caça ao comandante.
-    - "Plano do general": o seu general escolhe e comanda as táticas sozinho. Os mestres tiram os aldeões do caminho dos saqueadores.
-    - Claude no seu reino: conselheiro com dicas ou comandante dos seus generais e do Mestre Gaspar. O Claude do Reino Vermelho também escolhe táticas.
-    - Dois jogadores, cada um no seu aparelho, com convite por código e conexão direta.
-    - Capítulos 6 e 7 da campanha (A Névoa dos Mortos e O Gigante da Montanha), navio de guerra e editor de mapas com código para compartilhar.
-    - Para lives: votação do público pelo chat da Twitch ou pelo teclado, locutor das batalhas e vídeo com os melhores momentos.
-    - Três espaços de partidas salvas, tutorial de 5 minutos e correção das letras "fi" que apareciam trocadas em alguns textos.
+  Versão 2.3.1 (20 de novembro de 2026)
+    - Dois jogadores: o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos e festas, ordens do exército, batedores e pedidos.
+    - Votação do público mais simples: Chat da Twitch (conta sozinha), Outro chat (para TikTok, YouTube ou Instagram: você marca os votos tocando na opção ou nas teclas 1, 2 e 3) ou Sorteio, sem chat.
+    - Botão "Testar a votação agora", intervalo de 2, 3 ou 5 minutos e explicação de cada modo em Som e avisos. Sem votos, o jogo sorteia e avisa.
 
   Versão 1.15 (outubro de 2026)
     - Sino das vilas: pedir e dar socorro, favores entre vilas e reino.

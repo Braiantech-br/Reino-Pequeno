@@ -1,0 +1,3 @@
+Dois jogadores: o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos e festas, ordens do exército, batedores e pedidos.
+Votação do público mais simples: Chat da Twitch (conta sozinha), Outro chat (para TikTok, YouTube ou Instagram: você marca os votos tocando na opção ou nas teclas 1, 2 e 3) ou Sorteio, sem chat.
+Botão "Testar a votação agora", intervalo de 2, 3 ou 5 minutos e explicação de cada modo em Som e avisos. Sem votos, o jogo sorteia e avisa.

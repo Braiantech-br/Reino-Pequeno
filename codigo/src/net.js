@@ -78,21 +78,63 @@ function netHostMsg(o){
   else if(o.t==='bq'){const b=byId.get(o.id);if(!b||b.dead||b.team!==2)return;if(o.rally)b.rally=o.rally;const add=(o.q||[]).slice((b.queue||[]).length);for(const k of add)if(DEF[k])trainAt(b,k);}
   else if(o.t==='place'){const bl=(o.b||[]).map(id=>byId.get(id)).filter(u=>u&&!u.dead&&u.team===2);placeBuilding(2,o.k,o.x,o.y,bl);}
   else if(o.t==='res')startResearch(2);
+  else if(o.t==='fn'&&NET_FN.includes(o.f))netAsGuest(()=>{const fn=NET_FNS[o.f];if(fn)fn(...netArgsIn(o.a||[]));});
 }
+// the Council, the villages and the army orders of the friend: run here, in a world turned around for a moment so that the
+// friend's kingdom is the "player" one (the same functions the host's own buttons use), with the screen messages muted
+const NET_FN=['proposeContract','ctrCancel','ctrRenew','startConquest','townFestival','askHelp','caravanSend','trade','barter','econSetTax','econOpenStall','econFestival',
+  'armyOrder','sqCommand','startSweep','planApprove','planReject','cancelResearch','placeWall','demolish','townRaid','svcOrder'];
+const NET_FNS={};
+function netAsGuest(fn){
+  const H={};for(const k in HOOK){H[k]=HOOK[k];HOOK[k]=()=>{};}
+  netSwap(S);
+  try{return fn();}catch(e){}
+  finally{netSwap(S);for(const k in H)HOOK[k]=H[k];}
+}
+function netArgOut(v){
+  if(v&&typeof v==='object'){
+    if(v.id!=null&&v.kind&&byId.get(v.id)===v)return {__id:v.id};
+    if(v.lead!=null&&Array.isArray(v.mem))return {__sq:v.id};
+    if(Array.isArray(v))return v.map(netArgOut);
+    const o={};for(const k in v)o[k]=netArgOut(v[k]);return o;
+  }
+  return v;
+}
+function netArgsIn(a){
+  const f=v=>{if(v&&typeof v==='object'){if(v.__id!=null)return byId.get(v.__id);if(v.__sq!=null){const A=S.armies&&S.armies[1];return A&&A.sq.find(q=>q.id===v.__sq);}
+    if(Array.isArray(v))return v.map(f);const o={};for(const k in v)o[k]=f(v[k]);return o;}return v;};
+  return a.map(f);
+}
+// on the friend's device each of these goes to the host too (and runs here at once, so the screen answers right away)
+function netWrap(){
+  const wrap=(name,orig,set)=>{NET_FNS[name]=orig;set(function(...a){
+    if(netGuest()){netSend({t:'fn',f:name,a:a.map(netArgOut)});const r=orig.apply(this,a);for(const e of S.ents){NET.known.add(e.id);if(e.team===1&&DEF[e.kind].unit)NET.base[e.id]=e.order?JSON.stringify(e.order):'';}return r;}
+    return orig.apply(this,a);});};
+  wrap('proposeContract',proposeContract,f=>proposeContract=f);wrap('ctrCancel',ctrCancel,f=>ctrCancel=f);wrap('ctrRenew',ctrRenew,f=>ctrRenew=f);
+  wrap('startConquest',startConquest,f=>startConquest=f);wrap('townFestival',townFestival,f=>townFestival=f);wrap('askHelp',askHelp,f=>askHelp=f);
+  wrap('caravanSend',caravanSend,f=>caravanSend=f);wrap('trade',trade,f=>trade=f);wrap('barter',barter,f=>barter=f);
+  wrap('econSetTax',econSetTax,f=>econSetTax=f);wrap('econOpenStall',econOpenStall,f=>econOpenStall=f);wrap('econFestival',econFestival,f=>econFestival=f);
+  wrap('armyOrder',armyOrder,f=>armyOrder=f);wrap('sqCommand',sqCommand,f=>sqCommand=f);wrap('startSweep',startSweep,f=>startSweep=f);
+  wrap('planApprove',planApprove,f=>planApprove=f);wrap('planReject',planReject,f=>planReject=f);wrap('cancelResearch',cancelResearch,f=>cancelResearch=f);
+  wrap('placeWall',placeWall,f=>placeWall=f);wrap('demolish',demolish,f=>demolish=f);wrap('townRaid',townRaid,f=>townRaid=f);wrap('svcOrder',svcOrder,f=>svcOrder=f);
+}
+netWrap();
 // ---- the guest: shows the host's world with the teams swapped and sends its orders
 function netSwap(W){
   const sw=t=>t===1?2:t===2?1:t;
   for(const e of W.ents){e.team=sw(e.team);if(e.aid&&e.aid.team)e.aid.team=sw(e.aid.team);}
   for(const k of['teams','tech','honor','war','intel','armies','econ'])if(W[k]&&typeof W[k]==='object'){const a=W[k][1];W[k][1]=W[k][2];W[k][2]=a;}
   const a=W.engineerId;W.engineerId=W.redEngId;W.redEngId=a;
-  for(const T of W.towns||[]){T.owner=sw(T.owner);if(T.siege)T.siege.team=sw(T.siege.team);}
+  for(const T of W.towns||[]){T.owner=sw(T.owner);if(T.siege)T.siege.team=sw(T.siege.team);if(T.rep){const r=T.rep[1];T.rep[1]=T.rep[2];T.rep[2]=r;}if(T.conq&&T.conq.team)T.conq.team=sw(T.conq.team);}
+  for(const c of W.contracts||[])c.team=sw(c.team);
+  if(W.svc)for(const m of W.svc.list||[])m.team=sw(m.team);
   W.over=W.over==='win'?'lose':W.over==='lose'?'win':W.over;
   return W;
 }
 async function netGuestMsg(o){
   if(o.t==='full'){
     let d;try{d=JSON.parse(await edUncode(o.z),matchIn);}catch(e){return;}
-    const keepSel=ui.sel.slice();S=netSwap(d.S);S.cfg=Object.assign({},S.cfg,{mp:true,fog:false});afterLoad();
+    const keepSel=ui.sel.slice();S=netSwap(d.S);S.ask=null;S.asks=[];S.cfg=Object.assign({},S.cfg,{mp:true,fog:false});afterLoad();
     NET.base={};NET.known=new Set();for(const e of S.ents){if(e.team===1){if(DEF[e.kind].unit)NET.base[e.id]=e.order?JSON.stringify(e.order):'';else if(DEF[e.kind].building)NET.base['b'+e.id]=JSON.stringify(e.queue||[])+'|'+JSON.stringify(e.rally||null);}NET.known.add(e.id);}
     NET.res=S.teams[1].research?1:0;
     if(NET.first){NET.first=false;buildTerrain();buildMiniBase();const c=castleOf(1);

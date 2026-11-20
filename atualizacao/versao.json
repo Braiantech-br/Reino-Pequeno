@@ -1,19 +1,13 @@
 {
- "ver": 230,
- "name": "2.3",
+ "ver": 231,
+ "name": "2.3.1",
  "date": "2026-11-20",
  "file": "jogo.html",
- "bytes": 3709546,
- "sha256": "130e82b4969d1ef77b4df38660ef372be9c7a39b97a514cb20b513c4641f11c7",
+ "bytes": 3714939,
+ "sha256": "ab7392dc9cf5dec7e85b9a21d88d60c9e408f60f6e01f54b38619a1172dc946b",
  "notas": [
-  "Forja de Heróis: monte um herói só seu (classe, cores, pluma, olhos que brilham, coroa ou chifres, aura e poder) e leve-o para a batalha.",
-  "Personagens novos feitos a partir da arte original: seis heróis (Sir Brasa, Sir Varik, Mãe Raiz, Nyx, Isa e Serafina), esqueletos, orcs, Morvana, a Necromante, e Gorm, o Gigante de Pedra.",
-  "Conselho de Guerra: o Mestre Rubro e os generais pesam milhares de planos por decisão (mais de um milhão por partida) e usam táticas da história: emboscada na mata, pinça, martelo e bigorna, retirada fingida, guerrilha, sabotagem, diversão e caça ao comandante.",
-  "\"Plano do general\": o seu general escolhe e comanda as táticas sozinho. Os mestres tiram os aldeões do caminho dos saqueadores.",
-  "Claude no seu reino: conselheiro com dicas ou comandante dos seus generais e do Mestre Gaspar. O Claude do Reino Vermelho também escolhe táticas.",
-  "Dois jogadores, cada um no seu aparelho, com convite por código e conexão direta.",
-  "Capítulos 6 e 7 da campanha (A Névoa dos Mortos e O Gigante da Montanha), navio de guerra e editor de mapas com código para compartilhar.",
-  "Para lives: votação do público pelo chat da Twitch ou pelo teclado, locutor das batalhas e vídeo com os melhores momentos.",
-  "Três espaços de partidas salvas, tutorial de 5 minutos e correção das letras \"fi\" que apareciam trocadas em alguns textos."
+  "Dois jogadores: o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos e festas, ordens do exército, batedores e pedidos.",
+  "Votação do público mais simples: Chat da Twitch (conta sozinha), Outro chat (para TikTok, YouTube ou Instagram: você marca os votos tocando na opção ou nas teclas 1, 2 e 3) ou Sorteio, sem chat.",
+  "Botão \"Testar a votação agora\", intervalo de 2, 3 ou 5 minutos e explicação de cada modo em Som e avisos. Sem votos, o jogo sorteia e avisa."
  ]
 }

@@ -4,7 +4,7 @@
 // battles out loud (the game's own lines, or Claude's when Claude is connected). Melhores momentos: the battles are recorded from
 // the screen while they happen, and at the end they are joined into one short video (horizontal or vertical) to download.
 const LV={cfg:{vote:'off',chan:'',every:180,narr:'off',rec:false},ws:null,vote:null,next:0,narrT:0,said:{},clips:[],rec:null,seen:{}};
-function lvLoad(){try{Object.assign(LV.cfg,JSON.parse(localStorage.getItem('rp.live')||'{}'));}catch(e){}}
+function lvLoad(){try{Object.assign(LV.cfg,JSON.parse(localStorage.getItem('rp.live')||'{}'));}catch(e){}if(LV.cfg.vote==='teclado')LV.cfg.vote='manual';}
 function lvSave(){try{localStorage.setItem('rp.live',JSON.stringify(LV.cfg));}catch(e){}}
 const KN=t=>t===1?'Reino Azul':'Reino Vermelho';
 // ---- the events the audience can pick
@@ -23,21 +23,22 @@ function lvOn(){return S&&ui.started&&!S.over&&!S.editor&&S.mode==='skirmish';}
 function lvVoteStart(){
   const pool=LV_EVENTS.slice().sort(()=>Math.random()-.5).slice(0,3);
   const opts=pool.map(ev=>{const t=ev.both?0:Math.random()<.5?1:2;return {ev,t,txt:ev.txt(t),n:0};});
-  LV.vote={opts,until:S.t+30,voters:new Set()};
+  LV.vote={opts,until:S.t+30,voters:new Set(),t0:S.t};
   lvVoteDraw();$('vote').hidden=false;
   if(S.cfg&&S.cfg.watch)watchFeed(0,'event','Votação do público: '+opts.map((o,i)=>`${i+1} · ${o.txt}`).join(' | '));
 }
 function lvVoteDraw(){
   const V=LV.vote;if(!V)return;const tot=V.opts.reduce((a,o)=>a+o.n,0)||1;
-  $('vote').innerHTML=`<b>Votação do público</b><small>${LV.cfg.vote==='twitch'&&LV.cfg.chan?`Digite !1, !2 ou !3 no chat de twitch.tv/${esc(LV.cfg.chan)}`:'Votem no chat! (1, 2 ou 3)'} · ${Math.max(0,Math.ceil(V.until-S.t))} s</small>`+
-    V.opts.map((o,i)=>`<div class="vo"><i style="width:${Math.round(o.n/tot*100)}%"></i><span><kbd>${i+1}</kbd>${esc(o.txt)}</span><em>${o.n}</em></div>`).join('');
+  const m=LV.cfg.vote,how=m==='twitch'?(LV.ws&&LV.ws.readyState===1?`Digite !1, !2 ou !3 no chat da Twitch (${esc(LV.cfg.chan)})`:'Chat da Twitch desligado: confira o nome do canal em Som e avisos'):m==='sorteio'?'O jogo vai sortear um destes eventos':'Comente 1, 2 ou 3 no chat! (quem apresenta marca os votos)';
+  $('vote').innerHTML=`<b>Votação do público</b><small>${how} · ${Math.max(0,Math.ceil(V.until-S.t))} s</small>`+
+    V.opts.map((o,i)=>`<button type="button" class="vo" data-v="${i}"><i style="width:${Math.round(o.n/tot*100)}%"></i><span><kbd>${i+1}</kbd>${esc(o.txt)}</span><em>${m==='sorteio'?'':o.n}</em></button>`).join('');
 }
 function lvVoteAdd(i,who){const V=LV.vote;if(!V||!V.opts[i])return;if(who){if(V.voters.has(who))return;V.voters.add(who);}V.opts[i].n++;lvVoteDraw();}
 function lvVoteEnd(){
   const V=LV.vote;LV.vote=null;$('vote').hidden=true;if(!V||!lvOn())return;
-  const best=V.opts.slice().sort((a,b)=>b.n-a.n||Math.random()-.5)[0];
+  const none=V.opts.every(o=>!o.n),best=V.opts.slice().sort((a,b)=>b.n-a.n||Math.random()-.5)[0];
   best.ev.go(best.t);
-  banner('O público decidiu',best.txt,`${best.n} ${best.n===1?'voto':'votos'}.`,false);
+  banner(none?(LV.cfg.vote==='sorteio'?'O destino decidiu':'Ninguém votou: o jogo sorteou'):'O público decidiu',best.txt,none?'':`${best.n} ${best.n===1?'voto':'votos'}.`,false);
   if(S.cfg&&S.cfg.watch)watchFeed(0,'event',`O público escolheu: ${best.txt}.`);
   lvNarr(`O público decidiu: ${best.txt}!`,true);
 }
@@ -47,12 +48,12 @@ function lvTwitch(){
   const ch=(LV.cfg.chan||'').toLowerCase().replace(/[^a-z0-9_]/g,'');if(LV.cfg.vote!=='twitch'||!ch)return;
   try{
     const ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443');LV.ws=ws;
-    ws.onopen=()=>{ws.send('PASS SCHMOOPIIE');ws.send('NICK justinfan'+(10000+((Math.random()*80000)|0)));ws.send('JOIN #'+ch);};
+    ws.onopen=()=>{ws.send('PASS SCHMOOPIIE');ws.send('NICK justinfan'+(10000+((Math.random()*80000)|0)));ws.send('JOIN #'+ch);const st=$('lv-twst');if(st)st.textContent=`Ligado ao chat de twitch.tv/${ch}.`;};
     ws.onmessage=ev=>{for(const line of String(ev.data).split('\r\n')){
       if(line.startsWith('PING')){ws.send('PONG :tmi.twitch.tv');continue;}
       const m=line.match(/^:([^!]+)![^ ]+ PRIVMSG #[^ ]+ :(.*)$/);if(!m)continue;
       const v=m[2].trim().match(/^!?([1-3])\b/);if(v)lvVoteAdd(+v[1]-1,m[1]);}};
-    ws.onclose=()=>{if(LV.ws===ws)LV.ws=null;};
+    ws.onclose=()=>{if(LV.ws===ws)LV.ws=null;const st=$('lv-twst');if(st)st.textContent='Sem conexão com o chat da Twitch.';};
   }catch(e){toast('Não consegui ligar no chat da Twitch.','warn');}
 }
 // ---- the commentator
@@ -146,7 +147,7 @@ async function lvMakeReel(vertical){
 function lvTick(){
   if(!lvOn()){if(LV.vote){LV.vote=null;$('vote').hidden=true;}return;}
   if(LV.vote){if(S.t>=LV.vote.until)lvVoteEnd();else if(((S.t*4)|0)!==LV.vDraw){LV.vDraw=(S.t*4)|0;lvVoteDraw();}}
-  else if(LV.cfg.vote!=='off'&&S.t>=Math.max(LV.next,S.diff.peace*.5)&&S.t>60){LV.next=S.t+LV.cfg.every;lvVoteStart();}
+  else if(LV.cfg.vote!=='off'&&S.t>=Math.max(LV.next,60)){LV.next=S.t+(+LV.cfg.every||180);lvVoteStart();}
   LV.tick=(LV.tick||0)+1;if(LV.tick%120)return;   // about every two seconds
   const sc=lvWatch();lvRecTick(sc);lvClaudeNarr();
 }
@@ -157,7 +158,10 @@ function lvReset(){LV.vote=null;LV.next=0;LV.said={};LV.seen={};LV.clips=[];if(L
   const el=id=>document.getElementById(id),sync=()=>{
     for(const r of document.querySelectorAll('input[name="lvvote"]'))r.checked=r.value===LV.cfg.vote;
     for(const r of document.querySelectorAll('input[name="lvnarr"]'))r.checked=r.value===LV.cfg.narr;
-    el('lv-chan').value=LV.cfg.chan||'';el('lv-chanrow').hidden=LV.cfg.vote!=='twitch';el('lv-rec').checked=!!LV.cfg.rec;
+    el('lv-chan').value=LV.cfg.chan||'';el('lv-chanrow').hidden=LV.cfg.vote!=='twitch';el('lv-rec').checked=!!LV.cfg.rec;el('lv-every').value=String(LV.cfg.every||180);
+    el('lv-how').textContent={off:'',twitch:'A cada intervalo aparece uma votação com 3 eventos. Quem assiste digita !1, !2 ou !3 no chat do seu canal da Twitch; o jogo conta sozinho e, depois de 30 segundos, o mais votado acontece. Você não precisa fazer nada.',
+      manual:'Para TikTok, YouTube, Instagram ou qualquer chat: quem assiste comenta 1, 2 ou 3, e você marca os votos tocando na opção (ou nas teclas 1, 2 e 3). Depois de 30 segundos, o mais votado acontece.',
+      sorteio:'Sem chat: a cada intervalo o jogo mostra 3 eventos e sorteia um. Bom para deixar a live mais imprevisível.'}[LV.cfg.vote]||'';
   };
   sync();
   for(const r of document.querySelectorAll('input[name="lvvote"]'))r.addEventListener('change',()=>{LV.cfg.vote=r.value;lvSave();sync();lvTwitch();});
@@ -166,6 +170,9 @@ function lvReset(){LV.vote=null;LV.next=0;LV.said={};LV.seen={};LV.clips=[];if(L
   el('lv-rec').addEventListener('change',()=>{LV.cfg.rec=el('lv-rec').checked;lvSave();if(LV.cfg.rec&&!(typeof MediaRecorder==='function'&&cv.captureStream))toast('Este navegador não grava vídeo. Use o Chrome, o Edge ou o Firefox.','warn');});
   el('lv-reel-h').addEventListener('click',()=>lvMakeReel(false));
   el('lv-reel-v').addEventListener('click',()=>lvMakeReel(true));
+  el('lv-every').addEventListener('change',()=>{LV.cfg.every=+el('lv-every').value||180;lvSave();if(lvOn())LV.next=S.t+LV.cfg.every;});
+  el('lv-test').addEventListener('click',()=>{if(!lvOn()){toast('Comece uma Batalha Rápida (ou o modo observador) e toque em Testar de novo.','warn');return;}if(LV.cfg.vote==='off'){LV.cfg.vote='manual';lvSave();sync();}el('sndpop').hidden=true;lvVoteStart();});
+  el('vote').addEventListener('click',ev=>{const b=ev.target.closest('[data-v]');if(b&&LV.vote&&LV.cfg.vote!=='sorteio')lvVoteAdd(+b.dataset.v);});
   document.addEventListener('keydown',ev=>{if(!LV.vote||ev.target&&/INPUT|TEXTAREA/.test(ev.target.tagName))return;const n=+ev.key;if(n>=1&&n<=3){lvVoteAdd(n-1);ev.stopPropagation();}},true);
   if(LV.cfg.vote==='twitch')lvTwitch();
 }
