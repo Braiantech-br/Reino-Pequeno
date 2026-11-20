@@ -28,6 +28,17 @@ Os instaladores ficam na pasta [downloads](downloads/). Depois de instalado, o j
 As versões anteriores continuam disponíveis em [downloads/old](downloads/old/).
 Instruções para cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
 
+## Novidades da versão 2.3
+
+- **Forja de Heróis:** monte um herói só seu (classe, cores, pluma de fogo ou de gelo, olhos que brilham, coroa ou chifres, aura e poder) e leve-o para a batalha.
+- **Personagens novos**, feitos dentro do jogo a partir da arte original: seis heróis (Sir Brasa, Sir Varik, Mãe Raiz, Nyx, Isa e Serafina), esqueletos, orcs, Morvana, a Necromante, e Gorm, o Gigante de Pedra.
+- **Conselho de Guerra:** o Mestre Rubro e os generais pesam milhares de planos a cada decisão (mais de um milhão numa partida) e usam táticas da história: emboscada na mata, pinça, martelo e bigorna, retirada fingida, guerrilha, sabotagem, ataque de diversão e caça ao comandante. Com a ordem *Plano do general*, o seu general faz o mesmo pelo seu exército.
+- **Claude no seu reino:** conselheiro com dicas durante a partida, ou comandante dos seus generais e do Mestre Gaspar.
+- **Dois jogadores**, cada um no seu aparelho, com convite por código e conexão direta, sem servidor.
+- **Capítulos 6 e 7** da campanha (A Névoa dos Mortos e O Gigante da Montanha), **navio de guerra** e **editor de mapas** com código para compartilhar.
+- **Para lives:** votação do público pelo chat da Twitch (ou pelo teclado), locutor das batalhas e vídeo com os melhores momentos.
+- Três espaços de partidas salvas e um tutorial de 5 minutos.
+
 ## Novidades da versão 2.2
 
 - **Modo observador: máquina contra máquina.** Na Batalha Rápida, escolha quem joga cada reino: *Você*, *Computador* ou *Claude* no Azul; *Computador* ou *Claude* no Vermelho. Com uma máquina no Azul, as duas jogam sozinhas e você assiste (dá até para ver **Claude contra Claude**), com placar, câmera automática que acompanha as batalhas e os pensamentos e as provocações de cada Claude na tela. Ideal para transmissões ao vivo.

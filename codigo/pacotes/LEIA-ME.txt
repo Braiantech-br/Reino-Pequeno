@@ -802,6 +802,103 @@ e vozes embutidas, e o mesmo botão de atualização.
   Para transmitir: abra o jogo no computador em tela cheia (F11) e capture a
   janela no OBS ou no programa de transmissão que você usa.
 
+ 6.25 CONSELHO DE GUERRA (os mestres e os generais pensam sozinhos)
+  O Mestre Rubro e os generais do Reino Vermelho (e do Azul, no modo
+  observador) têm um Conselho de Guerra. A cada decisão, ele olha o mapa
+  (exércitos, aldeões, matas, morros, torres e comandantes) e pesa cada plano
+  do seu livro centenas de vezes, com sorte no meio: são dezenas de milhares
+  de futuros por decisão e mais de um milhão numa partida. O plano escolhido
+  é executado em fases pelos grupos de soldados:
+    Assalto direto ......... atacar de frente quando a força é bem maior.
+    Ataque em pinça ........ dois grupos fecham o inimigo pelos dois lados
+                             (Canas, 216 a.C.).
+    Martelo e bigorna ...... a infantaria segura de frente e a tropa rápida
+                             bate por trás (Alexandre, o Grande).
+    Emboscada na mata ...... o exército espera escondido na floresta, no
+                             caminho do inimigo (Teutoburgo, 9 d.C.).
+    Retirada fingida ....... poucos atacam e fogem de propósito até a
+                             armadilha (Hastings, 1066, e os mongóis).
+    Guerrilha .............. bater nos aldeões e sumir antes do exército
+                             chegar (Fábio Máximo contra Aníbal).
+    Sabotagem .............. fazendas, mercado, carroças e o engenheiro.
+    Ataque de diversão ..... atacar um lado e entrar pelo outro.
+    Caçar o comandante ..... sem general, o exército se desorganiza.
+    Defesa em profundidade . esperar nas torres e contra-atacar.
+  O Conselho aprende: um plano que acabou de falhar perde a confiança por um
+  tempo. Os mestres também tiram os aldeões do caminho dos saqueadores e os
+  mandam de volta ao trabalho quando o perigo passa.
+  O SEU GENERAL: no Conselho → Exército, a ordem "Plano do general (táticas
+  automáticas)" deixa o seu general escolher e comandar os planos sozinho. O
+  painel mostra o plano atual e quantos planos ele já avaliou.
+
+ 6.26 O CLAUDE NO SEU REINO (Batalha Rápida)
+  Em "Quem joga", com Você no Azul, escolha em "Claude no seu reino":
+    Conselheiro .......... de minuto e meio em minuto e meio, o Claude lê a
+                           situação e dá dicas curtas na tela.
+    Comanda os generais .. o Claude escolhe a direção e a tática do seu
+                           Conselho de Guerra e orienta o Mestre Gaspar; você
+                           cuida da economia e das construções.
+  O Claude do Reino Vermelho também pode mandar o Conselho dele usar uma
+  tática específica. A conexão é a mesma da seção 6.23.
+
+ 6.27 FORJA DE HERÓIS E PERSONAGENS NOVOS
+  Na tela inicial, "Forja de Heróis" monta um herói só seu: classe
+  (Guerreiro, Arqueiro, Lanceiro, Monge ou Lenhador), cores do elmo, da
+  espada, da pele e do cabelo, pluma (de fogo, gelo, sombra...), olhos que
+  brilham, coroa, diadema, chifres, galhada ou auréola, aura e poder (Fogo:
+  mais dano; Gelo: deixa lento; Raio: ataca mais rápido; Sombra: mais
+  rápido; Luz: cura em volta; Natureza: recupera a vida; Morte: rouba vida),
+  porte e voz. Ele aparece na lista de heróis da Campanha e da Defesa do Rei
+  e, se você quiser, na Batalha Rápida.
+  Há também seis heróis novos para escolher (Sir Brasa, Sir Varik, Mãe Raiz,
+  Nyx, Isa e Serafina) e criaturas novas: esqueletos, orcs, Morvana, a
+  Necromante, e Gorm, o Gigante de Pedra. Todos são feitos dentro do próprio
+  jogo a partir da arte original (cores trocadas e acessórios pintados pixel
+  a pixel); nenhuma imagem nova é distribuída.
+
+ 6.28 NOVOS CAPÍTULOS, NAVIOS DE GUERRA E EDITOR DE MAPAS
+  Capítulo 6, A Névoa dos Mortos: recupere os Cristais de Alma, forje a
+  Lanterna da Aurora (monges e paladinos causam o dobro de dano aos mortos-
+  vivos) e derrote Morvana, que levanta esqueletos durante a luta.
+  Capítulo 7, O Gigante da Montanha: tome as Runas da Montanha, arme as torres
+  com balistas e derrube Gorm, que atordoa e quebra muralhas.
+  Navio de guerra (Cais, Era II): atira flechas pesadas do mar em barcos, em
+  tropas na praia e em prédios perto da água. Torres e arqueiros revidam.
+  Editor de mapas (tela inicial): pinte grama, água, árvores e areia, ponha
+  ouro, ovelhas e acampamentos de bandidos, guarde o mapa e jogue. Em "Meus
+  mapas", cada mapa tem um código para compartilhar: quem colar o código
+  recebe o mapa.
+
+ 6.29 DOIS JOGADORES (cada um no seu aparelho)
+  Na tela inicial, "Dois jogadores": um toca em "Criar convite" e manda o
+  código para o amigo (pelo WhatsApp, por exemplo); o amigo cola o convite,
+  toca em "Entrar" e manda de volta o código de resposta; o anfitrião cola a
+  resposta e a partida começa. O anfitrião comanda o Reino Azul e o amigo, o
+  Vermelho (na tela do amigo, o reino dele aparece em azul). A conexão é
+  direta entre os aparelhos, sem servidor do jogo: funciona melhor no mesmo
+  Wi-Fi; pela internet, depende da rede de cada um. Se o amigo sair, o
+  computador assume o Reino Vermelho.
+
+ 6.30 TRANSMISSÃO AO VIVO (Som e avisos)
+  Votação do público: de tempos em tempos aparecem três eventos (chuva de
+  fogo, mercenários, ouro, bênção, bandidos, mortos-vivos, o Gigante de Pedra,
+  tempestade). Os espectadores votam com !1, !2 ou !3 no chat da Twitch (o
+  jogo só lê o chat, sem login), ou você aperta 1, 2 e 3 para os votos de
+  qualquer outro chat. O mais votado acontece na hora.
+  Locutor: narra as batalhas em voz alta, com as falas do jogo ou do Claude.
+  Gravar melhores momentos: as batalhas são gravadas da tela enquanto
+  acontecem; no fim da partida, toque em "Vídeo horizontal" ou "Vídeo
+  vertical" para baixar um vídeo curto com as melhores (no Chrome, no Edge
+  ou no Firefox).
+
+ 6.31 PARTIDAS SALVAS E TUTORIAL
+  Além da partida salva automaticamente, há três espaços: no menu durante a
+  partida, toque em "Salvar partida"; na tela inicial, "Partidas salvas"
+  mostra todas, com Continuar e Apagar.
+  "Aprender a jogar" abre um tutorial de 5 minutos no capítulo 1: uma seta
+  mostra onde tocar, e cada passo avança sozinho quando você faz o que ele
+  pede. Os ataques só começam no fim do tutorial.
+
 
 ==============================================================================
  7. DICAS PARA COMEÇAR

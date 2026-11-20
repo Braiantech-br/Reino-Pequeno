@@ -136,7 +136,10 @@ async function lvMakeReel(vertical){
   if(!LV.clips.length){st.textContent='Nenhuma batalha foi gravada nesta partida (ligue "Gravar melhores momentos" em Som e avisos antes de jogar).';return;}
   st.textContent='Montando o vídeo… (leva o tempo do próprio vídeo)';
   const blob=await lvReel(vertical,t=>{st.textContent=t;});if(!blob){st.textContent='Não consegui montar o vídeo.';return;}
-  const url=URL.createObjectURL(blob),ext=(blob.type||'').includes('mp4')?'mp4':'webm',a=document.createElement('a');a.href=url;a.download=`ReinoPequeno-melhores-momentos${vertical?'-vertical':''}.${ext}`;document.body.appendChild(a);a.click();a.remove();
+  const ext=(blob.type||'').includes('mp4')?'mp4':'webm',name=`ReinoPequeno-melhores-momentos${vertical?'-vertical':''}.${ext}`;
+  // inside claude.ai the page cannot download by itself: the viewer offers the file
+  let done=false;try{if(window.claude&&typeof window.claude.use==='function'){const dl=await window.claude.use('downloads');if(dl){await dl.save({filename:name,data:blob});done=true;}}}catch(e){}
+  if(!done){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
   st.textContent=`Vídeo pronto (${(blob.size/1048576).toFixed(1)} MB). Se o download não abriu, toque de novo.`;
 }
 // ---- every frame (cheap) and every two seconds
