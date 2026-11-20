@@ -82,6 +82,13 @@
 .tut-glow{outline:4px solid #ffd84a!important;outline-offset:2px;animation:tutglow 1s ease-in-out infinite alternate}@keyframes tutglow{from{box-shadow:0 0 0 0 rgba(255,216,74,.9)}to{box-shadow:0 0 14px 4px rgba(255,216,74,.9)}}
 #b-tut.first{background:var(--gold,#e9b434);border-color:#8a6412;color:#3a2610}
 @media (max-width:760px),(max-height:560px){#tut{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 132px)}#tut p{font-size:13px}}
+#vote{position:absolute;z-index:5;left:max(14px,env(safe-area-inset-left,0px));top:calc(env(safe-area-inset-top,0px) + 120px);width:min(330px,calc(100% - 28px));background:rgba(28,22,40,.88);color:#fff6dd;border:3px solid #ffd84a;border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+#vote b{font:400 26px/1 var(--f-display);color:#ffd84a}#vote small{font-size:12px;opacity:.85}
+#vote .vo{position:relative;border:2px solid rgba(255,255,255,.25);border-radius:9px;overflow:hidden;padding:6px 8px;display:flex;justify-content:space-between;gap:8px;font-size:14px}
+#vote .vo i{position:absolute;inset:0 auto 0 0;background:rgba(255,216,74,.32);transition:width .3s}#vote .vo span,#vote .vo em{position:relative}#vote kbd{display:inline-block;min-width:18px;margin-right:6px;padding:0 4px;border-radius:5px;background:#ffd84a;color:#2a1a06;font:700 13px var(--f-ui);text-align:center}
+#narr{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 160px);max-width:min(720px,calc(100% - 32px));background:rgba(20,16,30,.85);color:#fff;border-radius:12px;padding:8px 14px;font:600 16px/1.35 var(--f-ui);text-align:center}
+.lv-h{margin-top:12px!important}.lv-chan{display:flex;flex-direction:column;gap:3px;font-size:12px;margin:4px 0}.lv-chan input{font:600 14px var(--f-ui);padding:5px 8px;border:2px solid var(--wood);border-radius:8px}
+.lv-reel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.lv-reel small{flex-basis:100%;font-size:12px;color:var(--ink-soft)}
 #ov-saves{z-index:9}#ov-maps{z-index:9}#app.editing .panel,#app.editing #goals{display:none}
 #mp-code{width:100%;box-sizing:border-box;font:12px/1.3 ui-monospace,monospace;border:2px solid var(--wood);border-radius:10px;padding:8px;background:#fffaf0;resize:vertical}
 #edbar{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:min(980px,calc(100% - 24px));background:#fff6dd;border:3px solid var(--wood);border-radius:14px;box-shadow:0 4px 0 var(--wood-dk);padding:8px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
@@ -260,7 +267,23 @@
       <label><input type="radio" name="avisos" value="todos"><i>Todos</i></label>
     </div>
     <p class="sp-note">Os avisos que não aparecem ficam no Conselho, em Notícias.</p>
+    <b class="sp-h lv-h">Transmissão ao vivo</b>
+    <div class="vx" role="radiogroup" aria-label="Votação do público"><span>Votação do público</span>
+      <label><input type="radio" name="lvvote" value="off"><i>Desligada</i></label>
+      <label><input type="radio" name="lvvote" value="teclado"><i>Teclas 1 2 3</i></label>
+      <label><input type="radio" name="lvvote" value="twitch"><i>Chat da Twitch</i></label>
+    </div>
+    <label class="lv-chan" id="lv-chanrow" hidden><span>Canal da Twitch</span><input id="lv-chan" type="text" placeholder="nome do canal" autocomplete="off" spellcheck="false"></label>
+    <div class="vx" role="radiogroup" aria-label="Locutor"><span>Locutor</span>
+      <label><input type="radio" name="lvnarr" value="off"><i>Desligado</i></label>
+      <label><input type="radio" name="lvnarr" value="jogo"><i>Do jogo</i></label>
+      <label><input type="radio" name="lvnarr" value="claude"><i>Claude</i></label>
+    </div>
+    <label class="sw"><input type="checkbox" id="lv-rec"><span>Gravar melhores momentos</span></label>
+    <p class="sp-note">Votos: !1, !2 ou !3 no chat (na Twitch, lidos sem login) ou as teclas 1, 2 e 3 do seu teclado. O locutor fala com a voz escolhida em "Falas dos personagens".</p>
   </div>
+  <div id="vote" hidden aria-live="polite"></div>
+  <div id="narr" hidden aria-live="polite"></div>
   <div id="toasts" aria-live="polite"></div>
   <div id="tut" hidden role="status" aria-live="polite"><small id="tut-n">Tutorial</small><p id="tut-t"></p><button class="btn alt sm-btn" id="tut-skip" type="button">Pular tutorial</button></div>
   <div id="tut-arrow" hidden aria-hidden="true">▼</div>
@@ -521,6 +544,7 @@
       <h2 id="end-title">Vitória!</h2>
       <p id="end-text"></p>
       <div class="stats" id="end-stats"></div>
+      <div class="lv-reel"><b>Melhores momentos</b> <button class="btn alt sm-btn" id="lv-reel-h" type="button">Vídeo horizontal</button><button class="btn alt sm-btn" id="lv-reel-v" type="button">Vídeo vertical</button><small id="lv-reel-st"></small></div>
       <details class="howto end-claude" id="end-claude" hidden><summary id="end-claude-sum">O que o Claude pensou <small id="end-claude-n"></small></summary><ol id="end-claude-list"></ol></details>
       <div class="row"><button class="btn" id="b-next" type="button" hidden>Próximo capítulo</button><button class="btn" id="b-again" type="button">Jogar de novo</button><button class="btn alt" id="b-menu" type="button">Menu</button></div>
     </div>

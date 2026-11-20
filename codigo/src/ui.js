@@ -153,6 +153,7 @@ const WAR_LEAD={1:'O general azul',2:'Mestre Rubro'};
 HOOK.war=(team,ev,pl,W,why)=>{
   if(!S)return;
   const watch=S.cfg&&S.cfg.watch,P=pl&&WAR_PLANS[pl.type],K=team===1?'Azul':'Vermelho';
+  if(pl&&WAR_PLANS[pl.type]&&(ev==='start'||ev==='strike')&&(watch||ev==='strike'))lvNarr(ev==='start'?`${team===1?'O Conselho azul':'O Mestre Rubro'} prepara: ${WAR_PLANS[pl.type].name}!`:`${WAR_PLANS[pl.type].name}! O ${team===1?'Reino Azul':'Reino Vermelho'} ataca agora!`);
   if(ev==='evac'){if(team===1&&!watch)toast('Mestre Gaspar tirou os aldeões do caminho dos saqueadores.');else if(watch)watchFeed(team,'event',`${team===1?'Mestre Gaspar':'Mestre Rubro'} esconde os aldeões dos saqueadores.`);return;}
   if(!P)return;
   if(watch){
@@ -1302,6 +1303,7 @@ function resumeMatch(n){
   document.querySelector('#c-foe img').src=S.mode==='skirmish'?'assets/ic_enemy.png':'assets/ic_wild.png';
   $('c-foe').title=S.mode==='skirmish'?'Reino Vermelho':'Próximo ataque';
   refreshPanel(true);hud();
+  lvReset();
   if(S.tut&&!S.tut.done)tutShow();else{$('tut').hidden=true;$('tut-arrow').hidden=true;}
   banner('Partida retomada',S.cfg&&S.cfg.watch?'Modo observador':(MODE_NAME[S.mode]||''),`${fmt(S.t)} de jogo. O jogo está pausado: toque em Continuar quando estiver pronto.`,false);
   watchStart();
@@ -1357,6 +1359,7 @@ function showMenu(){
 }
 function startGame(p){
   p=p||{};
+  lvReset();
   $('tut').hidden=true;$('tut-arrow').hidden=true;tutGlow(null);
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
   const blue=mode==='skirmish'?(p.blue||(['voce','pc','claude'].includes(CLAUDE.cfg.blue)?CLAUDE.cfg.blue:'voce')):'voce',watch=blue!=='voce';
@@ -1613,6 +1616,7 @@ function frame(now){
     if(n>=10)acc=0;
     clTick();
     if(S.tut&&!S.tut.done)tutTick();
+    lvTick();
   }
   ui.alarmT-=rdt;
   ui.musT=(ui.musT||0)-rdt;if(ui.musT<=0){ui.musT=.5;try{musWatch();}catch(e){}}
@@ -1767,5 +1771,5 @@ window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTi
   CLAUDE,clApply,clReport,clPrompt,watchStart,watchFeed,watchScore,WATCH:W,aiInit,withTeam,
   walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
-  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,
+  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},lvReel,lvRecTick,lvRecStop,lvVoteStart,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
   setAT(v){AT=v;}};
