@@ -82,7 +82,13 @@
 .tut-glow{outline:4px solid #ffd84a!important;outline-offset:2px;animation:tutglow 1s ease-in-out infinite alternate}@keyframes tutglow{from{box-shadow:0 0 0 0 rgba(255,216,74,.9)}to{box-shadow:0 0 14px 4px rgba(255,216,74,.9)}}
 #b-tut.first{background:var(--gold,#e9b434);border-color:#8a6412;color:#3a2610}
 @media (max-width:760px),(max-height:560px){#tut{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 132px)}#tut p{font-size:13px}}
-#ov-saves{z-index:9}.sheet.saves{max-width:620px}
+#ov-saves{z-index:9}#ov-maps{z-index:9}#app.editing .panel,#app.editing #goals{display:none}
+#mp-code{width:100%;box-sizing:border-box;font:12px/1.3 ui-monospace,monospace;border:2px solid var(--wood);border-radius:10px;padding:8px;background:#fffaf0;resize:vertical}
+#edbar{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:min(980px,calc(100% - 24px));background:#fff6dd;border:3px solid var(--wood);border-radius:14px;box-shadow:0 4px 0 var(--wood-dk);padding:8px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.ed-tools{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.ed-tools button{font:600 13px var(--f-ui);padding:6px 10px;border:2px solid var(--wood);border-radius:9px;background:#fffaf0;cursor:pointer}
+.ed-tools button[aria-pressed="true"]{background:#ffe08a;border-color:#b07d16;box-shadow:inset 0 -2px 0 #b07d16}.ed-sz{font:600 12px var(--f-ui);display:inline-flex;gap:3px;align-items:center;margin-left:6px}
+.ed-act{display:flex;gap:6px;flex-wrap:wrap}.ed-act .btn{font-size:18px;padding:5px 12px}
+.sheet.saves{max-width:620px}
 .sv-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .sv-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 12px;border:3px solid var(--wood);border-radius:12px;background:#fff6dd}
 .sv-row b{font:400 24px/1 var(--f-display)}.sv-row small{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px}
@@ -270,6 +276,16 @@
     <div class="card mini"><canvas id="mini" width="192" height="128" aria-label="Minimapa"></canvas></div>
   </div>
 
+  <div id="edbar" hidden><div class="ed-tools" id="ed-tools"></div><div class="ed-act"><button class="btn sm-btn" id="ed-play" type="button">Jogar</button><button class="btn alt sm-btn" id="ed-save" type="button">Guardar</button><button class="btn alt sm-btn" id="ed-new" type="button">Sortear outro</button><button class="btn alt sm-btn" id="ed-exit" type="button">Sair</button></div></div>
+  <div class="overlay" id="ov-maps" hidden>
+    <div class="sheet saves" role="dialog" aria-label="Meus mapas">
+      <div class="kicker">Editor de mapas</div><h2>Meus mapas</h2>
+      <div id="mp-list" class="sv-list"></div>
+      <h4 class="lbl">Código de mapa</h4>
+      <textarea id="mp-code" rows="3" spellcheck="false" placeholder="Cole aqui o código de um mapa que alguém mandou" aria-label="Código do mapa"></textarea>
+      <div class="row"><button class="btn alt" id="mp-import" type="button">Abrir código</button><button class="btn alt" id="mp-close" type="button">Fechar</button></div>
+    </div>
+  </div>
   <div class="overlay" id="ov-saves" hidden>
     <div class="sheet saves" role="dialog" aria-label="Partidas salvas">
       <div class="kicker" id="sv-kick">Partidas salvas</div>
@@ -301,7 +317,7 @@
       <p class="lead">Um mapa novo a cada partida, cheio de florestas, ouro, ovelhas e covis de bandidos. Escolha como quer jogar.</p>
       <h4 class="lbl">Modo de jogo</h4>
       <div class="modes" role="radiogroup" aria-label="Modo de jogo">
-        <label><input type="radio" name="mode" value="campaign" checked><span><b>Campanha</b><em>A Coroa de Pedravale: 5 capítulos com história, herói e o rei para proteger.</em></span></label>
+        <label><input type="radio" name="mode" value="campaign" checked><span><b>Campanha</b><em>A Coroa de Pedravale: 7 capítulos com história, herói, o rei para proteger, mortos-vivos e um gigante de pedra.</em></span></label>
         <label><input type="radio" name="mode" value="skirmish"><span><b>Batalha Rápida</b><em>Você contra o Reino Vermelho num mapa grande. Quatro vilas neutras crescem, negociam, alugam tropas e heróis e podem ser aliadas ou conquistadas; bandidos rondam as estradas.</em></span></label>
         <label><input type="radio" name="mode" value="survival"><span><b>Defesa do Rei</b><em>Ondas sem fim e um chefe a cada cinco. Quantas você aguenta?</em></span></label>
       </div>
@@ -369,6 +385,8 @@
       <div class="row">
         <button class="btn" id="b-start" type="button">Começar</button>
         <button class="btn alt" id="b-tut" type="button">Aprender a jogar<small>tutorial de 5 minutos</small></button>
+        <button class="btn alt" id="b-editor" type="button">Editor de mapas</button>
+        <button class="btn alt" id="b-maps" type="button">Meus mapas</button>
         <button class="btn alt" id="b-resume" type="button" hidden>Continuar</button>
         <button class="btn alt" id="b-load" type="button" hidden>Continuar partida salva<small id="load-info"></small></button>
         <button class="btn alt" id="b-save" type="button" hidden>Salvar partida</button>

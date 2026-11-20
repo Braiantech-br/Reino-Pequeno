@@ -215,8 +215,8 @@ function showEnd(){
   if(S.mode==='campaign'&&C){
     const h=byId.get(S.heroId),hr=h&&!h.dead?h.rank||0:S.heroDown?S.heroDown.rank:0,hk=h&&!h.dead?h.kills||0:S.heroDown?S.heroDown.kills:0;
     kick=`Capítulo ${C.n} · ${C.title}`;
-    title=win?(C.n===5?'A coroa voltou!':'Capítulo concluído!'):why==='king'?'O rei caiu':'O castelo caiu';
-    text=win?(C.n<5?`Próximo: ${CHAPTERS[C.n+1].title}. Seu herói leva as patentes para o próximo capítulo.`:'Você terminou a campanha A Coroa de Pedravale. Experimente a Defesa do Rei ou uma dificuldade maior.'):
+    title=win?(C.n===5?'A coroa voltou!':C.n===CHAPTERS.length-1?'Fim da campanha!':'Capítulo concluído!'):why==='king'?'O rei caiu':'O castelo caiu';
+    text=win?(C.n<CHAPTERS.length-1?`Próximo: ${CHAPTERS[C.n+1].title}. Seu herói leva as patentes para o próximo capítulo.`:'Você terminou a campanha A Coroa de Pedravale. Experimente a Defesa do Rei ou uma dificuldade maior.'):
       why==='king'?'O Rei Aldebrando caiu em batalha e Pedravale se rendeu. Mantenha o rei perto das torres, longe da linha de frente.':'O castelo de Pedravale foi derrubado. Construa torres perto dele e mantenha tropas em casa durante os ataques.';
     st=[[time,'tempo de jogo'],[A.stats.kills,'inimigos derrotados'],[A.stats.lost,'unidades perdidas'],[`${RANKS[hr].n}`,`${HEROES[S.heroKey]?HEROES[S.heroKey].name:'herói'}, ${hk} abates`],[Object.keys(S.items).filter(k=>ITEMS[k]&&ITEMS[k].cost&&S.items[k]).length,'itens forjados'],[A.stats.wood+A.stats.gold+A.stats.food,'recursos coletados']];
   }else if(S.mode==='survival'){
@@ -1120,7 +1120,7 @@ function topControls(){
   bs.classList.toggle('mute',mute);bs.classList.toggle('on',mute);if(bs.lastChild.textContent!==sl)bs.lastChild.textContent=sl;
   const tl=$('top-l');tl.classList.toggle('more',tl.scrollWidth>tl.clientWidth+4&&tl.scrollLeft+tl.clientWidth<tl.scrollWidth-4);
   const ov=[...document.querySelectorAll('.overlay')].some(o=>!o.hidden);
-  $('pausecard').hidden=!(ui.started&&ui.paused&&S&&!S.over&&!ov&&!ui.placing);
+  $('pausecard').hidden=!(ui.started&&ui.paused&&S&&!S.over&&!S.editor&&!ov&&!ui.placing);
 }
 function renderEras(){
   const T=S?S.teams[1]:{era:1};
@@ -1308,7 +1308,7 @@ function resumeMatch(n){
   clStart(false);
 }
 ui.save=loadSave();
-ui.chapter=Math.min(5,ui.save.unlocked||1);
+ui.chapter=Math.min(CHAPTERS.length-1,ui.save.unlocked||1);
 const newSeed=()=>(Math.random()*1e9)|0;
 ui.seed=newSeed();
 const radio=n=>{const r=document.querySelector(`input[name="${n}"]:checked`);return r?r.value:null;};
@@ -1474,6 +1474,7 @@ function local(ev){const r=cv.getBoundingClientRect();return {x:ev.clientX-r.lef
 cv.addEventListener('contextmenu',e=>e.preventDefault());
 cv.addEventListener('pointerdown',ev=>{
   if(!S||!ui.started)return;
+  if(S.editor&&edPointer(ev,'down')){try{cv.setPointerCapture(ev.pointerId);}catch(e){}return;}
   audioInit();
   try{cv.setPointerCapture(ev.pointerId);}catch(e){}
   const p=local(ev);
@@ -1497,6 +1498,7 @@ cv.addEventListener('pointerdown',ev=>{
   }else if(pts.size===2){const a=[...pts.values()];pinch={d:hyp(a[0].x-a[1].x,a[0].y-a[1].y),z:cam.z};}
 });
 cv.addEventListener('pointermove',ev=>{
+  if(S&&S.editor&&ED.painting&&edPointer(ev,'move'))return;
   const p=local(ev);
   ui.mouse.x=p.x;ui.mouse.y=p.y;ui.mouse.in=true;
   if(S&&ui.placing&&ev.pointerType==='mouse'){const w=toWorld(p.x,p.y);ui.ghost=ghostFor(ui.placing,w.x,w.y);}
@@ -1516,6 +1518,7 @@ cv.addEventListener('pointermove',ev=>{
   t.x=p.x;t.y=p.y;
 });
 function endPointer(ev){
+  if(S&&S.editor&&ED.painting){edPointer(ev,'up');return;}
   const t=pts.get(ev.pointerId);pts.delete(ev.pointerId);
   if(pts.size<2)pinch=null;
   if(!S||!ui.started)return;

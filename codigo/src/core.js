@@ -179,7 +179,7 @@ function carryCap(t){const e=eraOf(t);return e>=5?16:e>=3?13:10;}
 function wildMult(){return 1+Math.min(1,(S?S.t:0)/1800)*.8;}
 function hpMult(t,k){if(t===3)return wildMult();if(!DEF[k].mil)return 1;const e=eraOf(t);return 1+(e>=3?.15:0)+(e>=5?.15:0);}
 function dmgMult(t){if(t===3)return wildMult();const e=eraOf(t);return 1+(e>=4?.2:0)+(e>=5?.15:0);}
-function towerMult(t){const e=eraOf(t);return 1+(e>=4?.35:0)+(e>=5?.25:0);}
+function towerMult(t){const e=eraOf(t);return (1+(e>=4?.35:0)+(e>=5?.25:0))*(t===1&&S.mode==='campaign'&&has('balista')?1.5:1);}
 function bldMult(t){const e=eraOf(t);return 1+(e>=3?.2:0)+(e>=5?.2:0);}
 function convertTime(team,target){const e=eraOf(team);return (DEF[target.kind].building?8:e>=5?3:e>=4?4:5)*(team===1&&has('relicario')?.6:1);}
 function unlocked(t,k){return (DEF[k].era||1)<=eraOf(t);}
@@ -1822,6 +1822,7 @@ function updProj(dt){
   S.proj=S.proj.filter(p=>!p.done);
 }
 function damage(t,dmg,src){
+  if(src&&DEF[t.kind]&&DEF[t.kind].undead&&src.team===1&&S.mode==='campaign'&&has('luz')){const SD=DEF[src.kind]||{};if(SD.holy||SD.aura||src.kind==='paladin'||src.kind==='wizard')dmg*=2;}
   if(!alive(t))return;
   const TD=DEF[t.kind];
   if(t.team===1&&TD.unit&&has('escudos'))dmg*=.85;

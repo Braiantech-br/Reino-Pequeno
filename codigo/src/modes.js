@@ -10,6 +10,10 @@ const ITEMS={
   aco:       {name:'Lingote de Aço',glyph:'▬',col:'#9aa7b8',drop:true,desc:'Aço dos ferreiros do Corvo Negro.'},
   ariete:    {name:'Aríete Real',glyph:'⚒',col:'#a8744a',desc:'Derruba o portão do castelo vermelho.',cost:{wood:300,gold:150},need:{aco:2}},
   coroa:     {name:'Coroa de Pedravale',glyph:'♛',col:'#e9b434',drop:true,desc:'A coroa roubada pelo Duque.'},
+  cristal:   {name:'Cristal de Alma',glyph:'◆',col:'#7cff6b',drop:true,desc:'Um cristal verde que prende as almas. Morvana guarda vários nas criptas.'},
+  luz:       {name:'Lanterna da Aurora',glyph:'☀',col:'#ffd84a',desc:'Monges e paladinos causam o dobro de dano aos mortos-vivos.',cost:{gold:200,food:100},need:{cristal:3}},
+  runa:      {name:'Runa da Montanha',glyph:'ᚱ',col:'#9aa7b8',drop:true,desc:'Pedra gravada que acorda o gigante.'},
+  balista:   {name:'Balistas das Torres',glyph:'➶',col:'#a8744a',desc:'Torres causam 50% mais dano.',cost:{wood:300,gold:200}},
 };
 const CHAR={
   king:{name:'Rei Aldebrando',av:'av11'},
@@ -20,6 +24,9 @@ const CHAR={
   marta:{name:'Marta, a aldeã',av:'av15'},
   engineer:{name:'Mestre Gaspar, engenheiro-chefe',av:'av05'},
   bandit:{name:'Chefe dos bandidos',av:'av25'},
+  necro:{name:'Morvana, a Necromante',av:'Fnecro'},
+  giant:{name:'Gorm, o Gigante de Pedra',av:'Fgigante'},
+  druid:{name:'Mãe Raiz, a druida',av:'Fdruida'},
 };
 const HEROES={
   warrior:{kind:'warrior',name:'Sir Tomás',av:'av01',role:'Guerreiro',desc:'Muita vida e golpe pesado. Vence arqueiros.'},
@@ -152,7 +159,55 @@ const CHAPTERS=[null,
   ],
   waves:[],
   deaths:{duke:['duke','A coroa... nunca foi... sua...']},
-  outro:[['king','A Coroa de Pedravale voltou para casa. {hero}, de hoje em diante você é o Campeão do Reino, e o seu nome vai ser cantado em todas as aldeias.'],['marta','Fim da campanha. Obrigada por jogar Reino Pequeno!']],
+  outro:[['king','A Coroa de Pedravale voltou para casa. {hero}, de hoje em diante você é o Campeão do Reino, e o seu nome vai ser cantado em todas as aldeias.'],['marta','Mas a paz durou pouco: do pântano do leste chega uma névoa verde... Continue no capítulo 6.']],
+},
+{n:6,title:'A Névoa dos Mortos',place:'Pântano das Criptas',
+  start:{res:{wood:400,gold:300,food:400},era:3,blds:['house','house','house','farm','farm','barracks','archery'],units:{warrior:3,archer:3,monk:1}},
+  recipes:['ferramentas','armas','escudos','luz'],
+  marks:[{kinds:['lair','hideout'],n:3,drop:'cristal',guards:['skel','skel','skel','skelA','skelA']}],
+  intro:[
+    ['druid','Sou a Mãe Raiz, guardiã do bosque. A névoa verde vem das criptas de Morvana, a Necromante: ela acorda os mortos do pântano.'],
+    ['druid','Os esqueletos não sentem medo, e cada um que cai ela levanta de novo. Só a luz os vence: traga os 3 Cristais de Alma das criptas marcadas e forje a Lanterna da Aurora.'],
+    ['necro','Mais um reino cheio de soldados vivos... Que desperdício. Logo eles vão marchar para mim.'],
+  ],
+  goals:[
+    {id:'monastery',text:'Construa um mosteiro',type:'build',kind:'monastery',n:1},
+    {id:'crystals',text:'Recupere os 3 Cristais de Alma das criptas marcadas',type:'got',item:'cristal',n:3},
+    {id:'lantern',text:'Forje a Lanterna da Aurora',type:'item',item:'luz',say:['druid','A Lanterna acendeu! Os mortos não vão aguentar a luz dos seus monges.']},
+    {id:'necro',text:'Derrote Morvana, a Necromante',type:'kill',kind:'necro',hidden:'Ela vai aparecer quando a Lanterna acender'},
+  ],
+  waves:[
+    {t:200,team:3,from:'edge',units:{skel:4,skelA:2},count:false,say:['necro','Levantem-se, meus queridos. Há trabalho a fazer.']},
+    {t:420,team:3,from:'edge',units:{skel:6,skelA:3},count:false},
+    {t:640,team:3,from:'edge',units:{skel:7,skelA:4,orc:1},count:false},
+    {after:'lantern',delay:40,team:3,from:'edge',units:{necro:1,skel:6,skelA:4},count:false,say:['necro','Uma lanterna? Contra mim? Vou apagar essa luz com as suas próprias almas!']},
+  ],
+  deaths:{necro:['necro','A névoa... não morre... comigo...']},
+  outro:[['druid','A névoa se desfez e o pântano respira de novo. Mas a terra tremeu ao norte: algo enorme acordou nas montanhas.']],
+},
+{n:7,title:'O Gigante da Montanha',place:'Passo das Pedras',
+  start:{res:{wood:500,gold:400,food:450},era:4,blds:['house','house','house','house','farm','farm','farm','barracks','archery','monastery','tower'],units:{warrior:4,archer:4,lancer:3,monk:2}},
+  recipes:['ferramentas','armas','escudos','balista'],
+  marks:[{kinds:['hideout','lair'],n:2,drop:'runa',guards:['orc','orc','banditA','banditA','shaman']}],
+  intro:[
+    ['king','Os orcs da montanha descem pelo passo e queimam as fazendas. Dizem que obedecem a Gorm, um gigante de pedra que dormia havia cem anos.'],
+    ['king','As runas que o acordaram estão nos acampamentos dos orcs. Tome as duas runas, arme as torres com balistas e esteja pronto: quando o gigante descer, ele derruba muralhas com um golpe.'],
+    ['giant','QUEM... ACORDOU... GORM?'],
+  ],
+  goals:[
+    {id:'towers',text:'Tenha 4 torres',type:'build',kind:'tower',n:4},
+    {id:'runes',text:'Tome as 2 Runas da Montanha',type:'got',item:'runa',n:2},
+    {id:'ballista',text:'Arme as torres com balistas',type:'item',item:'balista',say:['king','Balistas nas torres! Que venha o gigante.']},
+    {id:'giant',text:'Derrote Gorm, o Gigante de Pedra',type:'kill',kind:'giant',hidden:'Ele vai descer quando as runas forem tomadas'},
+  ],
+  waves:[
+    {t:180,team:3,from:'edge',units:{orc:3,banditA:2},count:false,say:['giant','GORM... COM... FOME.']},
+    {t:400,team:3,from:'edge',units:{orc:5,banditA:3,shaman:1},count:false},
+    {t:620,team:3,from:'edge',units:{orc:6,banditA:4,chief:1},count:false},
+    {after:'runes',delay:60,team:3,from:'edge',units:{giant:1,orc:5,banditA:3},count:false,say:['giant','PEDRA... NÃO... ESQUECE!']},
+  ],
+  deaths:{giant:['giant','Gorm... volta... a dormir...']},
+  outro:[['king','O gigante voltou a ser montanha. {hero}, Pedravale nunca teve um campeão como você.'],['marta','Fim da campanha. Obrigada por jogar Reino Pequeno! Crie o seu herói na Forja e enfrente o Reino Vermelho na Batalha Rápida.']],
 },
 ];
 
@@ -239,12 +294,12 @@ function markCamps(m){
     const kind=m.kinds[0],cx=6+Math.random()*(MW-12),cy=6+Math.random()*(MH-12);
     if(hyp(cx*TS-c.x,cy*TS-c.y)<16*TS)continue;
     const sp=campSpot(kind,cx,cy,false,S.home.road);
-    if(sp.length){const camp=makeCamp(kind,sp[0],guards[kind]);got.push(byId.get(camp.lair));}
+    if(sp.length){const camp=makeCamp(kind,sp[0],m.guards||guards[kind]);got.push(byId.get(camp.lair));}
   }
   for(const b of got){
     b.drop=m.drop;
     const ci=S.camps.findIndex(cp=>cp.lair===b.id);
-    if(ci>=0){const cp=S.camps[ci],extra=b.kind==='den'?['bandit','banditA']:['bandit','banditA','bandit'];for(const k of extra){cp.kinds.push(k);spawnGuard(cp,k,cp.kinds.length);}}
+    if(ci>=0){const cp=S.camps[ci],extra=m.guards?m.guards.slice(0,3):b.kind==='den'?['bandit','banditA']:['bandit','banditA','bandit'];for(const k of extra){cp.kinds.push(k);spawnGuard(cp,k,cp.kinds.length);}}
   }
 }
 
