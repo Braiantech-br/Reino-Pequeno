@@ -23,13 +23,13 @@ function centroid(list){let x=0,y=0;for(const u of list){x+=u.x;y+=u.y;}return l
 function aiScan(){
   const T=S.teams[ME];
   const I={T,era:T.era,res:T.res,pawns:[],idle:[],army:[],monks:[],blds:{},unbuilt:[],castle:castleOf(ME),
-    foeArmy:[],foePawns:[],foeBlds:[],foeMil:{warrior:0,archer:0,lancer:0,monk:0},gath:{wood:0,gold:0,food:0},threats:[],wild:[],lairs:[]};
+    ships:[],foeArmy:[],foePawns:[],foeBlds:[],foeMil:{warrior:0,archer:0,lancer:0,monk:0},gath:{wood:0,gold:0,food:0},threats:[],wild:[],lairs:[]};
   for(const e of S.ents){
     if(e.dead)continue;const D=DEF[e.kind];
     if(e.team===ME){
       if(D.unit){
         if(e.kind==='pawn'){I.pawns.push(e);if(!e.order)I.idle.push(e);else if(e.order.type==='gather')I.gath[e.order.res]++;}
-        else if(D.holy)I.monks.push(e);else if(!D.boss&&!e.wave&&!D.cart&&!e.svc&&!D.civil&&!e.retreat)I.army.push(e);
+        else if(D.naval)I.ships.push(e);else if(D.holy)I.monks.push(e);else if(!D.boss&&!e.wave&&!D.cart&&!e.svc&&!D.civil&&!e.retreat)I.army.push(e);
       }else if(D.building){(I.blds[e.kind]=I.blds[e.kind]||[]).push(e);if(!e.built)I.unbuilt.push(e);}
     }else if(e.team===FO){
       if(D.unit){if(D.mil){I.foeArmy.push(e);I.foeMil[baseKind(e.kind)]=(I.foeMil[baseKind(e.kind)]||0)+1;}else I.foePawns.push(e);}
@@ -316,6 +316,9 @@ function aiTrain(I){
   const want={warrior:1+3*f.archer/tot,archer:1+3*f.lancer/tot+(I.era>=2?.3:0),lancer:1+3*f.warrior/tot};
   const qmax=S.diff.key==='insano'?3:2;
   const score=k=>want[k]/(1+own[k]*.35);
+  // warships from a dock, when the enemy sails or once the kingdom can afford them
+  for(const d of I.blds.dock||[]){if(!d.built||d.queue.length)continue;const fs=I.foeArmy.filter(u=>DEF[u.kind].naval).length;
+    if(unlocked(ME,'warship')&&I.ships.filter(u=>DEF[u.kind].warship).length<Math.min(4,1+fs)&&aiCanBuy(I,DEF.warship.cost)&&(fs||I.era>=3))trainAt(d,'warship');}
   for(const kind of['barracks','archery','monastery']){
     for(const b of I.blds[kind]||[]){
       if(!b.built||b.queue.length>=qmax)continue;

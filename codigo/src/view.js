@@ -377,7 +377,27 @@ function drawDock(e){
   ctx.restore();
 }
 // a little boat with a sail in the team's colour; heads show who is aboard
+function drawShip(e){
+  const bob=Math.sin(AT*2.1+e.id)*1.4,f=(e.face||1)<0?-1:1,tc=TEAMC[e.team]||'#888';
+  ctx.save();ctx.translate(0,bob);
+  ctx.globalAlpha=.35;ell(0,5,32,7,'#ffffff');ctx.globalAlpha=1;
+  // the hull, longer and higher than a boat, with a ram at the bow and shields along the side
+  P();ctx.moveTo(-30*f,-10);ctx.lineTo(28*f,-10);ctx.lineTo(38*f,-4);ctx.quadraticCurveTo(26*f,10,10*f,11);ctx.lineTo(-20*f,11);ctx.quadraticCurveTo(-32*f,6,-30*f,-10);ctx.closePath();fs('#7a4f2a','#3a2414',2.2);
+  line(-26*f,-4,30*f,-4,'#5a3a1c',1.6);
+  for(let k=0;k<5;k++){circ(-20*f+k*10*f,-7,3.6,k%2?tc:'#e8dcc0','#2b2232',1.1);}
+  // two masts, a striped sail in the team colour
+  line(-6*f,-10,-6*f,-58,'#3a2414',2.6);line(16*f,-10,16*f,-44,'#3a2414',2);
+  P();ctx.moveTo(-5*f,-56);ctx.quadraticCurveTo(14*f,-40,-5*f,-20);ctx.closePath();fs('#fff6dd','#2b2232',1.4);
+  rr(-5*f-(f<0?13:0),-46,13,6,1,tc);rr(-5*f-(f<0?13:0),-34,13,6,1,tc);
+  P();ctx.moveTo(17*f,-42);ctx.quadraticCurveTo(28*f,-32,17*f,-20);ctx.closePath();fs('#fff6dd','#2b2232',1.2);
+  P();ctx.moveTo(-6*f,-58);ctx.lineTo(4*f,-55);ctx.lineTo(-6*f,-52);ctx.closePath();fs(tc,'#2b2232',1);
+  // the archers on deck draw when it shoots
+  const dr=e.atkT>0?1:0;for(const x of[-14,6]){circ(x*f,-15,3.4,'#f2d0a8','#2b2232',1);if(dr){line(x*f+3*f,-20,x*f+3*f,-10,'#5a3a1c',1.4);}}
+  ctx.restore();
+  if(e.hitT>0){ctx.globalAlpha=.4;ell(0,0,32,9,'#ffffff');ctx.globalAlpha=1;}
+}
 function drawBoat(e){
+  if(DEF[e.kind]&&DEF[e.kind].warship){drawShip(e);return;}
   const bob=Math.sin(AT*2.4+e.id)*1.6,f=(e.face||1)<0?-1:1,n=e.cargo?e.cargo.length:0;
   ctx.save();ctx.translate(0,bob);
   ctx.globalAlpha=.35;ell(0,4,24,6,'#ffffff');ctx.globalAlpha=1;
@@ -908,7 +928,7 @@ function iconFor(kind,team){
     const m=META[skey],bw=m[5]-m[3],bh=m[6]-m[4],sc=Math.min(88/bw,88/bh)/SPS;
     ctx.imageSmoothingEnabled=sc*SPS<1;
     spr(skey,0,48,48+bh*sc*SPS/2,{s:sc,ax:(m[3]+m[5])/2,ay:m[6]});
-  }else if(D.naval){ctx.save();ctx.translate(48,66);ctx.scale(1.5,1.5);drawBoat({id:1,team:team||1,face:1});ctx.restore();}
+  }else if(D.naval){ctx.save();ctx.translate(48,66);ctx.scale(D.warship?1.15:1.5,D.warship?1.15:1.5);drawBoat({id:1,team:team||1,face:1,kind});ctx.restore();}
   else if(D.cart){ctx.save();ctx.translate(52,72);ctx.scale(1.35,1.35);drawCart({id:1,kind,team:team||1,face:1,load:{k:'gold'}});ctx.restore();}
   else if(D.mech){ctx.save();ctx.translate(kind==='ram'?37:48,74);ctx.scale(kind==='ram'?1.3:1.55,kind==='ram'?1.3:1.55);drawSiege({id:1,kind,team:team||1,face:1,cd:0});ctx.restore();}
   else if(kind==='dock'){ctx.save();ctx.scale(1.25,1.25);ctx.translate(6,12);drawDock({tx:0,ty:0,kind,team:team||1,built:true});ctx.restore();}

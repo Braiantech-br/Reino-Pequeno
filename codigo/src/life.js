@@ -705,7 +705,9 @@ function updBoat(u,dt){
   if(u.hitT>0)u.hitT-=dt;
   u.moving=false;
   if(!walkPt(u.x,u.y)){const w=nearestWalk(clamp(tileOf(u.x),0,MW-1),clamp(tileOf(u.y),0,MH-1));if(w){u.x=w[0]*TS+16;u.y=w[1]*TS+16;u.path=null;}}
-  const o=u.order;if(!o)return;
+  const o=u.order;
+  if(DEF[u.kind].warship&&shipFight(u,dt,o))return;
+  if(!o)return;
   if(o.type==='move'){doMove(u,dt);return;}
   if(o.type==='unload'){
     if(!u.cargo||!u.cargo.length){u.order=null;return;}
@@ -719,6 +721,27 @@ function updBoat(u,dt){
     return;
   }
   u.order=null;
+}
+// a warship shoots whatever is in range (ships, units on the shore, buildings by the water) and chases what it was sent against
+function shipFight(u,dt,o){
+  const D=DEF[u.kind];u.cd=Math.max(0,(u.cd||0)-dt);if(u.atkT>0)u.atkT-=dt;
+  let t=o&&o.type==='attack'?byId.get(o.id):null;if(t&&!alive(t)){u.order=null;o=null;t=null;}
+  const inR=e=>e&&(DEF[e.kind].building?distRect(u.x,u.y,rectOf(e)):hyp(e.x-u.x,e.y-u.y))<=D.range;
+  let shot=t&&inR(t)?t:null;
+  if(!shot&&(!o||o.type!=='move'||o.amove)){shot=pickTarget(u,D.range);
+    if(!shot)for(const b of BLDS)if(!b.dead&&b.team&&b.team!==u.team&&b.team!==0&&inR(b)){shot=b;break;}}
+  if(shot&&u.cd<=0){
+    u.cd=D.cd;u.atkT=.45;const c=centerOf(shot);u.face=c.x>u.x?1:-1;
+    const dmg=D.dmg*dmgMult(u.team);shoot(u,shot,dmg,u);
+    if(D.volley){let k=D.volley-1;forNear(u.x,u.y,D.range,e=>{if(k<=0||e===shot||e.dead||!e.team||e.team===u.team||!DEF[e.kind].unit||hyp(e.x-u.x,e.y-u.y)>D.range)return;k--;shoot(u,e,dmg*.7,u);});}
+  }
+  if(t&&!inR(t)){
+    // sail towards the target along the water
+    if(!u.path||!o.sail||S.t-o.sail>4){o.sail=S.t;const c=centerOf(t);const r=pathToPoint(u,c.x,c.y,true);if(r===0){u.order=null;return true;}}
+    followPath(u,dt);return true;
+  }
+  if(t)return true;
+  return false;
 }
 function unloadBoat(u,lx,ly,gx,gy){
   PNAV=false;

@@ -443,7 +443,8 @@ function command(wx,wy){
   const boats=units.filter(u=>DEF[u.kind].naval);
   if(boats.length){
     const water=inB(tx,ty)&&S.tiles[idx(tx,ty)]===WATER&&!bridgeA[idx(tx,ty)];
-    for(const b of boats){clearU(b);b.order=water?{type:'move',x:wx,y:wy}:(b.cargo&&b.cargo.length?{type:'unload',x:wx,y:wy}:{type:'move',x:wx,y:wy});}
+    const foe=hit&&hit.team&&hit.team!==1&&hit.team!==0;
+    for(const b of boats){clearU(b);b.order=foe&&DEF[b.kind].warship?{type:'attack',id:hit.id}:water?{type:'move',x:wx,y:wy}:(b.cargo&&b.cargo.length?{type:'unload',x:wx,y:wy}:{type:'move',x:wx,y:wy});}
     mark(wx,wy,water?'#7fd4ff':'#ffe066');
     if(!water&&boats.some(b=>b.cargo&&b.cargo.length))toast('O barco vai até a praia mais perto e desembarca as tropas.');
     units=units.filter(u=>!DEF[u.kind].naval);if(!units.length)return;
@@ -684,6 +685,7 @@ function statusOf(e){
   if(e.team===3)return (D.building?'Covil de criaturas: enquanto estiver de pé, repõe os guardas.':e.roam?'Bando errante: ataca qualquer reino.':'Guarda o covil e o ouro perto dele.')+(D.bounty?` Vale ${Object.entries(D.bounty).map(([k,v])=>`${v} de ${RES_NAME[k]}`).join(' e ')}.`:'');
   if(D.resource)return `${e.amount} de ouro restante`;
   if(D.critter)return `${e.amount} de comida`;
+  if(D.warship)return e.order&&e.order.type==='attack'?'Caçando o alvo pelo mar.':e.order?'Navegando.':'Vigiando a costa: atira em tudo o que chegar perto.';
   if(D.naval)return `Levando ${e.cargo?e.cargo.length:0} de ${D.cap}. `+(e.order&&e.order.type==='unload'?'Indo desembarcar.':e.order?'Navegando.':'Parado.');
   if(e.kind==='pit'&&e.built)return 'Fosso: ninguém passa a pé. Faça uma ponte por cima para suas tropas atravessarem.';
   if(e.kind==='house'&&e.team===1&&e.built){

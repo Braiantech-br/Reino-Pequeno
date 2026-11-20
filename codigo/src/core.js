@@ -57,7 +57,8 @@ const DEF={
   market: {name:'Mercado',building:true,w:3,h:2,hp:500,trains:['merchant'],cost:{wood:150},time:22,era:1,key:'7',desc:'Troca madeira e comida por ouro e treina mercadores.'},
   pit:    {name:'Fosso',building:true,wall:true,pit:true,w:1,h:1,hp:260,cost:{},time:7,era:1,desc:'Um buraco que ninguém atravessa a pé. Arraste para cavar uma linha. Construa uma ponte por cima para as suas tropas passarem.'},
   bridge: {name:'Ponte',building:true,flat:true,bridge:true,w:1,h:1,hp:320,cost:{wood:20},time:5,era:1,desc:'Atravessa água estreita ou um fosso. Comece na margem e arraste até o outro lado.'},
-  dock:   {name:'Cais',building:true,w:2,h:2,hp:450,trains:['boat'],cost:{wood:120},time:20,era:1,desc:'Constrói barcos. Precisa ficar na beira da água.'},
+  dock:   {name:'Cais',building:true,w:2,h:2,hp:450,trains:['boat','warship'],cost:{wood:120},time:20,era:1,desc:'Constrói barcos. Precisa ficar na beira da água.'},
+  warship:{name:'Navio de guerra',unit:true,mil:true,naval:true,warship:true,ranged:true,hp:420,speed:66,r:16,dmg:15,range:200,cd:1.7,sight:270,volley:2,cost:{wood:170,gold:70},time:24,era:2,desc:'Atira flechas pesadas do mar: afunda barcos e acerta tudo o que está perto da praia. Torres e arqueiros revidam.'},
   boat:   {name:'Barco',unit:true,naval:true,hp:220,speed:72,r:13,dmg:0,range:0,cd:1,sight:220,cost:{wood:110,gold:10},time:18,era:1,cap:6,desc:'Leva até 6 unidades pela água. Toque no barco com tropas selecionadas para embarcar.'},
   wall:   {name:'Muralha',building:true,wall:true,w:1,h:1,hp:450,cost:{wood:8},time:4,era:1,key:'8',desc:'Bloqueia a passagem. Arraste para construir uma linha. Arqueiros encostados nela atiram mais longe.'},
   gate:   {name:'Portão',building:true,wall:true,gate:true,w:1,h:1,hp:650,cost:{wood:30},time:8,era:1,key:'9',desc:'Suas tropas passam, os inimigos não. Também dá para transformar um pedaço de muralha em portão.'},
@@ -1006,6 +1007,7 @@ function pickTarget(u,range,opts){
     if(neu){if(!foes.includes(e.team))return;}
     else if(!e.team&&!(u.vsTown!=null&&DEF[e.kind].neutral&&e.town===u.vsTown)&&!(e.aid&&S.t<e.aid.until&&e.aid.foes.includes(u.team))&&!(e.town!=null&&townFoe(e.town,u.team))&&!(u.team===3&&DEF[e.kind].cart))return;
     if(u.team===3&&DEF[e.kind].envoy)return;
+    if(DEF[e.kind].naval&&!D.ranged&&!D.naval)return;
     const d=hyp(e.x-u.x,e.y-u.y);if(d>range)return;
     let s=d-(1-e.hp/e.maxhp)*(D.ranged?70:35);
     if(bonus(u.kind,e.kind)>1)s-=45;
