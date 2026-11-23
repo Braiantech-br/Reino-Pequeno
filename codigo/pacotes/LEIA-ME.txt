@@ -870,15 +870,29 @@ e vozes embutidas, e o mesmo botão de atualização.
   recebe o mapa.
 
  6.29 DOIS JOGADORES (cada um no seu aparelho)
-  Na tela inicial, "Dois jogadores": um toca em "Criar convite" e manda o
-  código para o amigo (pelo WhatsApp, por exemplo); o amigo cola o convite,
-  toca em "Entrar" e manda de volta o código de resposta; o anfitrião cola a
-  resposta e a partida começa. O anfitrião comanda o Reino Azul e o amigo, o
-  Vermelho (na tela do amigo, o reino dele aparece em azul). Os dois usam o
-  Conselho inteiro: contratos, diplomacia, conquista, economia e exército.
-  A conexão é direta entre os aparelhos, sem servidor do jogo: funciona
-  melhor no mesmo Wi-Fi; pela internet, depende da rede de cada um. Se o
-  amigo sair, o computador assume o Reino Vermelho.
+  Na tela inicial, toque em "Dois jogadores":
+    1. Quem cria a sala toca em "Criar convite" e manda o código para o amigo
+       (pelo WhatsApp, por exemplo). Pode fechar a janela para ir ao
+       WhatsApp: o convite continua valendo.
+    2. O amigo cola o convite, toca em "Entrar com o convite" e manda de
+       volta o código de resposta. Depois, volta logo para o jogo.
+    3. Quem criou cola a resposta e toca em "Conectar". A partida começa.
+  Quem cria a sala comanda o Reino Azul; o amigo, o Vermelho (na tela do
+  amigo, o reino dele aparece em azul). Os dois usam o Conselho inteiro:
+  contratos, diplomacia, conquista, economia e exército. Os dois precisam
+  estar na versão 2.3.2 ou mais nova.
+  A conexão é direta entre os aparelhos, sem servidor do jogo. Não precisa
+  desligar o firewall. Se não conectar, o jogo avisa e mostra o porquê:
+    - mesmo Wi-Fi: é o jeito mais garantido. Wi-Fi de visitantes (ou com
+      isolamento de clientes no roteador) não deixa os aparelhos se verem;
+    - Windows: se o Firewall do Windows perguntar, toque em Permitir e marque
+      Redes privadas; deixe o seu Wi-Fi como Rede privada;
+    - redes diferentes ou dados móveis: muitas operadoras bloqueiam a conexão
+      direta. Nesse caso, quem cria a sala configura a retransmissão em
+      "Problemas para conectar?" (uma conta grátis no Metered/Open Relay dá
+      20 GB por mês).
+  "Testar a minha rede" mostra se o aparelho consegue a conexão direta.
+  Se o amigo sair, o computador assume o Reino Vermelho.
 
  6.30 TRANSMISSÃO AO VIVO (Som e avisos)
   Votação do público (escolha o modo em Som e avisos):

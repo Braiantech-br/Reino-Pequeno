@@ -1,13 +1,14 @@
 {
- "ver": 231,
- "name": "2.3.1",
- "date": "2026-11-20",
+ "ver": 232,
+ "name": "2.3.2",
+ "date": "2026-11-23",
  "file": "jogo.html",
- "bytes": 3714939,
- "sha256": "ab7392dc9cf5dec7e85b9a21d88d60c9e408f60f6e01f54b38619a1172dc946b",
+ "bytes": 3723911,
+ "sha256": "ead21ce4d5264e0de499f08b39358a7bd7c5a954ff99566d049cdaf7f3a5473b",
  "notas": [
-  "Dois jogadores: o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos e festas, ordens do exército, batedores e pedidos.",
-  "Votação do público mais simples: Chat da Twitch (conta sozinha), Outro chat (para TikTok, YouTube ou Instagram: você marca os votos tocando na opção ou nas teclas 1, 2 e 3) ou Sorteio, sem chat.",
-  "Botão \"Testar a votação agora\", intervalo de 2, 3 ou 5 minutos e explicação de cada modo em Som e avisos. Sem votos, o jogo sorteia e avisa."
+  "Dois jogadores consertado: o convite continua valendo mesmo se você fechar a janela para ir ao WhatsApp (antes, fechar ou abrir de novo a tela apagava o convite e a resposta do amigo não conectava mais).",
+  "Os códigos de convite ficaram mais curtos e funcionam em qualquer navegador e celular, inclusive iPhones e Androids mais antigos.",
+  "O botão \"Copiar código\" agora copia de verdade (antes, às vezes dizia \"copiado\" sem ter copiado) e há um botão para compartilhar no celular.",
+  "Se a conexão falhar, o jogo avisa em até 25 segundos e explica o motivo, com o botão \"Testar a minha rede\" e a opção de retransmissão pela internet para redes diferentes e dados móveis."
  ]
 }

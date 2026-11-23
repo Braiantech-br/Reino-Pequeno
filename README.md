@@ -28,6 +28,11 @@ Os instaladores ficam na pasta [downloads](downloads/). Depois de instalado, o j
 As versões anteriores continuam disponíveis em [downloads/old](downloads/old/).
 Instruções para cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
 
+## Novidades da versão 2.3.2
+
+- **Dois jogadores consertado:** o convite continua valendo mesmo se você fechar a janela para mandar o código pelo WhatsApp, os códigos ficaram mais curtos e funcionam em qualquer navegador, e o botão *Copiar código* copia de verdade.
+- Se a conexão falhar, o jogo avisa e explica o motivo, com *Testar a minha rede* e a opção de retransmissão (TURN) para jogar em redes diferentes e nos dados móveis. Não precisa desligar o firewall.
+
 ## Novidades da versão 2.3.1
 
 - **Dois jogadores:** o amigo (Reino Vermelho) agora também usa o Conselho inteiro: contratos com as vilas, diplomacia, conquista, comércio, impostos, ordens do exército e batedores.

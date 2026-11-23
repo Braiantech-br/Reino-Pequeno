@@ -1,0 +1,4 @@
+Dois jogadores consertado: o convite continua valendo mesmo se você fechar a janela para ir ao WhatsApp (antes, fechar ou abrir de novo a tela apagava o convite e a resposta do amigo não conectava mais).
+Os códigos de convite ficaram mais curtos e funcionam em qualquer navegador e celular, inclusive iPhones e Androids mais antigos.
+O botão "Copiar código" agora copia de verdade (antes, às vezes dizia "copiado" sem ter copiado) e há um botão para compartilhar no celular.
+Se a conexão falhar, o jogo avisa em até 25 segundos e explica o motivo, com o botão "Testar a minha rede" e a opção de retransmissão pela internet para redes diferentes e dados móveis.

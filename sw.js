@@ -1,5 +1,5 @@
-// Reino Pequeno 2.3.1: the newest copy when online, the saved copy when offline
-const CACHE='reino-231';
+// Reino Pequeno 2.3.2: the newest copy when online, the saved copy when offline
+const CACHE='reino-232';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-180.png','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
