@@ -241,7 +241,9 @@ function netTick(dt){
 }
 {
   const el=id=>document.getElementById(id);
-  el('b-net').addEventListener('click',()=>{netShow();if(!NET.pc)netStatus('');el('ov-net').hidden=false;});
+  // the claude.ai link runs the game in a sandboxed frame that does not allow WebRTC, and very old browsers have none
+  const netBlocked=()=>!!window.__RP_ART||/claudeusercontent\.com$/.test(location.hostname)||typeof RTCPeerConnection!=='function';
+  el('b-net').addEventListener('click',()=>{netShow();const no=netBlocked();el('net-noapp').hidden=!no;el('net-main').hidden=no;if(!NET.pc)netStatus('');el('ov-net').hidden=false;});
   el('net-host').addEventListener('click',()=>{el('net-in').value='';netCreate().catch(()=>netStatus('Este aparelho não conseguiu criar a conexão (o navegador não tem WebRTC?).',true));});
   el('net-join').addEventListener('click',()=>{if(!el('net-in').value.trim()){netStatus('Cole primeiro, no campo de cima, o convite que o seu amigo mandou.',true);return;}netJoin().catch(()=>netStatus('Não consegui usar esse convite.',true));});
   el('net-go').addEventListener('click',()=>{if(NET.role!=='host'||!NET.pc){netStatus('Primeiro toque em "Criar convite".',true);return;}netAnswerIn();});

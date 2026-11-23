@@ -3,8 +3,8 @@
  "name": "2.3.2",
  "date": "2026-11-23",
  "file": "jogo.html",
- "bytes": 3723911,
- "sha256": "ead21ce4d5264e0de499f08b39358a7bd7c5a954ff99566d049cdaf7f3a5473b",
+ "bytes": 3724932,
+ "sha256": "1bbdafe1bb3e47878dfc162f167b96867151b60395424d128a120a851b798674",
  "notas": [
   "Dois jogadores consertado: o convite continua valendo mesmo se você fechar a janela para ir ao WhatsApp (antes, fechar ou abrir de novo a tela apagava o convite e a resposta do amigo não conectava mais).",
   "Os códigos de convite ficaram mais curtos e funcionam em qualquer navegador e celular, inclusive iPhones e Androids mais antigos.",
