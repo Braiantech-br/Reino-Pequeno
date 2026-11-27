@@ -4,13 +4,13 @@ Estratégia medieval em tempo real, no estilo Age of Empires, Stronghold e Warcr
 
 Construa a vila, avance pelas cinco eras, negocie com as vilas neutras, contrate mercenários e heróis, monte o exército com generais e derrube o castelo do Reino Vermelho. Roda no navegador, no computador e no celular, inclusive sem internet.
 
-## Vídeo da atualização 2.3
+## Vídeo da atualização 2.4: a IA que aprende com você
 
-[![Vídeo da atualização 2.3 do Reino Pequeno (clique para assistir)](trailer/previa-2.3.gif)](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.3-Atualizacao.mp4)
+[![Vídeo da atualização 2.4 do Reino Pequeno (clique para assistir)](trailer/previa-2.4.gif)](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.4-Atualizacao.mp4)
 
-▶ [Assistir no navegador](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.3-Atualizacao.mp4) · [Baixar o vídeo (horizontal, 1080p)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.3-Atualizacao.mp4) · [Baixar a versão vertical (TikTok, Reels, Shorts, Status)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.3-Atualizacao-vertical.mp4)
+▶ [Assistir no navegador](https://braiantech-br.github.io/Reino-Pequeno/trailer/ReinoPequeno-2.4-Atualizacao.mp4) · [Baixar o vídeo (horizontal, 1080p)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.4-Atualizacao.mp4) · [Baixar a versão vertical (TikTok, Reels, Shorts, Status)](https://github.com/Braiantech-br/Reino-Pequeno/raw/main/trailer/ReinoPequeno-2.4-Atualizacao-vertical.mp4)
 
-Os trailers anteriores (2.1 e 2.2: Claude × Claude) estão na pasta [trailer/old](trailer/old/).
+Os vídeos anteriores (2.1, 2.2 e 2.3) estão na pasta [trailer/old](trailer/old/).
 
 ## Jogar
 
@@ -27,6 +27,16 @@ Os trailers anteriores (2.1 e 2.2: Claude × Claude) estão na pasta [trailer/ol
 Os instaladores ficam na pasta [downloads](downloads/). Depois de instalado, o jogo se atualiza sozinho.
 As versões anteriores continuam disponíveis em [downloads/old](downloads/old/).
 Instruções para cada sistema, regras e controles: [LEIA-ME.txt](LEIA-ME.txt).
+
+## Novidades da versão 2.4: a IA que aprende com você
+
+- **Memória do Rubro.** A cada Batalha Rápida, o Mestre Rubro estuda como você joga: as tropas de cada era, o horário e o lado dos seus ataques, o caminho do seu exército, os aldeões e as torres, como você responde aos saques, os contratos com as vilas. Tudo vira um dossiê sobre você.
+- **Um plano contra você.** Antes de cada partida ele lê o dossiê e se prepara: as tropas que vencem as suas prontas antes do seu ataque, torre e exército no lado de onde você vem, emboscada na mata do caminho que você mais usa, ataque grande no seu momento fraco, saques onde os seus aldeões ficam sem guarda. Durante a partida o plano é refeito a cada minuto.
+- **O Conselho de Guerra lembra** quais táticas já funcionaram contra você e pesa mais futuros por decisão quanto mais te conhece.
+- **Evolução.** O jeito do Rubro tem dez genes; depois de cada partida ele guarda a versão que melhor jogou contra você e testa uma nova. A geração aparece na tela.
+- **O Claude também aprende.** No comando do Reino Vermelho, ele recebe o dossiê a cada minuto e, no fim da partida, escreve as próprias lições e o plano para a próxima.
+- **Defesa do Rei:** as ondas chegam pelo lado que você defende menos, com as tropas que vencem as suas.
+- **Tela nova no menu:** o seu estilo, o caminho do seu exército, as previsões, o plano do Rubro, as táticas que funcionam contra você, as lições e as últimas partidas. Dá para desligar o aprendizado ou apagar a memória; tudo fica só no seu aparelho.
 
 ## Novidades da versão 2.3.2
 
@@ -88,6 +98,7 @@ index.html, manifest.webmanifest, sw.js, icon-*.png   o jogo on-line (GitHub Pag
 downloads/                                            os instaladores (Windows, Mac, Linux, Android, iPhone)
 atualizacao/versao.json, atualizacao/jogo.html        o canal de atualização dos jogos baixados
 LEIA-ME.txt                                           manual: instalação, regras, controles
+trailer/                                              o vídeo da atualização (os anteriores em trailer/old)
 COMO-ATUALIZAR.md                                     como publicar uma versão nova
 codigo/src/                                           o código do jogo (JavaScript, HTML, CSS)
 codigo/build.py                                       monta a página de teste (codigo/preview.html)

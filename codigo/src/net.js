@@ -125,7 +125,7 @@ async function netTest(){
 function netHostStart(){
   $('ov-net').hidden=true;
   startGame({mode:'skirmish',diff:radio('diff')||'dificil',blue:'voce',claude:false,hero:'nenhum'});
-  S.ai=null;S.cfg=Object.assign({},S.cfg,{mp:true,claude:false,fog:false});S.autoBuild=false;
+  S.ai=null;S.cfg=Object.assign({},S.cfg,{mp:true,claude:false,fog:false});S.autoBuild=false;if(S.lrn)S.lrn.on=false;
   for(const t of[1,2]){const C=CLAUDE.side[t];C.gid++;C.on=false;}clChip();
   banner('Dois jogadores','Você é o Reino Azul','O seu amigo comanda o Reino Vermelho. Boa batalha!',false);
   NET.fT=0;NET.dT=0;netFull();

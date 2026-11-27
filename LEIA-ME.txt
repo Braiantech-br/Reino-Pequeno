@@ -1,10 +1,10 @@
 ﻿==============================================================================
-  REINO PEQUENO  ·  versão 2.3.2  ·  23 de novembro de 2026
+  REINO PEQUENO  ·  versão 2.4  ·  27 de novembro de 2026
   Estratégia medieval em tempo real  ·  Braian Tech
 ==============================================================================
 
 Este pacote roda o jogo inteiro no seu aparelho, SEM internet e SEM passar
-por nenhum servidor. O que você faz aqui (jogos salvos, capítulos liberados)
+por nenhum servidor. O que você faz aqui (jogos salvos, capítulos liberados, a Memória do Rubro)
 fica guardado apenas no aparelho. A internet só é usada quando VOCÊ toca em
 "Procurar atualização" para baixar uma versão nova.
 
@@ -29,7 +29,7 @@ fica guardado apenas no aparelho. A internet só é usada quando VOCÊ toca em
 ==============================================================================
 
   Cada sistema tem o seu próprio arquivo para baixar (nos Releases, o nome
-  traz o número da versão, como em ReinoPequeno-2.3.2-Windows.zip):
+  traz o número da versão, como em ReinoPequeno-2.4-Windows.zip):
 
   ReinoPequeno-Windows.zip ...... Reino Pequeno.exe (abre ou instala)
   ReinoPequeno-Mac.zip .......... Reino Pequeno.app
@@ -922,6 +922,48 @@ e vozes embutidas, e o mesmo botão de atualização.
   mostra onde tocar, e cada passo avança sozinho quando você faz o que ele
   pede. Os ataques só começam no fim do tutorial.
 
+ 6.32 MEMÓRIA DO RUBRO (a IA aprende com você)
+  Na Batalha Rápida contra o Reino Vermelho, o Mestre Rubro estuda cada
+  partida sua e muda a própria estratégia para te vencer.
+    O que ele observa ... as tropas que você treina em cada era, quando e por
+                          qual lado você ataca (e com quantos soldados), o
+                          caminho que o seu exército faz, quantos aldeões,
+                          torres e muralhas você ergue, como você responde aos
+                          saques, os contratos e conquistas com as vilas, o
+                          comércio e o momento em que o seu exército fica
+                          pequeno perto dos aldeões.
+    Antes da partida .... ele lê o dossiê e monta um plano: as tropas que
+                          vencem as suas prontas antes do seu ataque, torre e
+                          exército esperando no lado de onde você vem,
+                          emboscada na mata do caminho que você mais usa,
+                          ataque grande no seu momento fraco, saques onde os
+                          seus aldeões ficam sem guarda, aríetes contra
+                          torres, alianças com as vilas antes de você.
+    Durante a partida ... o plano é refeito a cada minuto com o que ele vê; se
+                          o seu ataque fracassa, ele contra-ataca na hora.
+    Conselho de Guerra .. lembra quais táticas já funcionaram contra você,
+                          confia mais nelas e pesa mais futuros por decisão.
+    Evolução ............ o jeito de jogar dele tem dez genes (aldeões a mais,
+                          torres, saques, cerco, pressa de era, coragem,
+                          cautela...). Depois de cada partida ele guarda a
+                          versão que melhor jogou contra você e testa uma nova
+                          com poucas mudanças. A geração aparece na tela.
+    O Claude ............ quando o Claude comanda o Reino Vermelho, o dossiê vai
+                          junto com o relatório de cada minuto (é o único caso
+                          em que algo da memória sai do aparelho, para a
+                          Anthropic). No fim da partida, o Claude escreve as
+                          próprias lições e o plano para a próxima. Como
+                          conselheiro do seu reino, ele vê o que o Rubro sabe
+                          de você e ajuda a surpreendê-lo.
+    Defesa do Rei ....... as ondas chegam pelo lado que você defende menos e
+                          trazem as tropas que vencem as suas.
+  Na tela inicial, "Memória do Rubro" mostra o seu estilo, o caminho do seu
+  exército, o que ele espera de você, o plano dele, as táticas que mais
+  funcionam contra você, o jeito dele (os genes), as lições e as últimas
+  partidas. Ali dá para desligar o aprendizado ("A IA aprende comigo") ou
+  apagar a memória. Partidas abandonadas também contam (como desistência).
+  O modo observador e a partida de dois jogadores não entram na memória.
+
 
 ==============================================================================
  7. DICAS PARA COMEÇAR
@@ -1018,11 +1060,14 @@ e vozes embutidas, e o mesmo botão de atualização.
 
   Código-fonte e versões: https://github.com/Braiantech-br/Reino-Pequeno
 
-  Versão 2.3.2 (23 de novembro de 2026)
-    - Dois jogadores consertado: o convite continua valendo mesmo se você fechar a janela para ir ao WhatsApp (antes, fechar ou abrir de novo a tela apagava o convite e a resposta do amigo não conectava mais).
-    - Os códigos de convite ficaram mais curtos e funcionam em qualquer navegador e celular, inclusive iPhones e Androids mais antigos.
-    - O botão "Copiar código" agora copia de verdade (antes, às vezes dizia "copiado" sem ter copiado) e há um botão para compartilhar no celular.
-    - Se a conexão falhar, o jogo avisa em até 25 segundos e explica o motivo, com o botão "Testar a minha rede" e a opção de retransmissão pela internet para redes diferentes e dados móveis.
+  Versão 2.4 (27 de novembro de 2026)
+    - Memória do Rubro: o Reino Vermelho aprende com você. A cada Batalha Rápida, o Mestre Rubro estuda como você joga (as tropas de cada era, o horário e o lado dos seus ataques, o caminho do seu exército, quantos aldeões e torres você faz, como você defende os aldeões dos saques, os contratos com as vilas) e guarda tudo num dossiê sobre você.
+    - Antes de cada partida ele lê o dossiê e monta um plano contra você: tropas que vencem as suas prontas antes do seu ataque, torre e exército no lado de onde você vem, emboscada na mata do caminho que você mais usa, ataque grande no momento em que o seu exército costuma estar menor, saques onde os seus aldeões ficam sem guarda. Durante a partida ele continua aprendendo.
+    - O Conselho de Guerra lembra quais táticas já funcionaram contra você e confia mais nelas, e pesa mais futuros por decisão quanto mais te conhece.
+    - O jeito do Rubro evolui: depois de cada partida, vitória ou derrota, ele guarda a versão que melhor jogou contra você e testa uma nova (dez genes: aldeões, torres, saques, cerco, pressa de era, coragem, cautela...). A geração aparece na tela.
+    - O Claude também aprende: quando comanda o Reino Vermelho, ele recebe o dossiê junto com o relatório e, no fim da partida, escreve as próprias lições e o plano para a próxima.
+    - Defesa do Rei aprende: as ondas chegam pelo lado que você defende menos e trazem as tropas que vencem as suas.
+    - Nova tela "Memória do Rubro" no menu: o seu estilo, o caminho do seu exército, o que ele espera de você, o plano dele, as táticas que funcionam contra você, as lições e as últimas partidas. Dá para desligar o aprendizado ou apagar a memória. Tudo fica guardado só no seu aparelho.
 
   Versão 1.15 (outubro de 2026)
     - Sino das vilas: pedir e dar socorro, favores entre vilas e reino.

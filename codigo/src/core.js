@@ -1139,6 +1139,7 @@ function update(dt){
   villageMind(dt);
   if(!S.over&&S.ai)aiUpdate(dt);
   if(!S.over)warUpdate(dt);
+  if(!S.over)lrnTick(dt);
   if(!S.over)modeUpdate(dt);
 }
 
@@ -1755,6 +1756,7 @@ function updBuilding(b,dt){
   }
 }
 function onTrained(u,b){
+  lrnTrained(u);
   if(u.team===1){HOOK.toast(`${unitName(u)} pronto!`,'good',{x:u.x,y:u.y,id:u.id});HOOK.sfx('train',u.x,u.y,1);HOOK.trained(u);}
   if(DEF[u.kind].naval)return;
   const rp=b.rally;
@@ -1834,6 +1836,7 @@ function damage(t,dmg,src){
   else if(TD.mech&&src&&!DEF[src.kind])dmg*=t.kind==='ram'?.2:.6;
   if(t.gate&&!has('ariete')&&!(src&&DEF[src.kind]&&(DEF[src.kind].siege||DEF[src.kind].wallx>=6))){dmg*=.08;if(src&&src.team===1&&S.t-(S.gateT||-99)>12){S.gateT=S.t;HOOK.toast('O portão do castelo vermelho é reforçado demais. Forje o Aríete Real.','warn',{x:t.x,y:t.y});}}
   t.hp-=dmg;t.hitT=.18;t.lastHit=S.t;
+  if(src&&src.team===1&&t.team===2&&S.lrn)S.lrn.hit={t:S.t,x:t.x,y:t.y};
   loot(t,dmg,src);
   if(t.team===3&&src&&src.team&&src.team!==3){const c=campOf(t);if(c){c.hitT=S.t;c.hitBy=src.team;}}
   if(TD.unit&&src&&src.id!=null&&alive(src)&&DEF[src.kind]&&DEF[src.kind].unit&&src.team!==t.team){
@@ -1881,6 +1884,7 @@ function kill(t,src){
   }
   if(t.kind==='castle'){if(t.team===1)endGame(false,'castle');else if(S.mode==='skirmish')endGame(true);}
   if(D.king&&t.team===1)endGame(false,'king');
+  lrnKill(t,src);
   modeKill(t,src);
 }
 function addKill(u){
@@ -1899,6 +1903,7 @@ function addKill(u){
 function endGame(win,why){
   if(S.over)return;
   S.over=win?'win':'lose';S.why=why||'';
+  try{lrnEnd(win?'win':'lose');}catch(e){}
   HOOK.over(win,why);
 }
 

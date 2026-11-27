@@ -102,6 +102,8 @@ function warSnap(I,W){
     W.covT=S.t;W.cov=[];const c=I.castle,from=clusters[0]||fc||{x:c.x+I.dir.x*800,y:c.y+I.dir.y*800};
     for(const f of[.3,.45,.6]){const p={x:c.x+(from.x-c.x)*f,y:c.y+(from.y-c.y)*f},q=coverNear(p.x,p.y,6);if(q)W.cov.push(q);}
     for(const w of work.slice(0,2)){const q=coverNear(w.x,w.y,6);if(q)W.cov.push(Object.assign(q,{work:true}));}
+    // the woods on the path the player always walks (Memória do Rubro) come first
+    W.cov.unshift(...lrnCover());
   }
   const me=warForce(army),them=warForce(foeArmy);
   return {army,foeArmy,fast,mob,clusters,work,econ,leaders,cov:W.cov,me,them,cmod:warCounter(army,foeArmy),fc,
@@ -138,7 +140,7 @@ function warCandidates(I,P){
 }
 function warTravel(I,x,y){return hyp(x-I.castle.x,y-I.castle.y)/55;}
 function warScore(I,P,k,R){
-  const me=P.me,them=P.them,cm=P.cmod,peace=S.t<S.diff.peace;
+  const me=P.me,them=P.them,cm=P.cmod,peace=S.t<S.diff.peace,lc=lrnCP(),soon=lrnSoon();
   const group=f=>fscale(me,f);
   let sum=0,sq=0;
   for(let r=0;r<R;r++){
@@ -158,14 +160,15 @@ function warScore(I,P,k,R){
         g=lb*(foeF.val+(T.kind==='castle'&&win?3000:0))-la*me.val-(warTravel(I,T.x,T.y)*4);
         break;}
       case 'emboscada':{
-        const p=k.p,pass=P.attacking?.75:(k.p.work?.4:.3)*(them.n>2?1:.3);
+        // the player walks past more often where he always walks, and when his attack is due (Memória do Rubro)
+        const p=k.p,pass=Math.min(.95,(P.attacking?.75:(k.p.work?.4:.3)*(them.n>2?1:.3))+(k.heat||0)*.45+soon*.25);
         if(react>pass){g=-20;break;}
         const surprise=seen<.8?1.55:1.0,hostF=fscale(them,.55+Math.random()*.45);
         const [la,lb]=warFight(me,hostF,cm*luck*surprise*(1+(elev[idx(tileOf(p.x),tileOf(p.y))]||0)*.12),1);
         g=lb*hostF.val-la*me.val+10;
         break;}
       case 'fingida':{
-        const lure=react<.55,tw=warForce(towersNear(k.p.x,k.p.y,300,ME));
+        const lure=react<.55+(lc?lc.chase*.25:0),tw=warForce(towersNear(k.p.x,k.p.y,300,ME));
         if(!lure){g=-35;break;}
         const hostF=fscale(them,.5+Math.random()*.4);
         const [la,lb]=warFight(fadd(me,tw,1),hostF,cm*luck*(seen<.75?1.4:1.05),1);
@@ -176,13 +179,13 @@ function warScore(I,P,k,R){
         const raid=group(Math.min(1,5/Math.max(1,P.army.length))),w=k.w,gd=w.guard;
         const [la,lb,win]=warFight(raid,gd,luck*1.15,1);
         const kills=win?Math.min(w.units.length,3+Math.random()*4):0,flee=react<.5;   // the enemy army arrives, the raiders vanish
-        g=kills*65*1.5+lb*gd.val-la*raid.val*(flee?.5:1)-warTravel(I,w.x,w.y)*2;
+        g=kills*65*1.5*(1+(lc?lc.vuln*.6:0))+lb*gd.val-la*raid.val*(flee?.5:1)-warTravel(I,w.x,w.y)*2;
         break;}
       case 'sabotagem':{
         if(peace){g=-1e4;break;}
         const b=k.b,gd=warForce(foesNear(b.x,b.y,300,ME).concat(towersNear(b.x,b.y,260,FO))),sq6=group(Math.min(1,6/Math.max(1,P.army.length)));
         const [la,,win]=warFight(sq6,gd,luck,1);
-        g=(win?unitVal(b)*1.6:0)-la*sq6.val-warTravel(I,b.x,b.y)*2;
+        g=(win?unitVal(b)*1.6*(lc&&(b.kind==='market'||DEF[b.kind].cart)?1+lc.trade*.6:1):0)-la*sq6.val-warTravel(I,b.x,b.y)*2;
         break;}
       case 'diversao':{
         if(peace){g=-1e4;break;}
@@ -197,7 +200,7 @@ function warScore(I,P,k,R){
         g=(win?unitVal(L)+them.val*.18:0)+lb*esc.val*.5-la*st.val;
         break;}
       case 'defesa':{
-        const att=P.attacking?1:react<.35?1:0,tw=warForce(towersNear(I.castle.x,I.castle.y,9*TS,ME));
+        const att=P.attacking?1:react<.35+soon*.45?1:0,tw=warForce(towersNear(I.castle.x,I.castle.y,9*TS,ME));
         if(!att){g=8;break;}
         const [la,lb]=warFight(fadd(me,tw,1),them,cm*luck*1.25,1);
         g=lb*them.val-la*me.val;
@@ -206,15 +209,18 @@ function warScore(I,P,k,R){
     sum+=g;sq+=g*g;
   }
   const mean=sum/R,sd=Math.sqrt(Math.max(0,sq/R-mean*mean));
-  return mean-sd*.25;                                            // a careful captain: a sure gain beats a wild gamble
+  return mean-sd*(lc?lc.care:.25);                               // a careful captain: a sure gain beats a wild gamble
 }
 function warDecide(I,W){
   const P=warSnap(I,W),C=warCandidates(I,P);if(!C.length)return null;
   let best=null,bs=-1e9;
+  // against a player it knows, the council plays out more futures and trusts the plans that already beat him (Memória do Rubro)
+  const lc=lrnCP(),R=lc?lc.roll:WAR_ROLL;
+  for(const k of C)if(k.p)k.heat=lrnHeatAt(k.p.x,k.p.y);
   // the council learns: a plan that just failed is trusted less for a while, one that worked a bit more
   const memo=t=>{let m=1;for(const h of W.hist.slice(0,5))if(h.type===t&&S.t-h.t<300)m*=h.ok===false?.6:h.ok?1.1:1;return m;};
-  for(const k of C){const raw=warScore(I,P,k,WAR_ROLL),m=memo(k.type),s=raw>0?raw*m:raw/m;k.score=s;if(s>bs){bs=s;best=k;}}
-  W.evals+=C.length*WAR_ROLL;W.lastN=C.length*WAR_ROLL;W.lastC=C.map(k=>({type:k.type,score:Math.round(k.score)})).sort((a,b)=>b.score-a.score).slice(0,4);
+  for(const k of C){const raw=warScore(I,P,k,R),m=memo(k.type)*lrnPlanMult(k.type),s=raw>0?raw*m:raw/m;k.score=s;if(s>bs){bs=s;best=k;}}
+  W.evals+=C.length*R;W.lastN=C.length*R;W.lastC=C.map(k=>({type:k.type,score:Math.round(k.score)})).sort((a,b)=>b.score-a.score).slice(0,4);
   return best&&{k:best,P};
 }
 
@@ -249,6 +255,7 @@ function warEnd(W,ok,why){
   const pl=W.plan;if(!pl)return;
   for(const gk in pl.g)for(const id of pl.g[gk]){const u=byId.get(id);if(u&&u.war===pl.id){u.war=0;if(u.order&&u.order.war)u.order=null;}}
   if(W.hist[0]&&W.hist[0].type===pl.type)W.hist[0].ok=ok;
+  lrnPlanEnd(pl.type,ok);
   HOOK.war(ME,ok?'done':'fail',pl,W,why);
   W.plan=null;W.next=S.t+(ok?3:6);
 }
@@ -370,10 +377,11 @@ function warRun(I,W){
 function warMasters(I,W){
   W.evacT=(W.evacT||0)-1;if(W.evacT>0)return;W.evacT=2;
   if(ME===1&&S.rules&&S.rules.evacuar===false)return;
-  const c=I.castle;let fled=0;
+  // against a raider the workers run earlier (Memória do Rubro)
+  const c=I.castle,lc=lrnCP(),fr=200+(lc&&lc.raid>.35?80:0);let fled=0;
   for(const p of I.pawns){
     if(p.fleeT>S.t)continue;
-    const f=foesNear(p.x,p.y,200,ME).filter(e=>!DEF[e.kind].civil);
+    const f=foesNear(p.x,p.y,fr,ME).filter(e=>!DEF[e.kind].civil);
     if(f.length&&!foesNear(p.x,p.y,1,0).length){
       const guard=strength(I.army.filter(u=>hyp(u.x-p.x,u.y-p.y)<260));
       if(guard>strength(f)*.8)continue;

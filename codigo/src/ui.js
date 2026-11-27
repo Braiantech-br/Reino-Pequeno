@@ -241,7 +241,7 @@ function showEnd(){
   $('b-next').hidden=!(S.mode==='campaign'&&win&&C&&C.n<5);
   $('b-again').textContent=S.mode==='campaign'?(win?'Repetir capítulo':'Tentar de novo'):'Jogar de novo';
   $('ov-end').hidden=false;
-  clEndLog();
+  clEndLog();lrnEndUI();
 }
 
 // ---------------------------------------------------------------- story, talk and goals (campaign and Defesa do Rei)
@@ -1293,7 +1293,8 @@ function resumeMatch(n){
   n=n||'auto';let d=null;try{d=JSON.parse(localStorage.getItem(slotKey(n))||'null',matchIn);}catch(e){d=null;}
   if(!d||!d.S){delSlot(n);toast('Não consegui abrir a partida salva.');renderMenu();return;}
   fjSync();
-  S=d.S;afterLoad();
+  if(S&&ui.started&&!S.over)lrnPendSave();
+  S=d.S;afterLoad();lrnBegin(true);
   if(d.cam)Object.assign(cam,d.cam);clampCam();
   ui.last=d.last||{mode:S.mode,diff:S.diff&&S.diff.key,chapter:S.chapter};
   audioInit();
@@ -1329,6 +1330,7 @@ function renderMenu(){
   $('chap-list').innerHTML=CHAPTERS.slice(1).map(C=>`<button type="button" data-ch="${C.n}" class="${C.n===ui.chapter?'on':''}${C.n<un?' done':''}"${C.n>un?' disabled title="Termine o capítulo anterior"':''}><b>${C.n}. ${C.title}</b>${C.n>un?'Bloqueado':C.place}</button>`).join('');
   drawPreview();
   $('b-start').textContent=mode==='campaign'?`Começar capítulo ${ui.chapter}`:mode==='survival'?'Defender o rei':'Começar batalha';
+  lrnMenuInfo();
 }
 function drawPreview(){
   const mode=radio('mode')||'campaign';
@@ -1359,6 +1361,7 @@ function showMenu(){
 }
 function startGame(p){
   p=p||{};
+  if(S&&ui.started&&!S.over)lrnPendSave();
   lvReset();
   $('tut').hidden=true;$('tut-arrow').hidden=true;tutGlow(null);
   const mode=p.mode||radio('mode')||'campaign',diff=p.diff||radio('diff')||'dificil';
@@ -1379,6 +1382,7 @@ function startGame(p){
     for(const k in S.teams[1].res)S.teams[1].res[k]+=S.diff.start;
     S.rules=Object.assign({},S.rules||{},{obras:true,estradas:true,socorro:true,renovar:true,medicos:true,batedor:true,armyAuto:true,gold:2000});
   }
+  lrnBegin(false);
   ui.last={mode,diff,chapter:opts.chapter,hero:opts.hero&&opts.hero.key,fog:opts.fog,claude:vsClaude,blue};COUNCIL.log.length=0;COUNCIL.last='';ui.townTab='com';
   ui.seed=newSeed();
   audioInit();
@@ -1396,7 +1400,8 @@ function startGame(p){
     banner('Defesa do Rei','Proteja o rei',`A primeira onda chega em ${fmt(waveInfo().inT)}. Forje armas e escudos no castelo.`,false);
     setTimeout(()=>talk('king','Eles vêm de todos os lados, onda após onda. Enquanto eu estiver de pé, Pedravale não cai.'),1800);
   }else if(watch)banner('Modo observador',`${watchWho(1)} × ${watchWho(2)}`,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)}. A câmera segue as batalhas sozinha; arraste o mapa para olhar à vontade.`,false);
-  else banner('Começa a partida',ERAS[1].name,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)} antes do primeiro ataque grande.${S.cfg&&S.cfg.claude?' Quem comanda o Reino Vermelho é o Claude.':''}`,false);
+  else banner('Começa a partida',ERAS[1].name,`Dificuldade ${S.diff.name}. Trégua de ${fmt(S.diff.peace)} antes do primeiro ataque grande.${S.cfg&&S.cfg.claude?' Quem comanda o Reino Vermelho é o Claude.':''}${S.lrn&&S.lrn.on&&LRN.games?` O Rubro já estudou ${LRN.games} ${LRN.games===1?'partida sua':'partidas suas'} (geração ${LRN.gen}).`:''}`,false);
+  lrnIntro();
   watchStart();
   clStart(true);
 }
@@ -1744,14 +1749,14 @@ window.addEventListener('resize',resize);
 function boot(data){
   resize();try{voxInit();}catch(e){}sndApply();
   if(data&&data.S){
-    S=data.S;afterLoad();
+    S=data.S;afterLoad();if(S.lrn)lrnBegin(true);
     if(data.cam)Object.assign(cam,data.cam);
     ui.started=!!data.started;if(ui.started)$('ov-start').hidden=true;
   }else{
     const c=newGame(ui.seed,'dificil');
     cam.z=VW<700?1.15:1.5;centerOn(c.x+30,c.y-10);
   }
-  councilBind();clBind();renderMenu();loadBtn();updButton();
+  councilBind();clBind();lrnBindUI();renderMenu();loadBtn();updButton();
   try{localStorage.removeItem('rp.try');}catch(e){}
   if(updOn()){let last=0;try{last=+localStorage.getItem('rp.check')||0;}catch(e){}if(Date.now()-last>6*3600e3)setTimeout(()=>checkUpdate(false),6000);}
   loadAssets(ok=>{
@@ -1772,5 +1777,5 @@ window.__reino={get S(){return S},spawnFixed,playSfx,banner,toast,centerOn,musTi
   CLAUDE,clApply,clReport,clPrompt,watchStart,watchFeed,watchScore,WATCH:W,aiInit,withTeam,
   walkNear,armyUnits,damage,conquer,armyVoteShow,get BLDS(){return BLDS},sqOf,townFestival,removeQuiet,folkName,
   proposeContract,ctrList,ctrTerms,startConquest,armyOrder,armyOf,startSweep,planApprove,intelOf,econOpenStall,econOf,econSetTax,econFestival,addRep:(T,t,v)=>addRep(T,t,v),openCouncil,COUNCIL,sqCommand,honorOf,caravanSend,fogOn,
-  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},get NET(){return NET},netSend,lvReel,lvRecTick,lvRecStop,lvVoteStart,lvVoteDraw,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,
+  FGR,fgPre,fgSheet,FG_TOP,IMG,META,iconFor,get LV(){return LV},get NET(){return NET},netSend,lvReel,lvRecTick,lvRecStop,lvVoteStart,lvVoteDraw,lvNarr,warNow,openSaves,saveSlot,edOpen,tutStart,lrnLoad,lrnSave,lrnShow,lrnRender,lrnReset,lrnBegin,lrnSay,lrnPreview,lrnEnd,lrnEndUI,lrnKnow,
   setAT(v){AT=v;}};

@@ -89,6 +89,18 @@
 #narr{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 160px);max-width:min(720px,calc(100% - 32px));background:rgba(20,16,30,.85);color:#fff;border-radius:12px;padding:8px 14px;font:600 16px/1.35 var(--f-ui);text-align:center}
 .lv-h{margin-top:12px!important}.lv-chan{display:flex;flex-direction:column;gap:3px;font-size:12px;margin:4px 0}.lv-chan input,.lv-chan select{font:600 14px var(--f-ui);padding:5px 8px;border:2px solid var(--wood);border-radius:8px}.lv-chan small{font-size:11px;color:var(--ink-soft)}#lv-test{margin:6px 0}
 .lv-reel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}.lv-reel small{flex-basis:100%;font-size:12px;color:var(--ink-soft)}
+#ov-lrn{z-index:10}.sheet.lrn{max-width:760px}.lrn-top{display:flex;gap:12px;align-items:center}.lrn-av{width:64px;height:64px;image-rendering:pixelated;border:3px solid var(--red-dk);border-radius:12px;background:#f3d6c8}
+.lrn-top h2{color:var(--red-dk)}.lrn-lead{font-size:14px;line-height:1.45;margin:8px 0 0;max-width:none}.lrn-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media (max-width:640px){.lrn-grid{grid-template-columns:1fr}}
+.lrn-bars{display:flex;flex-direction:column;gap:4px}.lrn-bar{display:grid;grid-template-columns:minmax(120px,1.3fr) 2fr 40px;align-items:center;gap:8px;font-size:13px}.lrn-bar i{display:block;height:10px;border-radius:5px;background:var(--wood-lt)}
+.lrn-bar.best i{background:var(--red)}.lrn-bar.best span{font-weight:700}.lrn-bar b{font:400 18px/1 var(--f-display);text-align:right}.lrn-bar small{grid-column:1/-1;font-size:11px;color:var(--ink-soft);margin:-3px 0 2px}
+#lrn-map{width:100%;max-width:340px;height:auto;border:2px solid var(--parch-dk);border-radius:10px;image-rendering:auto;display:block}.lrn-small{display:block;font-size:12px;color:var(--ink-soft);margin:4px 0;max-width:none}
+.lrn-list{margin:4px 0;padding-left:18px;font-size:14px;line-height:1.45}.lrn-list li{margin:3px 0}.lrn-list.red li::marker{color:var(--red)}.lrn-none{color:var(--ink-soft);font-size:13px;list-style:none;margin-left:-18px}
+.lrn-cl,.lrn-pc{display:inline-block;font:700 10px/1 var(--f-ui);text-transform:uppercase;letter-spacing:.04em;padding:3px 5px;border-radius:5px;vertical-align:1px;margin-right:3px;color:#fff;background:#c96a3a}.lrn-pc{background:var(--red-dk)}
+.lrn-dna{display:flex;flex-wrap:wrap;gap:6px}.lrn-dna span{background:#fff6dd;border:2px solid var(--parch-dk);border-radius:9px;padding:4px 8px;font-size:12px}.lrn-dna b{font:400 18px/1 var(--f-display);margin-right:5px;color:var(--red-dk)}
+.lrn-h{width:100%;border-collapse:collapse;font-size:12px}.lrn-h th,.lrn-h td{text-align:left;padding:3px 5px;border-bottom:1px solid var(--parch-dk)}.lrn-h tr.win td:nth-child(3){color:#2c7a2c;font-weight:700}.lrn-h tr.lose td:nth-child(3){color:var(--red-dk);font-weight:700}
+.end-lrn{display:flex;gap:10px;align-items:flex-start;background:#f9e2d6;border:2px solid #d79a86;border-radius:12px;padding:8px 10px;margin-top:10px;text-align:left}.end-lrn img{width:44px;height:44px;image-rendering:pixelated;border-radius:8px;border:2px solid var(--red-dk)}
+.end-lrn b{font:400 22px/1 var(--f-display);color:var(--red-dk)}.end-lrn p{margin:3px 0;font-size:13px}.end-lrn ul{margin:2px 0 6px;padding-left:16px;font-size:13px;line-height:1.4}
+#b-lrn small{display:block;font:600 12px/1.3 var(--f-ui);opacity:.85;margin-top:3px}
 #ov-saves{z-index:9}#ov-maps{z-index:9}#ov-net{z-index:9}.net-noapp{background:#fff1d6;border:2px solid #c9862a;border-radius:12px;padding:8px 12px;margin:8px 0;font-size:14px}.net-noapp p{margin:4px 0}.net-steps{margin:6px 0 2px;padding-left:20px;font-size:14px;line-height:1.4}.net-steps li{margin:3px 0}#net-st.bad{color:#9a2a1a;font-weight:600}.net-test-r{white-space:pre-wrap;font:12px/1.45 var(--f-ui);margin:6px 0 0}#net-turn{width:100%;box-sizing:border-box;font:12px ui-monospace,monospace;padding:7px 9px;border:2px solid var(--wood);border-radius:9px;background:#fffaf0}#net-help ul{padding-left:18px;font-size:13px;line-height:1.4}#net-help p{font-size:13px}#net-in,#net-out{width:100%;box-sizing:border-box;font:12px/1.3 ui-monospace,monospace;border:2px solid var(--wood);border-radius:10px;padding:8px;background:#fffaf0;resize:vertical}#app.editing .panel,#app.editing #goals{display:none}
 #mp-code{width:100%;box-sizing:border-box;font:12px/1.3 ui-monospace,monospace;border:2px solid var(--wood);border-radius:10px;padding:8px;background:#fffaf0;resize:vertical}
 #edbar{position:absolute;z-index:5;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:min(980px,calc(100% - 24px));background:#fff6dd;border:3px solid var(--wood);border-radius:14px;box-shadow:0 4px 0 var(--wood-dk);padding:8px 10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
@@ -451,6 +463,7 @@
         <button class="btn" id="b-start" type="button">Começar</button>
         <button class="btn alt" id="b-tut" type="button">Aprender a jogar<small>tutorial de 5 minutos</small></button>
         <button class="btn alt" id="b-net" type="button">Dois jogadores<small>com um amigo, cada um no seu aparelho</small></button>
+        <button class="btn alt" id="b-lrn" type="button">Memória do Rubro<small id="lrn-info">a IA aprende com você</small></button>
         <button class="btn alt" id="b-editor" type="button">Editor de mapas</button>
         <button class="btn alt" id="b-maps" type="button">Meus mapas</button>
         <button class="btn alt" id="b-resume" type="button" hidden>Continuar</button>
@@ -581,6 +594,25 @@
     </div>
   </div>
 
+  <div class="overlay" id="ov-lrn" hidden>
+    <div class="sheet wide lrn" role="dialog" aria-label="Memória do Rubro">
+      <div class="lrn-top"><img class="lrn-av" src="assets/av06.png" alt=""><div><div class="kicker">O Reino Vermelho aprende com você</div><h2>Memória do Rubro</h2></div></div>
+      <p class="lrn-lead" id="lrn-lead"></p>
+      <div class="stats" id="lrn-stats"></div>
+      <div class="lrn-grid">
+        <section><h4 class="lbl">Seu estilo, segundo o Rubro</h4><div id="lrn-style" class="lrn-bars"></div></section>
+        <section><h4 class="lbl">O caminho do seu exército</h4><canvas id="lrn-map" width="300" height="168" aria-label="Mapa do caminho que o seu exército costuma fazer"></canvas><small id="lrn-map-t" class="lrn-small"></small></section>
+      </div>
+      <h4 class="lbl">O que ele espera de você</h4><ul id="lrn-pred" class="lrn-list"></ul>
+      <h4 class="lbl">O plano do Rubro para a próxima partida</h4><ul id="lrn-plan" class="lrn-list red"></ul>
+      <h4 class="lbl">Táticas do Conselho de Guerra contra você</h4><div id="lrn-tac" class="lrn-bars"></div>
+      <h4 class="lbl">O jeito do Rubro · geração <span id="lrn-gen">1</span></h4><p class="lrn-small">Depois de cada partida ele guarda a versão que melhor jogou contra você e testa uma nova, como uma evolução.</p><div id="lrn-dna" class="lrn-dna"></div>
+      <h4 class="lbl">Lições aprendidas</h4><ul id="lrn-less" class="lrn-list"></ul>
+      <details class="howto"><summary>Últimas partidas</summary><div id="lrn-hist"></div></details>
+      <label class="sw opt-fog"><input type="checkbox" id="lrn-on" checked><span><b>A IA aprende comigo</b> · o Rubro e o Claude estudam as suas partidas e mudam a estratégia para te vencer. Tudo fica guardado só neste aparelho.</span></label>
+      <div class="row"><button class="btn" id="b-lrn-close" type="button">Fechar</button><button class="btn alt sm-btn" id="b-lrn-reset" type="button">Apagar a memória</button></div>
+    </div>
+  </div>
   <div class="overlay" id="ov-end" hidden>
     <div class="sheet">
       <div class="kicker" id="end-kicker">Fim de jogo</div>
@@ -588,6 +620,7 @@
       <p id="end-text"></p>
       <div class="stats" id="end-stats"></div>
       <div class="lv-reel"><b>Melhores momentos</b> <button class="btn alt sm-btn" id="lv-reel-h" type="button">Vídeo horizontal</button><button class="btn alt sm-btn" id="lv-reel-v" type="button">Vídeo vertical</button><small id="lv-reel-st"></small></div>
+      <div class="end-lrn" id="end-lrn" hidden><img src="assets/av06.png" alt=""><div><b id="end-lrn-t">O Rubro aprendeu com esta partida</b><p id="end-lrn-p"></p><ul id="end-lrn-l"></ul><button class="btn alt sm-btn" id="b-end-lrn" type="button">Ver a memória do Rubro</button></div></div>
       <details class="howto end-claude" id="end-claude" hidden><summary id="end-claude-sum">O que o Claude pensou <small id="end-claude-n"></small></summary><ol id="end-claude-list"></ol></details>
       <div class="row"><button class="btn" id="b-next" type="button" hidden>Próximo capítulo</button><button class="btn" id="b-again" type="button">Jogar de novo</button><button class="btn alt" id="b-menu" type="button">Menu</button></div>
     </div>

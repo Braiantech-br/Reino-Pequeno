@@ -329,6 +329,8 @@ const waveMult=()=>({normal:.75,dificil:1,insano:1.35})[S.diff.key]||1;
 function waveSpot(from){
   const c=castleOf(1)||{x:MW*TS/2,y:MH*TS/2};
   let best=null,bs=-1e9;
+  // Defesa do Rei learns: the waves lean toward the side the player defends less (Memória do Rubro)
+  const wb=from==='east'?null:lrnWaveSectors();
   for(let k=0;k<500;k++){
     const x=2+Math.floor(Math.random()*(MW-4)),y=2+Math.floor(Math.random()*(MH-4));
     if(from==='east'&&x<MW*.7)continue;
@@ -337,7 +339,7 @@ function waveSpot(from){
     if(d<22)continue;
     let near=false;for(const b of BLDS)if(b.team===1&&!b.dead&&hyp(b.x-px,b.y-py)<12*TS){near=true;break;}
     if(near)continue;
-    const s=from==='east'?x+Math.random()*10:-Math.abs(d-32)+Math.random()*8;
+    const s=from==='east'?x+Math.random()*10:-Math.abs(d-32)+Math.random()*8+(wb?wb[lrnSec(c,px,py)]:0);
     if(s>bs){bs=s;best={x:px,y:py};}
   }
   return best;
@@ -397,6 +399,7 @@ function survivalWave(){
   else{add('warrior',Math.ceil(sz*.4));add(era>=2?(era>=4&&n%2?'royal':'archer'):'warrior',Math.floor(sz*.3));add(era>=3?'lancer':'warrior',Math.floor(sz*.25));if(era>=3)add('monk',Math.floor(sz/8));
     // the Red Kingdom brings its new troops as the waves grow
     if(era>=3)add('ram',1+Math.floor(n/12));if(era>=4){add('paladin',1+Math.floor(n/10));add('wizard',Math.floor(n/9));}if(era>=5)add('catapult',1);}
+  if(fac==='red')lrnWaveMix(units);
   const w={id:n,team,from:'edge',units,mult:1,count:true,bossHp:1+n/25,fac};
   S.waveList.push(w);
   spawnWave(w);

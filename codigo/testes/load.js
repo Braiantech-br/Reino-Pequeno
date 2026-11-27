@@ -2,7 +2,7 @@
 // require('./load.js')(seed) -> object with every top-level name of the simulation files (read live through getters).
 const fs = require('fs');
 const SRC = __dirname + '/../src/';
-const SIM = ['core', 'ai', 'modes', 'life', 'trade', 'towns', 'diplo', 'army', 'scout', 'econ', 'tactics'];
+const SIM = ['core', 'ai', 'modes', 'life', 'trade', 'towns', 'diplo', 'army', 'scout', 'econ', 'tactics', 'learn'];
 const RESERVED = new Set('break case catch class const continue debugger default delete do else export extends finally for function if import in instanceof new return super switch this throw try typeof var void while with yield let static enum await implements package protected interface private public null true false undefined NaN Infinity'.split(' '));
 module.exports = function (seed) {
   let a = (seed || 1) >>> 0;
